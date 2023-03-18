@@ -6,18 +6,22 @@ import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Long signUp(MemberSignUpRequest request) {
         validateDuplicateMember(request);
 
-        Member member = new Member(request.getEmail(), request.getPassword(), request.getNickname());
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        Member member = new Member(request.getEmail(), encodedPassword, request.getNickname());
         return memberRepository.save(member)
                 .getId();
     }
@@ -34,4 +38,5 @@ public class MemberService {
                 .orElseThrow(() -> new NotFoundMemberException("회원이 존재하지 않습니다."));
         memberRepository.delete(findMember);
     }
+
 }
