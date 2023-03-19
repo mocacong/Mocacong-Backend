@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -21,6 +22,11 @@ class MemberServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    MemberServiceTest() {
+    }
 
     @BeforeEach
     void setUp() {
@@ -68,5 +74,16 @@ class MemberServiceTest {
     void deleteByNotFoundMember() {
         assertThatThrownBy(() -> memberService.delete(9999L))
                 .isInstanceOf(NotFoundMemberException.class);
+    }
+
+    @Test
+    @DisplayName("회원 비밀번호를 정상적으로 암호화한다")
+    void encryptPassword(){
+        String rawPassword = "1234";
+
+        String encryptedPassword = passwordEncoder.encode(rawPassword);
+
+        Boolean matches = passwordEncoder.matches(rawPassword, encryptedPassword);
+        assertThat(matches).isTrue();
     }
 }
