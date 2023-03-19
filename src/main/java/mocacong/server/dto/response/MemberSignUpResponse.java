@@ -1,17 +1,14 @@
-package mocacong.server.dto.request;
+package mocacong.server.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Getter
-public class MemberSignUpRequest {
+public class MemberSignUpResponse {
 
-    private String email;
-    private String password;
-    private String nickname;
-    private String phone;
+    private Long id;
 }

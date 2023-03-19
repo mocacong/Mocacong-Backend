@@ -3,12 +3,12 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +17,12 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Long signUp(MemberSignUpRequest request) {
+    public MemberSignUpResponse signUp(MemberSignUpRequest request) {
         validateDuplicateMember(request);
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        Member member = new Member(request.getEmail(), encodedPassword, request.getNickname());
-        return memberRepository.save(member)
-                .getId();
+        Member member = new Member(request.getEmail(), encodedPassword, request.getNickname(), request.getPhone());
+        return new MemberSignUpResponse(memberRepository.save(member).getId());
     }
 
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
