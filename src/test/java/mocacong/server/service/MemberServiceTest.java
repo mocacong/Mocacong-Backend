@@ -38,7 +38,7 @@ class MemberServiceTest {
     @DisplayName("회원을 정상적으로 가입한다")
     void signUp() {
         String expected = "kth990303@naver.com";
-        MemberSignUpRequest request = new MemberSignUpRequest(expected, "1234", "케이");
+        MemberSignUpRequest request = new MemberSignUpRequest(expected, "1234", "케이", "010-1234-5678");
 
         memberService.signUp(request);
 
@@ -51,8 +51,8 @@ class MemberServiceTest {
     @DisplayName("이미 가입된 회원이 존재하면 회원 가입 시에 예외를 반환한다")
     void signUpByDuplicateMember() {
         String expected = "kth990303@naver.com";
-        MemberSignUpRequest request = new MemberSignUpRequest(expected, "1234", "케이");
-        memberRepository.save(new Member(expected, "1234", "케이"));
+        MemberSignUpRequest request = new MemberSignUpRequest(expected, "1234", "케이", "010-1234-5678");
+        memberRepository.save(new Member(expected, "1234", "케이", "010-1234-5678"));
 
         assertThatThrownBy(() -> memberService.signUp(request))
                 .isInstanceOf(DuplicateMemberException.class);
@@ -61,7 +61,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원을 정상적으로 탈퇴한다")
     void delete() {
-        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "1234", "케이"));
+        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "1234", "케이", "010-1234-5678"));
 
         memberService.delete(savedMember.getId());
 
@@ -78,7 +78,7 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("회원 비밀번호를 정상적으로 암호화한다")
-    void encryptPassword(){
+    void encryptPassword() {
         String rawPassword = "1234";
 
         String encryptedPassword = passwordEncoder.encode(rawPassword);

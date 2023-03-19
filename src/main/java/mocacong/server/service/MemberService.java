@@ -8,7 +8,6 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class MemberService {
         validateDuplicateMember(request);
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        Member member = new Member(request.getEmail(), encodedPassword, request.getNickname());
+        Member member = new Member(request.getEmail(), encodedPassword, request.getNickname(), request.getPhone());
         return memberRepository.save(member)
                 .getId();
     }

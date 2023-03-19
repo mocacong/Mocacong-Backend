@@ -25,10 +25,14 @@ public class Member {
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    public Member(String email, String password, String nickname) {
+    @Column(name = "phone", nullable = false)
+    private String phone;
+
+    public Member(String email, String password, String nickname, String phone) {
         // TODO: 검증 로직 프론트와 회의 후 작성하기
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.phone = phone;
     }
 }
