@@ -28,13 +28,13 @@ public class MemberService {
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
         memberRepository.findByEmail(memberSignUpRequest.getEmail())
                 .ifPresent(member -> {
-                    throw new DuplicateMemberException("이미 존재하는 회원입니다.");
+                    throw new DuplicateMemberException();
                 });
     }
 
     public void delete(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundMemberException("회원이 존재하지 않습니다."));
+                .orElseThrow(NotFoundMemberException::new);
         memberRepository.delete(findMember);
     }
 
