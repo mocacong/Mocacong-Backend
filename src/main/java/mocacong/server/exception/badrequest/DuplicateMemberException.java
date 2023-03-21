@@ -5,9 +5,7 @@ import lombok.Getter;
 @Getter
 public class DuplicateMemberException extends BadRequestException {
 
-    private final String message;
-
-    public DuplicateMemberException(String message) {
-        this.message = message;
+    public DuplicateMemberException() {
+        super("이미 존재하는 회원입니다.");
     }
 }

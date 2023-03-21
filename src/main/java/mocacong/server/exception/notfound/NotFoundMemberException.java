@@ -5,9 +5,7 @@ import lombok.Getter;
 @Getter
 public class NotFoundMemberException extends NotFoundException {
 
-    private final String message;
-
-    public NotFoundMemberException(String message) {
-        this.message = message;
+    public NotFoundMemberException() {
+        super("회원이 존재하지 않습니다.");
     }
 }
