@@ -11,7 +11,7 @@ import mocacong.server.exception.badrequest.InvalidSoundException;
 public enum Sound {
 
     QUIET("조용해요"),
-    NOISY("소음있어요"),
+    NOISY("적당해요"),
     LOUD("북적북적해요");
 
     private String value;

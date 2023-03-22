@@ -11,8 +11,8 @@ import mocacong.server.exception.badrequest.InvalidToiletException;
 public enum Toilet {
 
     CLEAN("깨끗해요"),
-    DIRTY("더러워요"),
-    NONE("없어요");
+    NORMAL("평범해요"),
+    UNCOMFORTABLE("불편해요");
 
     private String value;
 

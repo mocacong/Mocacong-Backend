@@ -11,7 +11,7 @@ import mocacong.server.exception.badrequest.InvalidStudyTypeException;
 public enum StudyType {
 
     SOLO("혼자"),
-    GROUP("다같이");
+    GROUP("여럿");
 
     private String value;
 

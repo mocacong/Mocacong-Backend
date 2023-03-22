@@ -10,8 +10,8 @@ import mocacong.server.exception.badrequest.InvalidPowerException;
 @AllArgsConstructor
 public enum Power {
 
-    MANY("많아요"),
-    FEW("적어요"),
+    MANY("충분해요"),
+    FEW("적당해요"),
     NONE("없어요");
 
     private String value;

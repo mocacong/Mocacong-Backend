@@ -10,8 +10,8 @@ import mocacong.server.exception.badrequest.InvalidParkingException;
 @AllArgsConstructor
 public enum Parking {
 
-    COMFORTABLE("편해요"),
-    UNCOMFORTABLE("불편해요"),
+    COMFORTABLE("여유로워요"),
+    UNCOMFORTABLE("협소해요"),
     NONE("없어요");
 
     private String value;
