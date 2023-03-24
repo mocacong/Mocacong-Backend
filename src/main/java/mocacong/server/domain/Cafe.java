@@ -1,5 +1,6 @@
 package mocacong.server.domain;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,9 @@ public class Cafe {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Embedded
+    private Coordinate coordinate;
+
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
 
@@ -38,8 +42,9 @@ public class Cafe {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String name) {
+    public Cafe(String name, double x, double y) {
         this.name = name;
+        this.coordinate = new Coordinate(new BigDecimal(x), new BigDecimal(y));
         this.cafeDetail = null;
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
