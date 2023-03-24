@@ -13,3 +13,7 @@ spring:
   h2:
     console:
       enabled: true
+
+security.jwt.token:
+  secret-key: testtesttesttesttesttesttesttesttesttest
+  expire-length: 864000

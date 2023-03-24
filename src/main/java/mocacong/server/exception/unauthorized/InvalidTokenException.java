@@ -1,4 +1,4 @@
-package mocacong.server.exception.authorization;
+package mocacong.server.exception.unauthorized;
 
 import mocacong.server.exception.MocacongException;
 import org.springframework.http.HttpStatus;

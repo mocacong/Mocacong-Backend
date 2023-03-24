@@ -1,2 +1,12 @@
-package mocacong.server.exception.notfound;public class NoSuchMemberException {
+package mocacong.server.exception.notfound;
+
+import mocacong.server.exception.InputFieldException;
+import org.springframework.http.HttpStatus;
+
+public class NoSuchMemberException extends InputFieldException {
+    private static final String MESSAGE = "존재하지 않는 회원입니다.";
+
+    public NoSuchMemberException() {
+        super(MESSAGE, HttpStatus.NOT_FOUND, EMAIL);
+    }
 }
