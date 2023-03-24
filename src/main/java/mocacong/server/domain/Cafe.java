@@ -42,9 +42,9 @@ public class Cafe {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String name, double x, double y) {
+    public Cafe(String name, BigDecimal x, BigDecimal y) {
         this.name = name;
-        this.coordinate = new Coordinate(new BigDecimal(x), new BigDecimal(y));
+        this.coordinate = new Coordinate(x, y);
         this.cafeDetail = null;
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();

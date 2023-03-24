@@ -19,10 +19,6 @@ public class Coordinate {
     @Column(name = "coordinate_y", nullable = false)
     private BigDecimal y;
 
-    public static Coordinate of(double x, double y) {
-        return new Coordinate(new BigDecimal(x), new BigDecimal(y));
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
