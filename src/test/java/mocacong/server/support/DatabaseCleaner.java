@@ -2,16 +2,16 @@ package mocacong.server.support;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import javax.persistence.metamodel.Type;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class DatabaseCleaner implements InitializingBean {
+public class DatabaseCleaner {
 
     private static final String FOREIGN_KEY_RULE_UPDATE_FORMAT = "SET REFERENTIAL_INTEGRITY %s";
     private static final String TRUNCATE_FORMAT = "TRUNCATE TABLE %s";
@@ -22,8 +22,8 @@ public class DatabaseCleaner implements InitializingBean {
 
     private List<String> tableNames;
 
-    @Override
-    public void afterPropertiesSet() {
+    @PostConstruct
+    public void findTableNames() {
         this.tableNames = entityManager.getMetamodel()
                 .getEntities()
                 .stream()
