@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,7 +46,7 @@ public class Cafe {
     public Cafe(String name, BigDecimal x, BigDecimal y) {
         this.name = name;
         this.coordinate = new Coordinate(x, y);
-        this.cafeDetail = null;
+        this.cafeDetail = new CafeDetail();
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.comments = new ArrayList<>();
@@ -65,12 +66,15 @@ public class Cafe {
     }
 
     private Object getMostFrequentType(Stream<Object> stream) {
-        return stream.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+        Map.Entry<Object, Long> frequentTypeInfo = stream
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet()
                 .stream()
                 .max(Map.Entry.comparingByValue())
-                .orElseThrow(() -> new IllegalArgumentException("카페 세부정보 갱신 중 예외가 발생했습니다."))
-                .getKey();
+                .orElse(null);
+
+        return frequentTypeInfo != null ? frequentTypeInfo.getKey() : null;
     }
 
     public double findAverageScore() {

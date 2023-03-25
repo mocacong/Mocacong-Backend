@@ -61,4 +61,39 @@ class CafeTest {
                 () -> assertThat(actual.getTumbler()).isEqualTo(Tumbler.NO_SALE)
         );
     }
+
+    @Test
+    @DisplayName("카페에 일부 세부정보 리뷰가 하나도 없을 경우 해당 세부정보는 null을 반환한다")
+    void updateCafeDetailsWhenSomeTypesNoReviews() {
+        Member member = new Member("kth@naver.com", "1234", "케이", "010-1234-5678");
+        Cafe cafe = new Cafe("케이카페", new BigDecimal("37.5666805"), new BigDecimal("126.9784147"));
+        CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD, Tumbler.NO_SALE);
+        Review review = new Review(member, cafe, cafeDetail);
+        cafe.addReview(review);
+
+        cafe.updateCafeDetails();
+
+        CafeDetail actual = cafe.getCafeDetail();
+        assertThat(actual.getParking()).isNull();
+    }
+
+    @Test
+    @DisplayName("카페에 리뷰가 하나도 없을 경우 모든 세부정보 타입에 null을 반환한다")
+    void updateCafeDetailsWhenNoReviews() {
+        Cafe cafe = new Cafe("케이카페", new BigDecimal("37.5666805"), new BigDecimal("126.9784147"));
+
+        cafe.updateCafeDetails();
+
+        CafeDetail actual = cafe.getCafeDetail();
+        assertAll(
+                () -> assertThat(actual.getStudyType()).isNull(),
+                () -> assertThat(actual.getWifi()).isNull(),
+                () -> assertThat(actual.getParking()).isNull(),
+                () -> assertThat(actual.getToilet()).isNull(),
+                () -> assertThat(actual.getDesk()).isNull(),
+                () -> assertThat(actual.getPower()).isNull(),
+                () -> assertThat(actual.getSound()).isNull(),
+                () -> assertThat(actual.getTumbler()).isNull()
+        );
+    }
 }
