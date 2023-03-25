@@ -16,6 +16,7 @@ public class Score {
     private static final int MINIMUM_SCORE = 1;
 
     @Id
+    @Column(name = "score_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
