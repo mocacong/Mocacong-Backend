@@ -8,14 +8,12 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@SpringBootTest
+@ServiceTest
 class MemberServiceTest {
 
     @Autowired
@@ -24,15 +22,6 @@ class MemberServiceTest {
     private MemberService memberService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    MemberServiceTest() {
-    }
-
-    @BeforeEach
-    void setUp() {
-        // TODO: 스프링 빈 초기화 시 DB Truncate 하는 로직 작성하기
-        memberRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
