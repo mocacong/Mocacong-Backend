@@ -1,12 +1,8 @@
 package mocacong.server.exception.unauthorized;
 
-import mocacong.server.exception.MocacongException;
-import org.springframework.http.HttpStatus;
-
-public class InvalidTokenException extends MocacongException {
-    private static final String MESSAGE = "로그인이 필요한 서비스입니다.";
+public class InvalidTokenException extends UnauthorizedException {
 
     public InvalidTokenException() {
-        super(MESSAGE, HttpStatus.UNAUTHORIZED);
+        super("올바르지 않은 토큰입니다. 다시 로그인해주세요.", 1015);
     }
 }

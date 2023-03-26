@@ -6,6 +6,6 @@ import lombok.Getter;
 public class DuplicateMemberException extends BadRequestException {
 
     public DuplicateMemberException() {
-        super("이미 존재하는 회원입니다.");
+        super("이미 존재하는 회원입니다.", 1000);
     }
 }

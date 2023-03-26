@@ -6,6 +6,6 @@ import lombok.Getter;
 public class NotFoundMemberException extends NotFoundException {
 
     public NotFoundMemberException() {
-        super("회원이 존재하지 않습니다.");
+        super("존재하지 않는 회원입니다.", 1001);
     }
 }
