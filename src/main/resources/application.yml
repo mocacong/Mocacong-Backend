@@ -16,6 +16,10 @@ spring:
       settings:
         web-allow-others: true
 
+security.jwt.token:
+  secret-key: testtesttesttesttesttesttesttesttesttest
+  expire-length: 864000
+
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
