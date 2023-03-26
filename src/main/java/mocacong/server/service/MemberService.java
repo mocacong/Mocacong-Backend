@@ -33,12 +33,6 @@ public class MemberService {
                 });
     }
 
-//    public void delete(Long memberId) {
-//        Member findMember = memberRepository.findById(memberId)
-//                .orElseThrow(NotFoundMemberException::new);
-//        memberRepository.delete(findMember);
-//    }
-
     public void delete(@LoginUserEmail String email){
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
