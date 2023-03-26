@@ -2,13 +2,12 @@ package mocacong.server.security.auth;
 
 import mocacong.server.exception.unauthorized.InvalidTokenException;
 import mocacong.server.exception.unauthorized.TokenExpiredException;
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class JwtTokenProviderTest {
@@ -29,7 +28,7 @@ class JwtTokenProviderTest {
 
     @DisplayName("올바른 토큰 정보로 payload를 조회한다")
     @Test
-    void getPayload(){
+    void getPayload() {
         token = jwtTokenProvider.createToken("dlawotn3@naver.com");
 
         String payload = jwtTokenProvider.getPayload(token);
@@ -39,7 +38,7 @@ class JwtTokenProviderTest {
 
     @DisplayName("유효하지 않은 토큰 형식의 토큰으로 payload를 조회할 경우 예외를 발생시킨다")
     @Test
-    void getPayloadByInvalidToken(){
+    void getPayloadByInvalidToken() {
         String invalidToken = "invalid-token";
 
         assertThatThrownBy(() -> jwtTokenProvider.validateToken(invalidToken))
@@ -48,7 +47,7 @@ class JwtTokenProviderTest {
 
     @DisplayName("만료된 토큰으로 payload를 조회할 경우 예외를 발생시킨다")
     @Test
-    void getPayloadByExpiredToken(){
+    void getPayloadByExpiredToken() {
         long expirationMillis = 1L;
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider("secret-key", expirationMillis);
         String expiredPayload = "expired-payload";
