@@ -1,6 +1,6 @@
 package mocacong.server.config;
 
-import mocacong.server.itegration.auth.LoginInterceptor;
+import mocacong.server.security.auth.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

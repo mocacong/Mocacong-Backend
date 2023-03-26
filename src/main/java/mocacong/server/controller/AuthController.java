@@ -1,5 +1,7 @@
 package mocacong.server.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.TokenResponse;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Tag(name = "Login", description = "로그인")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/login")
@@ -19,8 +22,9 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "자체로그인")
     @PostMapping
-    public ResponseEntity<TokenResponse> login(@RequestBody @Valid final AuthLoginRequest request) {
+    public ResponseEntity<TokenResponse> login(@RequestBody @Valid AuthLoginRequest request) {
         return ResponseEntity.ok()
                 .body(authService.login(request));
     }

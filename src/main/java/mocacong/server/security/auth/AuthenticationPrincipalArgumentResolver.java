@@ -1,5 +1,6 @@
-package mocacong.server.itegration.auth;
+package mocacong.server.security.auth;
 
+import mocacong.server.dto.LoginUserEmail;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -19,7 +20,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return false;
+        return parameter.getParameterType().equals(LoginUserEmail.class);
     }
 
     @Override
@@ -27,7 +28,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 
         String token = AuthorizationExtractor.extractAccessToken(request);
-        String email = jwtTokenProvider.getPayload(token);
-        return email;
+
+        return jwtTokenProvider.getPayload(token);
     }
 }

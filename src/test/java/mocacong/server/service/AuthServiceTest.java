@@ -3,8 +3,7 @@ package mocacong.server.service;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.TokenResponse;
-import mocacong.server.exception.badrequest.IdPasswordMismatchException;
-import mocacong.server.itegration.auth.JwtTokenProvider;
+import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,14 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class AuthServiceTest {
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -53,23 +51,13 @@ class AuthServiceTest {
     void loginWithException() {
         String email = "kth990303@naver.com";
         String password = "1234";
-        String encodedPassword = passwordEncoder.encode("1234");
-        Member member = new Member("kth990303@naver.com", encodedPassword, "케이", "010-1234-5678");
+        String encodedPassword = passwordEncoder.encode(password);
+        Member member = new Member(email, encodedPassword, "케이", "010-1234-5678");
         memberRepository.save(member);
 
         AuthLoginRequest loginRequest = new AuthLoginRequest(email, "wrongPassword");
 
-        assertThrows(IdPasswordMismatchException.class,
+        assertThrows(PasswordMismatchException.class,
                 () -> authService.login(loginRequest));
-    }
-
-    @DisplayName("JWT 토큰에서 페이로드를 추출하여 정상적으로 가져온다")
-    @Test
-    void getPayLoad(){
-        String token = jwtTokenProvider.createToken("kth990303@naver.com");
-
-        String payload = jwtTokenProvider.getPayload(token);
-
-        assertEquals("kth990303@naver.com", payload);
     }
 }

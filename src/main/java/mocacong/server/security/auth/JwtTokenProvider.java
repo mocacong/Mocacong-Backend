@@ -1,4 +1,4 @@
-package mocacong.server.itegration.auth;
+package mocacong.server.security.auth;
 
 import mocacong.server.exception.unauthorized.InvalidTokenException;
 import mocacong.server.exception.unauthorized.TokenExpiredException;

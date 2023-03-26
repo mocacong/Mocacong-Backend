@@ -1,4 +1,4 @@
-package mocacong.server.itegration.auth;
+package mocacong.server.security.auth;
 
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.unauthorized.InvalidBearerException;

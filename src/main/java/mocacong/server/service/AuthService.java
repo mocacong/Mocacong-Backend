@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.TokenResponse;
-import mocacong.server.exception.badrequest.IdPasswordMismatchException;
+import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NoSuchMemberException;
-import mocacong.server.itegration.auth.JwtTokenProvider;
+import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class AuthService {
 
     private void validatePassword(final Member findMember, final String password) {
         if (!passwordEncoder.matches(password, findMember.getPassword())) {
-            throw new IdPasswordMismatchException();
+            throw new PasswordMismatchException();
         }
     }
 }
