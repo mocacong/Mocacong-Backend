@@ -3,8 +3,6 @@ package mocacong.server.exception;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static java.lang.Character.LINE_SEPARATOR;
-
 @Getter
 public class MocacongException extends RuntimeException {
     private static final String DEFAULT_MESSAGE = "일시적으로 접속이 원활하지 않습니다. 모카콩 서비스 팀에 문의 부탁드립니다.";

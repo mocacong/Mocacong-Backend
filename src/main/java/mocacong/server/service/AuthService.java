@@ -6,18 +6,17 @@ import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.IdPasswordMismatchException;
 import mocacong.server.exception.notfound.NoSuchMemberException;
-import mocacong.server.infrastructure.auth.JwtUtils;
+import mocacong.server.itegration.auth.JwtTokenProvider;
 import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final MemberRepository memberRepository;
-    private final JwtUtils jwtUtils;
+    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
     public TokenResponse login(final AuthLoginRequest authLoginRequest) {
@@ -32,11 +31,9 @@ public class AuthService {
     }
 
     private String issueToken(final Member findMember) {
-        Map<String, Object> payload = JwtUtils.payloadBuilder()
-                .setSubject(findMember.getEmail())
-                .build();
+        String email = findMember.getEmail();
 
-        return jwtUtils.createToken(payload);
+        return jwtTokenProvider.createToken(email);
     }
 
     private void validatePassword(final Member findMember, final String password) {

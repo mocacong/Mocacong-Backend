@@ -6,7 +6,6 @@ import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
-import mocacong.server.infrastructure.auth.JwtUtils;
 import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
