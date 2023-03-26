@@ -18,14 +18,14 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 정상적으로 로그인한다")
     void login() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "1234", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "1234", "메리", "010-1234-5678");
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
                 .when().post("/members")
                 .then().log().all()
                 .extract();
-        AuthLoginRequest loginRequest = new AuthLoginRequest("kth990303@naver.com", "1234");
+        AuthLoginRequest loginRequest = new AuthLoginRequest("dlawotn3@naver.com", "1234");
 
         TokenResponse tokenResponse = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
