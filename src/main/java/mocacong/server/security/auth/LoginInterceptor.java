@@ -1,12 +1,10 @@
 package mocacong.server.security.auth;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -17,17 +15,19 @@ public class LoginInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-                             Object handler) throws IOException {
-        if (isPreflight(request)) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (isPreflight(request) || isSwaggerRequest(request)) {
             return true;
         }
 
-
         String token = AuthorizationExtractor.extractAccessToken(request);
         jwtTokenProvider.validateToken(token);
-
         return true;
+    }
+
+    private boolean isSwaggerRequest(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.contains("swagger") || uri.contains("api-docs") || uri.contains("webjars");
     }
 
     private boolean isPreflight(HttpServletRequest request) {
