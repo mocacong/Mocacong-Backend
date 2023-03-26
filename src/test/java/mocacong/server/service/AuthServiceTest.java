@@ -5,18 +5,16 @@ import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.repository.MemberRepository;
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-@SpringBootTest
+@ServiceTest
 class AuthServiceTest {
+
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -24,15 +22,8 @@ class AuthServiceTest {
     @Autowired
     private AuthService authService;
 
-
-    @BeforeEach
-    void setUp() {
-        // TODO: 스프링 빈 초기화 시 DB Truncate 하는 로직 작성하기
-        memberRepository.deleteAll();
-    }
-
-    @DisplayName("회원 로그인 요청이 옳다면 토큰을 발급한다")
     @Test
+    @DisplayName("회원 로그인 요청이 옳다면 토큰을 발급한다")
     void login() {
         String email = "kth990303@naver.com";
         String password = "1234";
@@ -46,8 +37,8 @@ class AuthServiceTest {
         assertNotNull(tokenResponse.getToken());
     }
 
-    @DisplayName("회원 로그인 요청이 올바르지 않다면 예외가 발생한다")
     @Test
+    @DisplayName("회원 로그인 요청이 올바르지 않다면 예외가 발생한다")
     void loginWithException() {
         String email = "kth990303@naver.com";
         String password = "1234";
