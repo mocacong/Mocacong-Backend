@@ -1,17 +1,19 @@
 package mocacong.server.service;
 
-import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ServiceTest
 class MemberServiceTest {
@@ -50,9 +52,10 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원을 정상적으로 탈퇴한다")
     void delete() {
-        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "1234", "케이", "010-1234-5678"));
+        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "1234",
+                "케이", "010-1234-5678"));
 
-        memberService.delete(savedMember.getId());
+        memberService.delete(savedMember.getEmail());
 
         List<Member> actual = memberRepository.findAll();
         assertThat(actual).hasSize(0);
@@ -61,7 +64,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("존재하지 않는 회원을 탈퇴 시에 예외를 반환한다")
     void deleteByNotFoundMember() {
-        assertThatThrownBy(() -> memberService.delete(9999L))
+        assertThatThrownBy(() -> memberService.delete("dlawotn3@naver.com"))
                 .isInstanceOf(NotFoundMemberException.class);
     }
 

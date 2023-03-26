@@ -2,6 +2,7 @@ package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
+import mocacong.server.dto.LoginUserEmail;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
@@ -32,10 +33,15 @@ public class MemberService {
                 });
     }
 
-    public void delete(Long memberId) {
-        Member findMember = memberRepository.findById(memberId)
+//    public void delete(Long memberId) {
+//        Member findMember = memberRepository.findById(memberId)
+//                .orElseThrow(NotFoundMemberException::new);
+//        memberRepository.delete(findMember);
+//    }
+
+    public void delete(@LoginUserEmail String email){
+        Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         memberRepository.delete(findMember);
     }
-
 }
