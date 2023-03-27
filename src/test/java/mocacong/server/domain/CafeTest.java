@@ -22,7 +22,7 @@ class CafeTest {
     @Test
     @DisplayName("카페의 평점을 올바르게 계산하여 반환한다")
     void findScore() {
-        Member member = new Member("kth@naver.com", "1234", "케이", "010-1234-5678");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         Cafe cafe = new Cafe("케이카페", new BigDecimal("37.5666805"), new BigDecimal("126.9784147"));
         Score score1 = new Score(5, member, cafe);
         Score score2 = new Score(2, member, cafe);
@@ -35,7 +35,7 @@ class CafeTest {
     @Test
     @DisplayName("카페 세부정보 갱신이 올바르게 작동한다")
     void updateCafeDetails() {
-        Member member = new Member("kth@naver.com", "1234", "케이", "010-1234-5678");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         Cafe cafe = new Cafe("케이카페", new BigDecimal("37.5666805"), new BigDecimal("126.9784147"));
         CafeDetail cafeDetail1 = new CafeDetail(StudyType.GROUP, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD, Tumbler.NO_SALE);
         Review review1 = new Review(member, cafe, cafeDetail1);
@@ -65,7 +65,7 @@ class CafeTest {
     @Test
     @DisplayName("카페에 일부 세부정보 리뷰가 하나도 없을 경우 해당 세부정보는 null을 반환한다")
     void updateCafeDetailsWhenSomeTypesNoReviews() {
-        Member member = new Member("kth@naver.com", "1234", "케이", "010-1234-5678");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         Cafe cafe = new Cafe("케이카페", new BigDecimal("37.5666805"), new BigDecimal("126.9784147"));
         CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD, Tumbler.NO_SALE);
         Review review = new Review(member, cafe, cafeDetail);

@@ -6,6 +6,6 @@ import lombok.Getter;
 public class InvalidTumblerException extends BadRequestException {
 
     public InvalidTumblerException() {
-        super("올바르지 않은 텀블러 정보입니다.");
+        super("올바르지 않은 텀블러 정보입니다.", 3003);
     }
 }

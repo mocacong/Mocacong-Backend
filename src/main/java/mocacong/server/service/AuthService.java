@@ -5,9 +5,9 @@ import mocacong.server.domain.Member;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
-import mocacong.server.exception.notfound.NoSuchMemberException;
-import mocacong.server.security.auth.JwtTokenProvider;
+import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.security.auth.JwtTokenProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class AuthService {
 
     public TokenResponse login(final AuthLoginRequest authLoginRequest) {
         Member findMember = memberRepository.findByEmail(authLoginRequest.getEmail())
-                .orElseThrow(NoSuchMemberException::new);
+                .orElseThrow(NotFoundMemberException::new);
 
         validatePassword(findMember, authLoginRequest.getPassword());
 
