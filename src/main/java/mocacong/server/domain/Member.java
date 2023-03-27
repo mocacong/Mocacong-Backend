@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
-import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
 
 @Entity
@@ -15,7 +14,6 @@ import mocacong.server.exception.badrequest.InvalidPhoneException;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
-    private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
     private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Z가-힣]{2,6}$");
     private static final Pattern PHONE_REGEX = Pattern.compile("^01[\\d\\-]{8,12}$");
 
@@ -37,23 +35,16 @@ public class Member {
     private String phone;
 
     public Member(String email, String password, String nickname, String phone) {
-        validateMemberInfo(password, nickname, phone);
+        validateMemberInfo(nickname, phone);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phone = phone;
     }
 
-    private void validateMemberInfo(String password, String nickname, String phone) {
-        validatePassword(password);
+    private void validateMemberInfo(String nickname, String phone) {
         validateNickname(nickname);
         validatePhone(phone);
-    }
-
-    private void validatePassword(String password) {
-        if (!PASSWORD_REGEX.matcher(password).matches()) {
-            throw new InvalidPasswordException();
-        }
     }
 
     private void validateNickname(String nickname) {

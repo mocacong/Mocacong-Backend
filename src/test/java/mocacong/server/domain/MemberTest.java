@@ -1,7 +1,6 @@
 package mocacong.server.domain;
 
 import mocacong.server.exception.badrequest.InvalidNicknameException;
-import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -18,22 +17,6 @@ class MemberTest {
         assertDoesNotThrow(
                 () -> new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678")
         );
-    }
-
-    @ParameterizedTest
-    @DisplayName("비밀번호가 8~20자가 아니면 예외를 반환한다")
-    @ValueSource(strings = {"abcdef7", "abcdefgabcdefgabcde21"})
-    void passwordLengthValidation(String password) {
-        assertThatThrownBy(() -> new Member("kth990303@naver.com", password, "케이", "010-1234-5678"))
-                .isInstanceOf(InvalidPasswordException.class);
-    }
-
-    @ParameterizedTest
-    @DisplayName("비밀번호가 소문자, 숫자를 모두 포함하지 않으면 예외를 반환한다")
-    @ValueSource(strings = {"abcdefgh", "12345678"})
-    void passwordConfigureValidation(String password) {
-        assertThatThrownBy(() -> new Member("kth990303@naver.com", password, "케이", "010-1234-5678"))
-                .isInstanceOf(InvalidPasswordException.class);
     }
 
     @ParameterizedTest

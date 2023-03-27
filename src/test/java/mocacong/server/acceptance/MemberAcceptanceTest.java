@@ -18,7 +18,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
     void signUp() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "1234", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
 
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
