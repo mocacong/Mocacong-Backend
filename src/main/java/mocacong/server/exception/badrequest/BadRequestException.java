@@ -1,16 +1,13 @@
 package mocacong.server.exception.badrequest;
 
 import lombok.Getter;
+import mocacong.server.exception.MocacongException;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends MocacongException {
 
-    private final int httpMethod;
-    private final String message;
-
-    public BadRequestException(String message) {
-        this.httpMethod = HttpStatus.BAD_REQUEST.value();
-        this.message = message;
+    public BadRequestException(String message, int code) {
+        super(HttpStatus.BAD_REQUEST, message, code);
     }
 }

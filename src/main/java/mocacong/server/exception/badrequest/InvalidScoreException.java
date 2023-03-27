@@ -6,6 +6,6 @@ import lombok.Getter;
 public class InvalidScoreException extends BadRequestException {
 
     public InvalidScoreException() {
-        super("별점은 1점 이상 5점 이하여야 합니다.");
+        super("범위에서 벗어난 평점입니다.", 2002);
     }
 }

@@ -26,8 +26,8 @@ class AuthServiceTest {
     @DisplayName("회원 로그인 요청이 옳다면 토큰을 발급한다")
     void login() {
         String email = "kth990303@naver.com";
-        String password = "1234";
-        String encodedPassword = passwordEncoder.encode("1234");
+        String password = "a1b2c3d4";
+        String encodedPassword = passwordEncoder.encode("a1b2c3d4");
         Member member = new Member("kth990303@naver.com", encodedPassword, "케이", "010-1234-5678");
         memberRepository.save(member);
         AuthLoginRequest loginRequest = new AuthLoginRequest(email, password);
@@ -41,7 +41,7 @@ class AuthServiceTest {
     @DisplayName("회원 로그인 요청이 올바르지 않다면 예외가 발생한다")
     void loginWithException() {
         String email = "kth990303@naver.com";
-        String password = "1234";
+        String password = "a1b2c3d4";
         String encodedPassword = passwordEncoder.encode(password);
         Member member = new Member(email, encodedPassword, "케이", "010-1234-5678");
         memberRepository.save(member);

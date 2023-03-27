@@ -1,15 +1,21 @@
 package mocacong.server.domain;
 
+import java.util.regex.Pattern;
 import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mocacong.server.exception.badrequest.InvalidNicknameException;
+import mocacong.server.exception.badrequest.InvalidPhoneException;
 
 @Entity
 @Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
+
+    private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Z가-힣]{2,6}$");
+    private static final Pattern PHONE_REGEX = Pattern.compile("^01[\\d\\-]{8,12}$");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +35,27 @@ public class Member {
     private String phone;
 
     public Member(String email, String password, String nickname, String phone) {
-        // TODO: 검증 로직 프론트와 회의 후 작성하기
+        validateMemberInfo(nickname, phone);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phone = phone;
+    }
+
+    private void validateMemberInfo(String nickname, String phone) {
+        validateNickname(nickname);
+        validatePhone(phone);
+    }
+
+    private void validateNickname(String nickname) {
+        if (!NICKNAME_REGEX.matcher(nickname).matches()) {
+            throw new InvalidNicknameException();
+        }
+    }
+
+    private void validatePhone(String phone) {
+        if (!PHONE_REGEX.matcher(phone).matches()) {
+            throw new InvalidPhoneException();
+        }
     }
 }

@@ -3,6 +3,7 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.LoginUserEmail;
 import mocacong.server.dto.request.MemberSignUpRequest;
@@ -21,7 +22,7 @@ public class MemberController {
 
     @Operation(summary = "회원가입")
     @PostMapping
-    public ResponseEntity<MemberSignUpResponse> signUp(@RequestBody MemberSignUpRequest request) {
+    public ResponseEntity<MemberSignUpResponse> signUp(@RequestBody @Valid MemberSignUpRequest request) {
         MemberSignUpResponse response = memberService.signUp(request);
         return ResponseEntity.ok(response);
     }

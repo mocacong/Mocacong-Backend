@@ -1,16 +1,13 @@
 package mocacong.server.exception.notfound;
 
 import lombok.Getter;
+import mocacong.server.exception.MocacongException;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends MocacongException {
 
-    private final int httpMethod;
-    private final String message;
-
-    public NotFoundException(String message) {
-        this.httpMethod = HttpStatus.NOT_FOUND.value();
-        this.message = message;
+    public NotFoundException(String message, int code) {
+        super(HttpStatus.NOT_FOUND, message, code);
     }
 }
