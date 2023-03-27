@@ -1,11 +1,12 @@
 package mocacong.server.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import mocacong.server.dto.LoginUserEmail;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.MemberSignUpResponse;
-import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(summary = "회원가입")
     @PostMapping
@@ -27,11 +27,10 @@ public class MemberController {
     }
 
     @Operation(summary = "회원탈퇴")
+    @SecurityRequirement(name = "JWT")
     @DeleteMapping
-    public ResponseEntity<String> delete(@RequestHeader("Authorization") String authorizationHeader) {
-        String token = authorizationHeader.replace("Bearer ", "");
-        String userEmail = jwtTokenProvider.getPayload(token);
-        memberService.delete(userEmail);
-        return ResponseEntity.ok("회원 탈퇴를 정상적으로 처리했습니다");
+    public ResponseEntity<Void> delete(@LoginUserEmail String email) {
+        memberService.delete(email);
+        return ResponseEntity.ok().build();
     }
 }
