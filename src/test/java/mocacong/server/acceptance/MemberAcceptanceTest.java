@@ -35,14 +35,14 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 정상적으로 탈퇴한다")
     void delete() {
-        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "1234", "메리", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
                 .when().post("/members")
                 .then().log().all()
                 .extract();
-        AuthLoginRequest loginRequest = new AuthLoginRequest("dlawotn3@naver.com", "1234");
+        AuthLoginRequest loginRequest = new AuthLoginRequest("dlawotn3@naver.com", "a1b2c3d4");
         String token = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(loginRequest)
