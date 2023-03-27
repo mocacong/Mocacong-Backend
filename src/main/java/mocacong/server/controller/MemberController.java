@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.dto.LoginUserEmail;
+import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.service.MemberService;
