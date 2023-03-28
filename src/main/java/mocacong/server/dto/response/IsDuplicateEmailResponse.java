@@ -1,9 +1,6 @@
 package mocacong.server.dto.response;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -11,4 +8,8 @@ import lombok.NoArgsConstructor;
 public class IsDuplicateEmailResponse {
 
     private boolean result;
+
+    public boolean isDuplicate() {
+        return result;
+    }
 }

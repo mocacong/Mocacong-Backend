@@ -11,4 +11,8 @@ import lombok.NoArgsConstructor;
 public class IsDuplicateNicknameResponse {
 
     private boolean result;
+
+    public boolean isDuplicate() {
+        return result;
+    }
 }

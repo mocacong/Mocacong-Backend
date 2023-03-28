@@ -91,17 +91,17 @@ class MemberServiceTest {
 
         IsDuplicateEmailResponse response = memberService.isDuplicateEmail(email);
 
-        assertThat(response.getResult()).isTrue();
+        assertThat(response.isDuplicate()).isTrue();
     }
 
     @Test
     @DisplayName("존재하지 않는 이메일인 경우 False를 반환한다")
-    void isDuplicateEmailReturnFail(){
+    void isDuplicateEmailReturnFalse(){
         String email = "dlawotn3@naver.com";
 
         IsDuplicateEmailResponse response = memberService.isDuplicateEmail(email);
 
-        assertThat(response.getResult()).isFalse();
+        assertThat(response.isDuplicate()).isFalse();
     }
 
     @Test
@@ -113,7 +113,7 @@ class MemberServiceTest {
 
         IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(nickname);
 
-        assertThat(response.getResult()).isTrue();
+        assertThat(response.isDuplicate()).isTrue();
     }
 
     @Test
@@ -123,7 +123,7 @@ class MemberServiceTest {
 
         IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(nickname);
 
-        assertThat(response.getResult()).isFalse();
+        assertThat(response.isDuplicate()).isFalse();
     }
 
     @Test
