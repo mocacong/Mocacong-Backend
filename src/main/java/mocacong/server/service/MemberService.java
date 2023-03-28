@@ -3,10 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.response.IsDuplicateEmailResponse;
-import mocacong.server.dto.response.IsDuplicateNicknameResponse;
-import mocacong.server.dto.response.MemberGetResponse;
-import mocacong.server.dto.response.MemberSignUpResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidEmailException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
@@ -57,12 +54,13 @@ public class MemberService {
         memberRepository.delete(findMember);
     }
 
-    public List<MemberGetResponse> getAllMembers() {
+    public MemberGetAllResponse getAllMembers() {
         List<Member> members = memberRepository.findAll();
-        return members.stream()
+        List<MemberGetResponse> memberGetResponses = members.stream()
                 .map(member -> new MemberGetResponse(member.getId(), member.getEmail(),
                         member.getNickname(), member.getPhone()))
                 .collect(Collectors.toList());
+        return new MemberGetAllResponse(memberGetResponses);
     }
 
     public IsDuplicateEmailResponse isDuplicateEmail(String email) {

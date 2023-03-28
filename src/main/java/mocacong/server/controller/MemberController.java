@@ -5,14 +5,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.response.*;
+import mocacong.server.dto.response.IsDuplicateEmailResponse;
+import mocacong.server.dto.response.IsDuplicateNicknameResponse;
+import mocacong.server.dto.response.MemberGetAllResponse;
+import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -54,7 +56,6 @@ public class MemberController {
     @Operation(summary = "회원전체조회")
     @GetMapping("/all")
     public MemberGetAllResponse getAllMembers() {
-        List<MemberGetResponse> memberList = memberService.getAllMembers();
-        return new MemberGetAllResponse(memberList);
+        return memberService.getAllMembers();
     }
 }
