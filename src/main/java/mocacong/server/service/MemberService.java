@@ -3,6 +3,8 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.response.IsDuplicateEmailResponse;
+import mocacong.server.dto.response.IsDuplicateNicknameResponse;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
@@ -51,16 +53,16 @@ public class MemberService {
         memberRepository.delete(findMember);
     }
 
-    public boolean isDuplicateEmail(String email) {
+    public IsDuplicateEmailResponse isDuplicateEmail(String email) {
         Optional<Member> findMember = memberRepository.findByEmail(email);
-        return findMember.isPresent();
+        return new IsDuplicateEmailResponse(findMember.isPresent());
     }
 
-    public boolean isDuplicateNickname(String nickname) {
+    public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
         if (nickname == null || nickname.length() == 0) {
             throw new InvalidNicknameException();
         }
         Optional<Member> findMember = memberRepository.findByNickname(nickname);
-        return findMember.isPresent();
+        return new IsDuplicateNicknameResponse(findMember.isPresent());
     }
 }
