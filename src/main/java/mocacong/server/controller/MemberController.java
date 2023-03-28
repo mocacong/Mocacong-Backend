@@ -34,6 +34,12 @@ public class MemberController {
         return memberService.isDuplicateEmail(value);
     }
 
+    @Operation(summary = "회원가입 닉네임 중복체크")
+    @GetMapping("/check-duplicate/nickname")
+    public boolean checkDuplicateNickname(@RequestParam String value) {
+        return memberService.isDuplicateNickname(value);
+    }
+
     @Operation(summary = "회원탈퇴")
     @SecurityRequirement(name = "JWT")
     @DeleteMapping

@@ -3,6 +3,7 @@ package mocacong.server.service;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
+import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
@@ -80,7 +81,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("중복되는 이메일인 경우 TRUE를 반환한다")
+    @DisplayName("이미 존재하는 이메일인 경우 True를 반환한다")
     void isDuplicateEmailReturnTrue(){
         String email = "dlawotn3@naver.com";
         MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
@@ -92,13 +93,49 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("중복되지 않은 이메일인 경우 FALSE를 반환한다")
+    @DisplayName("존재하지 않는 이메일인 경우 False를 반환한다")
     void isDuplicateEmailReturnFail(){
         String email = "dlawotn3@naver.com";
 
         Boolean result = memberService.isDuplicateEmail(email);
 
         assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임인 경우 True를 반환한다")
+    void isDuplicateNicknameReturnTrue() {
+        String existingNickname = "메리";
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", existingNickname, "010-1234-5678");
+        memberService.signUp(request);
+
+        Boolean result = memberService.isDuplicateNickname(existingNickname);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 닉네임인 경우 False를 반환한다")
+    void isDuplicateNicknameReturnFalse() {
+        String nickname = "메리";
+
+        Boolean result = memberService.isDuplicateNickname(nickname);
+
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("닉네임이 null인 경우 예외를 던진다")
+    void nicknameIsNullReturnException(){
+        assertThatThrownBy(() -> memberService.isDuplicateNickname(null))
+                .isInstanceOf(InvalidNicknameException.class);
+    }
+
+    @Test
+    @DisplayName("닉네임의 길이가 0인 경우 예외를 던진다")
+    void nicknameLengthIs0ReturnException(){
+        assertThatThrownBy(() -> memberService.isDuplicateNickname(""))
+                .isInstanceOf(InvalidNicknameException.class);
     }
 
     @Test

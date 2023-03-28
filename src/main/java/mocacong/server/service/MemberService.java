@@ -5,6 +5,7 @@ import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
+import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
@@ -55,5 +56,11 @@ public class MemberService {
         return findMember.isPresent();
     }
 
-
+    public boolean isDuplicateNickname(String nickname) {
+        if (nickname == null || nickname.length() == 0) {
+            throw new InvalidNicknameException();
+        }
+        Optional<Member> findMember = memberRepository.findByNickname(nickname);
+        return findMember.isPresent();
+    }
 }
