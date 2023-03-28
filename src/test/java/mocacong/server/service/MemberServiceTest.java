@@ -1,20 +1,22 @@
 package mocacong.server.service;
 
-import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ServiceTest
 class MemberServiceTest {
@@ -50,6 +52,17 @@ class MemberServiceTest {
                 .isInstanceOf(DuplicateMemberException.class);
     }
 
+    @Test
+    @DisplayName("회원 비밀번호를 정상적으로 암호화한다")
+    void encryptPassword() {
+        String rawPassword = "1234";
+
+        String encryptedPassword = passwordEncoder.encode(rawPassword);
+
+        Boolean matches = passwordEncoder.matches(rawPassword, encryptedPassword);
+        assertThat(matches).isTrue();
+    }
+
     @ParameterizedTest
     @DisplayName("비밀번호가 8~20자가 아니면 예외를 반환한다")
     @ValueSource(strings = {"abcdef7", "abcdefgabcdefgabcde21"})
@@ -64,6 +77,28 @@ class MemberServiceTest {
     void passwordConfigureValidation(String password) {
         assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest("kth990303@naver.com", password, "케이", "010-1234-5678")))
                 .isInstanceOf(InvalidPasswordException.class);
+    }
+
+    @Test
+    @DisplayName("중복되는 이메일인 경우 TRUE를 반환한다")
+    void isDuplicateEmailReturnTrue(){
+        String email = "dlawotn3@naver.com";
+        MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+        memberService.signUp(request);
+
+        Boolean result = memberService.isDuplicateEmail(email);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("중복되지 않은 이메일인 경우 FALSE를 반환한다")
+    void isDuplicateEmailReturnFail(){
+        String email = "dlawotn3@naver.com";
+
+        Boolean result = memberService.isDuplicateEmail(email);
+
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -82,16 +117,5 @@ class MemberServiceTest {
     void deleteByNotFoundMember() {
         assertThatThrownBy(() -> memberService.delete("dlawotn3@naver.com"))
                 .isInstanceOf(NotFoundMemberException.class);
-    }
-
-    @Test
-    @DisplayName("회원 비밀번호를 정상적으로 암호화한다")
-    void encryptPassword() {
-        String rawPassword = "1234";
-
-        String encryptedPassword = passwordEncoder.encode(rawPassword);
-
-        Boolean matches = passwordEncoder.matches(rawPassword, encryptedPassword);
-        assertThat(matches).isTrue();
     }
 }
