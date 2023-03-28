@@ -30,8 +30,8 @@ public class MemberController {
 
     @Operation(summary = "회원가입 이메일 중복체크")
     @GetMapping("/check-duplicate/email")
-    public boolean checkDuplicateEmail(@RequestParam String email) {
-        return memberService.isDuplicateEmail(email);
+    public boolean checkDuplicateEmail(@RequestParam String value) {
+        return memberService.isDuplicateEmail(value);
     }
 
     @Operation(summary = "회원탈퇴")

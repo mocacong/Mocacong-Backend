@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import static mocacong.server.acceptance.AcceptanceFixtures.로그인_토큰_발급;
 import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MemberAcceptanceTest extends AcceptanceTest {
@@ -53,5 +54,35 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .as(ErrorResponse.class);
 
         assertThat(response.getCode()).isEqualTo(1007);
+    }
+
+    @Test
+    @DisplayName("가입되어 있지 않은 이메일은 이메일 중복검사에서 걸리지 않는다")
+    void isDuplicateWithNonExistingEmail(){
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .queryParam("value", request.getEmail())
+                .when().get("/members/check-duplicate/email")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body(equalTo("false"));
+    }
+
+    @Test
+    @DisplayName("이미 가입된 이메일은 이메일 중복검사에서 걸린다")
+    void isDuplicateWithExistingEmail(){
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+
+        회원_가입(request);
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .queryParam("value", request.getEmail())
+                .when().get("/members/check-duplicate/email")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body(equalTo("true"));
     }
 }
