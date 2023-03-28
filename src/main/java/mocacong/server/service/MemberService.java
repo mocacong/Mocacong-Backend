@@ -7,6 +7,7 @@ import mocacong.server.dto.response.IsDuplicateEmailResponse;
 import mocacong.server.dto.response.IsDuplicateNicknameResponse;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
+import mocacong.server.exception.badrequest.InvalidEmailException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -54,15 +55,28 @@ public class MemberService {
     }
 
     public IsDuplicateEmailResponse isDuplicateEmail(String email) {
+        validateEmail(email);
+
         Optional<Member> findMember = memberRepository.findByEmail(email);
         return new IsDuplicateEmailResponse(findMember.isPresent());
     }
 
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
-        if (nickname == null || nickname.length() == 0) {
+        validateNickname(nickname);
+
+        Optional<Member> findMember = memberRepository.findByEmail(nickname);
+        return new IsDuplicateNicknameResponse(findMember.isPresent());
+    }
+
+    public void validateEmail(String email) {
+        if (email.isBlank()) {
+            throw new InvalidEmailException();
+        }
+    }
+
+    public void validateNickname(String nickname) {
+        if (nickname.isBlank()) {
             throw new InvalidNicknameException();
         }
-        Optional<Member> findMember = memberRepository.findByNickname(nickname);
-        return new IsDuplicateNicknameResponse(findMember.isPresent());
     }
 }
