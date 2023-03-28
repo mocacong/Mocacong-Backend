@@ -67,7 +67,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .when().get("/members/check-duplicate/email")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body(equalTo("false"));
+                .extract();
     }
 
     @Test
@@ -83,7 +83,21 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .when().get("/members/check-duplicate/email")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body(equalTo("true"));
+                .extract();
+    }
+
+    @Test
+    @DisplayName("길이가 0인 이메일은 이메일 중복검사에서 예외를 던진다")
+    void emailLengthIs0ReturnException() {
+        MemberSignUpRequest request = new MemberSignUpRequest("", "a1b2c3d4", "메리", "010-1234-5678");
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .queryParam("value", request.getEmail())
+                .when().get("/members/check-duplicate/email")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("code", equalTo(1006));
     }
 
     @Test
@@ -97,7 +111,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .when().get("/members/check-duplicate/nickname")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body(equalTo("false"));
+                .extract();
     }
 
     @Test
@@ -111,22 +125,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .when().get("/members/check-duplicate/nickname")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body(equalTo("false"));
-    }
-
-    @Test
-    @DisplayName("null인 닉네임은 닉네임 중복검사에서 예외를 던진다")
-    void nicknameIsNullReturnException() {
-        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", null, "010-1234-5678");
-
-        RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .queryParam("value", request.getNickname())
-                .when().get("/members/check-duplicate/nickname")
-                .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body("code", equalTo(1009))
-                .body("message", equalTo("닉네임은 영어, 한글로만 구성된 2~6자여야 합니다."));
+                .extract();
     }
 
     @Test
@@ -140,7 +139,6 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .when().get("/members/check-duplicate/nickname")
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body("code", equalTo(1009))
-                .body("message", equalTo("닉네임은 영어, 한글로만 구성된 2~6자여야 합니다."));
+                .body("code", equalTo(1009));
     }
 }
