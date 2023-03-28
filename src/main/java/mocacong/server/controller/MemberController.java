@@ -58,7 +58,8 @@ public class MemberController {
     public ResponseEntity<Void> deleteAllMembers() {
         memberService.deleteAll();
         return ResponseEntity.ok().build();
-
+    }
+    
     @Operation(summary = "회원전체조회")
     @GetMapping("/all")
     public MemberGetAllResponse getAllMembers() {
