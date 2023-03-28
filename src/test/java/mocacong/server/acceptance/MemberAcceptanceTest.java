@@ -141,4 +141,14 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("code", equalTo(1009));
     }
+
+    @Test
+    @DisplayName("회원을 전체 조회한다")
+    void getAllMembers() {
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/members/all")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+    }
 }
