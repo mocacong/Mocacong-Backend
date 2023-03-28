@@ -15,6 +15,7 @@ import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -52,6 +53,13 @@ public class MemberService {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         memberRepository.delete(findMember);
+    }
+
+    public void deleteAll() {
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            memberRepository.delete(member);
+        }
     }
 
     public IsDuplicateEmailResponse isDuplicateEmail(String email) {
