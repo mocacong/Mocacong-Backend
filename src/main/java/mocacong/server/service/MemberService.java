@@ -3,8 +3,12 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.response.IsDuplicateEmailResponse;
+import mocacong.server.dto.response.IsDuplicateNicknameResponse;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
+import mocacong.server.exception.badrequest.InvalidEmailException;
+import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
@@ -12,12 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
     private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
 
     private final MemberRepository memberRepository;
@@ -53,5 +57,31 @@ public class MemberService {
 
     public List<Member> getMembers() {
         return memberRepository.findAll();
+    }
+
+    public IsDuplicateEmailResponse isDuplicateEmail(String email) {
+        validateEmail(email);
+
+        Optional<Member> findMember = memberRepository.findByEmail(email);
+        return new IsDuplicateEmailResponse(findMember.isPresent());
+    }
+
+    private void validateEmail(String email) {
+        if (email.isBlank()) {
+            throw new InvalidEmailException();
+        }
+    }
+
+    public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
+        validateNickname(nickname);
+
+        Optional<Member> findMember = memberRepository.findByNickname(nickname);
+        return new IsDuplicateNicknameResponse(findMember.isPresent());
+    }
+
+    private void validateNickname(String nickname) {
+        if (nickname.isBlank()) {
+            throw new InvalidNicknameException();
+        }
     }
 }
