@@ -1,6 +1,5 @@
 package mocacong.server.service;
 
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
@@ -11,6 +10,9 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -48,4 +50,9 @@ public class MemberService {
                 .orElseThrow(NotFoundMemberException::new);
         memberRepository.delete(findMember);
     }
+
+    public List<Member> getAllMembers() {
+        return memberRepository.findAll();
+    }
+
 }

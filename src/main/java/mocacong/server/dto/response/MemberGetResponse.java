@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class MemberGetAllResponse {
-    
+public class MemberGetResponse {
+
     private Long id;
     private String email;
     private String nickname;
