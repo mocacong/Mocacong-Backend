@@ -61,6 +61,12 @@ public class MemberService {
         return new IsDuplicateEmailResponse(findMember.isPresent());
     }
 
+    private void validateEmail(String email) {
+        if (email.isBlank()) {
+            throw new InvalidEmailException();
+        }
+    }
+
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
         validateNickname(nickname);
 
@@ -68,13 +74,7 @@ public class MemberService {
         return new IsDuplicateNicknameResponse(findMember.isPresent());
     }
 
-    public void validateEmail(String email) {
-        if (email.isBlank()) {
-            throw new InvalidEmailException();
-        }
-    }
-
-    public void validateNickname(String nickname) {
+    private void validateNickname(String nickname) {
         if (nickname.isBlank()) {
             throw new InvalidNicknameException();
         }
