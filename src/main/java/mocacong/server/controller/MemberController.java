@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.IsDuplicateEmailResponse;
 import mocacong.server.dto.response.IsDuplicateNicknameResponse;
+import mocacong.server.dto.response.MemberGetAllResponse;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.MemberService;
@@ -57,5 +58,10 @@ public class MemberController {
     public ResponseEntity<Void> deleteAllMembers() {
         memberService.deleteAll();
         return ResponseEntity.ok().build();
+
+    @Operation(summary = "회원전체조회")
+    @GetMapping("/all")
+    public MemberGetAllResponse getAllMembers() {
+        return memberService.getAllMembers();
     }
 }

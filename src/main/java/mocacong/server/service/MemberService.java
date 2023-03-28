@@ -3,9 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.response.IsDuplicateEmailResponse;
-import mocacong.server.dto.response.IsDuplicateNicknameResponse;
-import mocacong.server.dto.response.MemberSignUpResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidEmailException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +59,14 @@ public class MemberService {
         for (Member member : members) {
             memberRepository.delete(member);
         }
+
+    public MemberGetAllResponse getAllMembers() {
+        List<Member> members = memberRepository.findAll();
+        List<MemberGetResponse> memberGetResponses = members.stream()
+                .map(member -> new MemberGetResponse(member.getId(), member.getEmail(),
+                        member.getNickname(), member.getPhone()))
+                .collect(Collectors.toList());
+        return new MemberGetAllResponse(memberGetResponses);
     }
 
     public IsDuplicateEmailResponse isDuplicateEmail(String email) {

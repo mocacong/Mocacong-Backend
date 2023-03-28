@@ -136,7 +136,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원을 정상적으로 탈퇴한다")
     void delete() {
-        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
+        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
 
         memberService.delete(savedMember.getEmail());
 
@@ -161,5 +161,14 @@ class MemberServiceTest {
 
         List<Member> actual = memberRepository.findAll();
         assertThat(actual).hasSize(0);
+
+    @DisplayName("회원을 전체 조회한다")
+    public void getAllMembers() {
+        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
+        memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
+
+        List<Member> members = memberRepository.findAll();
+
+        assertThat(members).hasSize(2);
     }
 }
