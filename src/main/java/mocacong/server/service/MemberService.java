@@ -43,8 +43,8 @@ public class MemberService {
                 });
     }
 
-    public void delete(Long memberId) {
-        Member findMember = memberRepository.findById(memberId)
+    public void delete(String email){
+        Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         memberRepository.delete(findMember);
     }

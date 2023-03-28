@@ -71,7 +71,7 @@ class MemberServiceTest {
     void delete() {
         Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
 
-        memberService.delete(savedMember.getId());
+        memberService.delete(savedMember.getEmail());
 
         List<Member> actual = memberRepository.findAll();
         assertThat(actual).hasSize(0);
@@ -80,7 +80,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("존재하지 않는 회원을 탈퇴 시에 예외를 반환한다")
     void deleteByNotFoundMember() {
-        assertThatThrownBy(() -> memberService.delete(9999L))
+        assertThatThrownBy(() -> memberService.delete("dlawotn3@naver.com"))
                 .isInstanceOf(NotFoundMemberException.class);
     }
 

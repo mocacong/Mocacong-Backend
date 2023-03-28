@@ -1,7 +1,6 @@
 package mocacong.server.security.auth;
 
 import javax.servlet.http.HttpServletRequest;
-import mocacong.server.dto.LoginUserEmail;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;

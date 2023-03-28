@@ -1,8 +1,8 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
+import static mocacong.server.acceptance.AcceptanceFixtures.로그인_토큰_발급;
+import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.ErrorResponse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,28 +20,35 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void signUp() {
         MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
 
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
                 .when().post("/members")
                 .then().log().all()
+                .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    @Test
+    @DisplayName("회원이 정상적으로 탈퇴한다")
+    void delete() {
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(request);
+        String token = 로그인_토큰_발급(request.getEmail(), request.getPassword());
+
+        RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .when().delete("/members")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
     }
 
     @Test
     @DisplayName("회원은 올바르지 않은 형식의 필드로 가입할 수 없다")
     void signUpInvalidInputField() {
         MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "abcdefgh", "케이", "010-1234-5678");
-
-        ErrorResponse response = RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(request)
-                .when().post("/members")
-                .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .extract()
+        ErrorResponse response = 회원_가입(request)
                 .as(ErrorResponse.class);
 
         assertThat(response.getCode()).isEqualTo(1007);

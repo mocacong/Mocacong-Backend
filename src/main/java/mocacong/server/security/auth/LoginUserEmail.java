@@ -1,4 +1,4 @@
-package mocacong.server.dto;
+package mocacong.server.security.auth;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
