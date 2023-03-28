@@ -3,14 +3,15 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.MemberSignUpResponse;
+import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -25,6 +26,12 @@ public class MemberController {
     public ResponseEntity<MemberSignUpResponse> signUp(@RequestBody @Valid MemberSignUpRequest request) {
         MemberSignUpResponse response = memberService.signUp(request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "회원가입 이메일 중복체크")
+    @GetMapping("/check-duplicate/email")
+    public boolean checkDuplicateEmail(@RequestParam String email) {
+        return memberService.isDuplicateEmail(email);
     }
 
     @Operation(summary = "회원탈퇴")
