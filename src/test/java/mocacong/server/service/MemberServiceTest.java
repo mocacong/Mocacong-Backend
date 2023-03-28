@@ -161,7 +161,8 @@ class MemberServiceTest {
 
         List<Member> actual = memberRepository.findAll();
         assertThat(actual).hasSize(0);
-
+    }
+    
     @DisplayName("회원을 전체 조회한다")
     public void getAllMembers() {
         memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
