@@ -53,7 +53,6 @@ public class MemberController {
     }
 
     @Operation(summary = "회원전체탈퇴")
-    @SecurityRequirement(name = "JWT")
     @DeleteMapping("/all")
     public ResponseEntity<Void> deleteAllMembers() {
         memberService.deleteAll();
