@@ -64,7 +64,7 @@ public class MemberService {
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
         validateNickname(nickname);
 
-        Optional<Member> findMember = memberRepository.findByEmail(nickname);
+        Optional<Member> findMember = memberRepository.findByNickname(nickname);
         return new IsDuplicateNicknameResponse(findMember.isPresent());
     }
 

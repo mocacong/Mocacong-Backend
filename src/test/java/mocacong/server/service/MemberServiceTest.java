@@ -2,6 +2,8 @@ package mocacong.server.service;
 
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.response.IsDuplicateEmailResponse;
+import mocacong.server.dto.response.IsDuplicateNicknameResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
@@ -87,9 +89,9 @@ class MemberServiceTest {
         MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
         memberService.signUp(request);
 
-        Boolean result = memberService.isDuplicateEmail(email);
+        IsDuplicateEmailResponse response = memberService.isDuplicateEmail(email);
 
-        assertThat(result).isTrue();
+        assertThat(response.getResult()).isTrue();
     }
 
     @Test
@@ -97,21 +99,21 @@ class MemberServiceTest {
     void isDuplicateEmailReturnFail(){
         String email = "dlawotn3@naver.com";
 
-        Boolean result = memberService.isDuplicateEmail(email);
+        IsDuplicateEmailResponse response = memberService.isDuplicateEmail(email);
 
-        assertThat(result).isFalse();
+        assertThat(response.getResult()).isFalse();
     }
 
     @Test
     @DisplayName("이미 존재하는 닉네임인 경우 True를 반환한다")
     void isDuplicateNicknameReturnTrue() {
-        String existingNickname = "메리";
-        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", existingNickname, "010-1234-5678");
+        String nickname = "메리";
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", nickname, "010-1234-5678");
         memberService.signUp(request);
 
-        Boolean result = memberService.isDuplicateNickname(existingNickname);
+        IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(nickname);
 
-        assertThat(result).isTrue();
+        assertThat(response.getResult()).isTrue();
     }
 
     @Test
@@ -119,16 +121,9 @@ class MemberServiceTest {
     void isDuplicateNicknameReturnFalse() {
         String nickname = "메리";
 
-        Boolean result = memberService.isDuplicateNickname(nickname);
+        IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(nickname);
 
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    @DisplayName("닉네임이 null인 경우 예외를 던진다")
-    void nicknameIsNullReturnException(){
-        assertThatThrownBy(() -> memberService.isDuplicateNickname(null))
-                .isInstanceOf(InvalidNicknameException.class);
+        assertThat(response.getResult()).isFalse();
     }
 
     @Test
