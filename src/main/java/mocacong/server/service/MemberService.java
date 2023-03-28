@@ -59,6 +59,7 @@ public class MemberService {
         for (Member member : members) {
             memberRepository.delete(member);
         }
+    }
 
     public MemberGetAllResponse getAllMembers() {
         List<Member> members = memberRepository.findAll();
@@ -95,3 +96,4 @@ public class MemberService {
         }
     }
 }
+
