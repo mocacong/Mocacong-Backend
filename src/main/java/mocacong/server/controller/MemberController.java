@@ -41,15 +41,13 @@ public class MemberController {
     }
 
     @Operation(summary = "회원전체조회")
-    @GetMapping
+    @GetMapping("/get")
     public ResponseEntity<List<MemberGetResponse>> getAllMembers() {
-        List<Member> members = memberService.getAllMembers();
+        List<Member> members = memberService.getMembers();
         List<MemberGetResponse> response = members.stream()
                 .map(member -> new MemberGetResponse(member.getId(), member.getEmail(),
                         member.getNickname(), member.getPhone()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok().body(response);
     }
-
-
 }

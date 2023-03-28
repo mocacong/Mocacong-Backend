@@ -1,20 +1,23 @@
 package mocacong.server.service;
 
-import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ServiceTest
 class MemberServiceTest {
@@ -69,7 +72,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원을 정상적으로 탈퇴한다")
     void delete() {
-        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
+        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
 
         memberService.delete(savedMember.getEmail());
 
@@ -93,5 +96,16 @@ class MemberServiceTest {
 
         Boolean matches = passwordEncoder.matches(rawPassword, encryptedPassword);
         assertThat(matches).isTrue();
+    }
+
+    @Test
+    @DisplayName("회원을 전체 조회한다")
+    public void getAllMembers() {
+        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
+        memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
+
+        List<Member> members = memberRepository.findAll();
+
+        assertEquals(2, members.size());
     }
 }

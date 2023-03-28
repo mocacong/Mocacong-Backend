@@ -51,8 +51,7 @@ public class MemberService {
         memberRepository.delete(findMember);
     }
 
-    public List<Member> getAllMembers() {
+    public List<Member> getMembers() {
         return memberRepository.findAll();
     }
-
 }
