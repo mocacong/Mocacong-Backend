@@ -141,4 +141,21 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("code", equalTo(1009));
     }
+
+    @Test
+    @DisplayName("회원을 전체 조회한다")
+    void getAllMembers() {
+        MemberSignUpRequest request1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(request1);
+        MemberSignUpRequest request2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        회원_가입(request2);
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get("/members/all")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .body();
+    }
 }
