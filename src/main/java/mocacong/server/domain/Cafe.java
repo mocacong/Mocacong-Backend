@@ -1,6 +1,11 @@
 package mocacong.server.domain;
 
-import java.math.BigDecimal;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import mocacong.server.domain.cafedetail.*;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,11 +13,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import mocacong.server.domain.cafedetail.*;
 
 @Entity
 @Table(name = "cafe")
@@ -28,8 +28,8 @@ public class Cafe {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Embedded
-    private Coordinate coordinate;
+    @Column(name = "map_id", nullable = false)
+    private String mapId;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
@@ -43,9 +43,9 @@ public class Cafe {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String name, BigDecimal x, BigDecimal y) {
+    public Cafe(String id, String name) {
+        this.mapId = id;
         this.name = name;
-        this.coordinate = new Coordinate(x, y);
         this.cafeDetail = new CafeDetail();
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
