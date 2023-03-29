@@ -1,5 +1,6 @@
 package mocacong.server.service;
 
+import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.IsDuplicateEmailResponse;
@@ -9,17 +10,14 @@ import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ServiceTest
 class MemberServiceTest {
@@ -84,24 +82,24 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("이미 존재하는 이메일인 경우 True를 반환한다")
-    void isDuplicateEmailReturnTrue(){
+    void isDuplicateEmailReturnTrue() {
         String email = "dlawotn3@naver.com";
         MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
         memberService.signUp(request);
 
         IsDuplicateEmailResponse response = memberService.isDuplicateEmail(email);
 
-        assertThat(response.isDuplicate()).isTrue();
+        assertThat(response.isResult()).isTrue();
     }
 
     @Test
     @DisplayName("존재하지 않는 이메일인 경우 False를 반환한다")
-    void isDuplicateEmailReturnFalse(){
+    void isDuplicateEmailReturnFalse() {
         String email = "dlawotn3@naver.com";
 
         IsDuplicateEmailResponse response = memberService.isDuplicateEmail(email);
 
-        assertThat(response.isDuplicate()).isFalse();
+        assertThat(response.isResult()).isFalse();
     }
 
     @Test
@@ -113,7 +111,7 @@ class MemberServiceTest {
 
         IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(nickname);
 
-        assertThat(response.isDuplicate()).isTrue();
+        assertThat(response.isResult()).isTrue();
     }
 
     @Test
@@ -123,12 +121,12 @@ class MemberServiceTest {
 
         IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(nickname);
 
-        assertThat(response.isDuplicate()).isFalse();
+        assertThat(response.isResult()).isFalse();
     }
 
     @Test
     @DisplayName("닉네임의 길이가 0인 경우 예외를 던진다")
-    void nicknameLengthIs0ReturnException(){
+    void nicknameLengthIs0ReturnException() {
         assertThatThrownBy(() -> memberService.isDuplicateNickname(""))
                 .isInstanceOf(InvalidNicknameException.class);
     }
