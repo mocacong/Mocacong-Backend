@@ -60,9 +60,8 @@ public class Cafe {
         Desk desk = (Desk) getMostFrequentType(reviews.stream().map(Review::getDesk));
         Power power = (Power) getMostFrequentType(reviews.stream().map(Review::getPower));
         Sound sound = (Sound) getMostFrequentType(reviews.stream().map(Review::getSound));
-        Tumbler tumbler = (Tumbler) getMostFrequentType(reviews.stream().map(Review::getTumbler));
 
-        this.cafeDetail = new CafeDetail(studyType, wifi, parking, toilet, desk, power, sound, tumbler);
+        this.cafeDetail = new CafeDetail(studyType, wifi, parking, toilet, desk, power, sound);
     }
 
     private Object getMostFrequentType(Stream<Object> stream) {
