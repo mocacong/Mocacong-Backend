@@ -25,7 +25,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
-            if (handlerMethod.hasMethodAnnotation(PostMapping.class) && request.getRequestURI().startsWith("/cafes")) {
+            if (handlerMethod.hasMethodAnnotation(PostMapping.class) && "/cafes".equals(request.getRequestURI())) {
                 return true;
             }
         }
