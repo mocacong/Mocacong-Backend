@@ -62,8 +62,4 @@ public class Review {
     public Sound getSound() {
         return cafeDetail.getSound();
     }
-
-    public Tumbler getTumbler() {
-        return cafeDetail.getTumbler();
-    }
 }

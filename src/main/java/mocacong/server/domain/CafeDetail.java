@@ -43,8 +43,4 @@ public class CafeDetail {
     @Column(name = "sound")
     @Enumerated(EnumType.STRING)
     private Sound sound;
-
-    @Column(name = "tumbler")
-    @Enumerated(EnumType.STRING)
-    private Tumbler tumbler;
 }

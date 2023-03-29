@@ -37,11 +37,11 @@ class CafeTest {
     void updateCafeDetails() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         Cafe cafe = new Cafe("케이카페", new BigDecimal("37.5666805"), new BigDecimal("126.9784147"));
-        CafeDetail cafeDetail1 = new CafeDetail(StudyType.GROUP, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD, Tumbler.NO_SALE);
+        CafeDetail cafeDetail1 = new CafeDetail(StudyType.GROUP, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
         Review review1 = new Review(member, cafe, cafeDetail1);
-        CafeDetail cafeDetail2 = new CafeDetail(StudyType.SOLO, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.NORMAL, Desk.UNCOMFORTABLE, Power.FEW, Sound.NOISY, Tumbler.NO_SALE);
+        CafeDetail cafeDetail2 = new CafeDetail(StudyType.SOLO, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.NORMAL, Desk.UNCOMFORTABLE, Power.FEW, Sound.NOISY);
         Review review2 = new Review(member, cafe, cafeDetail2);
-        CafeDetail cafeDetail3 = new CafeDetail(StudyType.SOLO, Wifi.NORMAL, Parking.UNCOMFORTABLE, Toilet.NORMAL, Desk.COMFORTABLE, Power.FEW, Sound.LOUD, Tumbler.NO_SALE);
+        CafeDetail cafeDetail3 = new CafeDetail(StudyType.SOLO, Wifi.NORMAL, Parking.UNCOMFORTABLE, Toilet.NORMAL, Desk.COMFORTABLE, Power.FEW, Sound.LOUD);
         Review review3 = new Review(member, cafe, cafeDetail3);
         cafe.addReview(review1);
         cafe.addReview(review2);
@@ -57,8 +57,7 @@ class CafeTest {
                 () -> assertThat(actual.getToilet()).isEqualTo(Toilet.NORMAL),
                 () -> assertThat(actual.getDesk()).isEqualTo(Desk.COMFORTABLE),
                 () -> assertThat(actual.getPower()).isEqualTo(Power.FEW),
-                () -> assertThat(actual.getSound()).isEqualTo(Sound.LOUD),
-                () -> assertThat(actual.getTumbler()).isEqualTo(Tumbler.NO_SALE)
+                () -> assertThat(actual.getSound()).isEqualTo(Sound.LOUD)
         );
     }
 
@@ -67,7 +66,7 @@ class CafeTest {
     void updateCafeDetailsWhenSomeTypesNoReviews() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         Cafe cafe = new Cafe("케이카페", new BigDecimal("37.5666805"), new BigDecimal("126.9784147"));
-        CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD, Tumbler.NO_SALE);
+        CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD);
         Review review = new Review(member, cafe, cafeDetail);
         cafe.addReview(review);
 
@@ -92,8 +91,7 @@ class CafeTest {
                 () -> assertThat(actual.getToilet()).isNull(),
                 () -> assertThat(actual.getDesk()).isNull(),
                 () -> assertThat(actual.getPower()).isNull(),
-                () -> assertThat(actual.getSound()).isNull(),
-                () -> assertThat(actual.getTumbler()).isNull()
+                () -> assertThat(actual.getSound()).isNull()
         );
     }
 }
