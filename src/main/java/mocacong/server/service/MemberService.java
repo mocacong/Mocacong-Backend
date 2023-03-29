@@ -55,10 +55,7 @@ public class MemberService {
     }
 
     public void deleteAll() {
-        List<Member> members = memberRepository.findAll();
-        for (Member member : members) {
-            memberRepository.delete(member);
-        }
+        memberRepository.deleteAll();
     }
 
     public MemberGetAllResponse getAllMembers() {

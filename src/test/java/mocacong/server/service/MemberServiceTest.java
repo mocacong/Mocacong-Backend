@@ -164,7 +164,7 @@ class MemberServiceTest {
     }
     
     @DisplayName("회원을 전체 조회한다")
-    public void getAllMembers() {
+    void getAllMembers() {
         memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
         memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
 
