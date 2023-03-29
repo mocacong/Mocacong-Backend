@@ -14,7 +14,6 @@ public class CafeService {
 
     public void cafeSave(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
-
         cafeRepository.findByMapId(request.getId())
                 .ifPresentOrElse(
                         cafe1 -> {
@@ -23,6 +22,5 @@ public class CafeService {
                             cafeRepository.save(cafe);
                         }
                 );
-
     }
 }
