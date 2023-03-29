@@ -150,8 +150,19 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("모든 회원을 전체 삭제한다")
+    void deleteAll() {
+        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
+        memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
+
+        memberService.deleteAll();
+
+        List<Member> actual = memberRepository.findAll();
+        assertThat(actual).hasSize(0);
+    }
+    
     @DisplayName("회원을 전체 조회한다")
-    public void getAllMembers() {
+    void getAllMembers() {
         memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
         memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
 

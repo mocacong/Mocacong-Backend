@@ -54,6 +54,10 @@ public class MemberService {
         memberRepository.delete(findMember);
     }
 
+    public void deleteAll() {
+        memberRepository.deleteAll();
+    }
+
     public MemberGetAllResponse getAllMembers() {
         List<Member> members = memberRepository.findAll();
         List<MemberGetResponse> memberGetResponses = members.stream()
@@ -89,3 +93,4 @@ public class MemberService {
         }
     }
 }
+

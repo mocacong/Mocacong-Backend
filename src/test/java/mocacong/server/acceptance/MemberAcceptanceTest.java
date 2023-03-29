@@ -47,6 +47,21 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @DisplayName("모든 회원을 전체 삭제한다")
+    void deleteAll() {
+        MemberSignUpRequest request1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(request1);
+        MemberSignUpRequest request2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        회원_가입(request2);
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().delete("/members/all")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
     @DisplayName("회원은 올바르지 않은 형식의 필드로 가입할 수 없다")
     void signUpInvalidInputField() {
         MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "abcdefgh", "케이", "010-1234-5678");
