@@ -5,7 +5,6 @@ import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.ErrorResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -14,7 +13,6 @@ import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MemberAcceptanceTest extends AcceptanceTest {
 
     @Test
