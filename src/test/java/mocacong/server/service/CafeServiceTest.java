@@ -24,7 +24,7 @@ class CafeServiceTest {
     void cafeSave() {
         CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페");
 
-        cafeService.cafeSave(request);
+        cafeService.save(request);
 
         List<Cafe> actual = cafeRepository.findAll();
         assertThat(actual).hasSize(1);
@@ -34,10 +34,10 @@ class CafeServiceTest {
     @DisplayName("등록되어 있는 카페는 등록하지 않는다")
     void cafeSaveDuplicate() {
         CafeRegisterRequest request1 = new CafeRegisterRequest("20", "메리네 카페");
-        cafeService.cafeSave(request1);
+        cafeService.save(request1);
 
         CafeRegisterRequest request2 = new CafeRegisterRequest("20", "카페");
-        cafeService.cafeSave(request2);
+        cafeService.save(request2);
 
         List<Cafe> actual = cafeRepository.findAll();
         assertThat(actual).hasSize(1);

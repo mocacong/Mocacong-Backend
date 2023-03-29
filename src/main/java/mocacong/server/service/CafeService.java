@@ -12,15 +12,13 @@ public class CafeService {
 
     private final CafeRepository cafeRepository;
 
-    public void cafeSave(CafeRegisterRequest request) {
+    public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
         cafeRepository.findByMapId(request.getId())
                 .ifPresentOrElse(
                         cafe1 -> {
                         },
-                        () -> {
-                            cafeRepository.save(cafe);
-                        }
+                        () -> cafeRepository.save(cafe)
                 );
     }
 }

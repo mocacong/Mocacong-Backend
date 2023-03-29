@@ -12,7 +12,7 @@ class CafeTest {
     @Test
     @DisplayName("카페에 평점을 기여한 사람이 없으면 0점을 반환한다")
     void findScoreWithNoReviews() {
-        Cafe cafe = new Cafe("1","케이카페");
+        Cafe cafe = new Cafe("1", "케이카페");
 
         double actual = cafe.findAverageScore();
 

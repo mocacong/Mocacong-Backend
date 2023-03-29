@@ -24,7 +24,7 @@ public class CafeController {
     @Operation(summary = "카페등록")
     @PostMapping
     public ResponseEntity<Void> cafeRegister(@RequestBody @Valid CafeRegisterRequest request) {
-        cafeService.cafeSave(request);
+        cafeService.save(request);
         return ResponseEntity.ok().build();
     }
 }
