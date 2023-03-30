@@ -22,7 +22,7 @@ public class AuthConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs", "/error")
                 .excludePathPatterns("/members", "/login", "/members/check-duplicate/email", "/members/check-duplicate/nickname",
-                        "/members/all");
+                        "/members/all", "/cafes/**");
         }
 
     @Override
