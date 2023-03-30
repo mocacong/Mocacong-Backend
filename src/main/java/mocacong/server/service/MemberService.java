@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
@@ -12,11 +16,7 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,16 +48,18 @@ public class MemberService {
                 });
     }
 
-    public void delete(String email){
+    public void delete(String email) {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         memberRepository.delete(findMember);
     }
 
+    @Transactional
     public void deleteAll() {
         memberRepository.deleteAll();
     }
 
+    @Transactional(readOnly = true)
     public MemberGetAllResponse getAllMembers() {
         List<Member> members = memberRepository.findAll();
         List<MemberGetResponse> memberGetResponses = members.stream()
