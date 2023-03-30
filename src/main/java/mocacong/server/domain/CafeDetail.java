@@ -16,10 +16,6 @@ import mocacong.server.domain.cafedetail.*;
 @AllArgsConstructor
 public class CafeDetail {
 
-    @Column(name = "study_type")
-    @Enumerated(EnumType.STRING)
-    private StudyType studyType;
-
     @Column(name = "wifi")
     @Enumerated(EnumType.STRING)
     private Wifi wifi;
