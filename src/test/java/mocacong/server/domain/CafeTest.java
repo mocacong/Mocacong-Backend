@@ -38,6 +38,7 @@ class CafeTest {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
 
         Cafe cafe = new Cafe("1", "케이카페");
+        
         CafeDetail cafeDetail1 = new CafeDetail(StudyType.GROUP, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
         Review review1 = new Review(member, cafe, cafeDetail1);
         CafeDetail cafeDetail2 = new CafeDetail(StudyType.SOLO, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.NORMAL, Desk.UNCOMFORTABLE, Power.FEW, Sound.NOISY);
@@ -66,8 +67,10 @@ class CafeTest {
     @DisplayName("카페에 일부 세부정보 리뷰가 하나도 없을 경우 해당 세부정보는 null을 반환한다")
     void updateCafeDetailsWhenSomeTypesNoReviews() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+
         Cafe cafe = new Cafe("1", "케이카페");
         CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD);
+
         Review review = new Review(member, cafe, cafeDetail);
         cafe.addReview(review);
 
