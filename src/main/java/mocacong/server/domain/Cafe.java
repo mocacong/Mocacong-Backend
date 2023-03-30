@@ -45,8 +45,8 @@ public class Cafe {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String id, String name) {
-        this.mapId = id;
+    public Cafe(String mapId, String name) {
+        this.mapId = mapId;
         this.name = name;
         this.cafeDetail = new CafeDetail();
         this.score = new ArrayList<>();
