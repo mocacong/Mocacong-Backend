@@ -44,7 +44,7 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public FindCafeResponse findCafe(String email, String mapId) {
+    public FindCafeResponse findCafeByMapId(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)

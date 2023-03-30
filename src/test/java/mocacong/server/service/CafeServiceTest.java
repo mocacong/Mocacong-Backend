@@ -59,7 +59,7 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        FindCafeResponse actual = cafeService.findCafe(member.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getScore()).isEqualTo(0.0),
@@ -86,7 +86,7 @@ class CafeServiceTest {
         Score score2 = new Score(5, member2, cafe);
         scoreRepository.save(score2);
 
-        FindCafeResponse actual = cafeService.findCafe(member1.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getEmail(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getScore()).isEqualTo(4.5),
