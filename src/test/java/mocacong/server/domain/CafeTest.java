@@ -38,8 +38,8 @@ class CafeTest {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
 
         Cafe cafe = new Cafe("1", "케이카페");
-        CafeDetail cafeDetail1 = new CafeDetail(StudyType.GROUP, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD, Tumbler.NO_SALE);
-
+        
+        CafeDetail cafeDetail1 = new CafeDetail(StudyType.GROUP, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
         Review review1 = new Review(member, cafe, cafeDetail1);
         CafeDetail cafeDetail2 = new CafeDetail(StudyType.SOLO, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.NORMAL, Desk.UNCOMFORTABLE, Power.FEW, Sound.NOISY);
         Review review2 = new Review(member, cafe, cafeDetail2);
@@ -69,7 +69,7 @@ class CafeTest {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
 
         Cafe cafe = new Cafe("1", "케이카페");
-        CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD, Tumbler.NO_SALE);
+        CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD);
 
         Review review = new Review(member, cafe, cafeDetail);
         cafe.addReview(review);
