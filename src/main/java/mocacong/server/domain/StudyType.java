@@ -28,19 +28,19 @@ public class StudyType {
     @JoinColumn(name = "cafe_id", nullable = false)
     private Cafe cafe;
 
-    @Column(name = "value", nullable = false)
-    private String value;
+    @Column(name = "study_type_value", nullable = false)
+    private String studyTypeValue;
 
-    public StudyType(Member member, Cafe cafe, String value) {
+    public StudyType(Member member, Cafe cafe, String studyTypeValue) {
         this.member = member;
         this.cafe = cafe;
         this.cafe.addStudyType(this);
-        validateValue(value);
-        this.value = value;
+        validateValue(studyTypeValue);
+        this.studyTypeValue = studyTypeValue;
     }
 
-    private void validateValue(String value) {
-        if (!value.equals(SOLO_STUDY_TYPE) && !value.equals(GROUP_STUDY_TYPE)) {
+    private void validateValue(String studyTypeValue) {
+        if (!studyTypeValue.equals(SOLO_STUDY_TYPE) && !studyTypeValue.equals(GROUP_STUDY_TYPE)) {
             throw new InvalidStudyTypeException();
         }
     }
