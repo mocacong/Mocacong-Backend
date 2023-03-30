@@ -1,6 +1,7 @@
 package mocacong.server.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class CafeController {
     }
 
     @Operation(summary = "특정 카페 조회")
+    @SecurityRequirement(name = "JWT")
     @GetMapping("/{mapId}")
     public ResponseEntity<FindCafeResponse> findCafeByMapId(
             @LoginUserEmail String email,
