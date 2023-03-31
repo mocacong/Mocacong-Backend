@@ -1,11 +1,5 @@
 package mocacong.server.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import mocacong.server.domain.cafedetail.*;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +7,11 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import mocacong.server.domain.cafedetail.*;
 
 @Entity
 @Table(name = "cafe")
@@ -34,6 +33,9 @@ public class Cafe {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
 
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudyType> studyTypes;
+
     @Embedded
     private CafeDetail cafeDetail;
 
@@ -43,17 +45,17 @@ public class Cafe {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String id, String name) {
-        this.mapId = id;
+    public Cafe(String mapId, String name) {
+        this.mapId = mapId;
         this.name = name;
         this.cafeDetail = new CafeDetail();
         this.score = new ArrayList<>();
+        this.studyTypes = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.comments = new ArrayList<>();
     }
 
     public void updateCafeDetails() {
-        StudyType studyType = (StudyType) getMostFrequentType(reviews.stream().map(Review::getStudyType));
         Wifi wifi = (Wifi) getMostFrequentType(reviews.stream().map(Review::getWifi));
         Parking parking = (Parking) getMostFrequentType(reviews.stream().map(Review::getParking));
         Toilet toilet = (Toilet) getMostFrequentType(reviews.stream().map(Review::getToilet));
@@ -61,7 +63,7 @@ public class Cafe {
         Power power = (Power) getMostFrequentType(reviews.stream().map(Review::getPower));
         Sound sound = (Sound) getMostFrequentType(reviews.stream().map(Review::getSound));
 
-        this.cafeDetail = new CafeDetail(studyType, wifi, parking, toilet, desk, power, sound);
+        this.cafeDetail = new CafeDetail(wifi, parking, toilet, desk, power, sound);
     }
 
     private Object getMostFrequentType(Stream<Object> stream) {
@@ -72,7 +74,6 @@ public class Cafe {
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .orElse(null);
-
         return frequentTypeInfo != null ? frequentTypeInfo.getKey() : null;
     }
 
@@ -85,6 +86,10 @@ public class Cafe {
 
     public void addScore(Score score) {
         this.score.add(score);
+    }
+
+    public void addStudyType(StudyType studyType) {
+        this.studyTypes.add(studyType);
     }
 
     public void addReview(Review review) {

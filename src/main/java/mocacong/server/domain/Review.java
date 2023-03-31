@@ -25,18 +25,19 @@ public class Review {
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "study_type_id", nullable = false)
+    private StudyType studyType;
+
     @Embedded
     private CafeDetail cafeDetail;
 
-    public Review(Member member, Cafe cafe, CafeDetail cafeDetail) {
+    public Review(Member member, Cafe cafe, StudyType studyType, CafeDetail cafeDetail) {
         this.member = member;
         this.cafe = cafe;
+        this.studyType = studyType;
         this.cafe.addReview(this);
         this.cafeDetail = cafeDetail;
-    }
-
-    public StudyType getStudyType() {
-        return cafeDetail.getStudyType();
     }
 
     public Wifi getWifi() {

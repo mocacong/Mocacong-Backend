@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import mocacong.server.dto.response.FindCafeResponse;
+import mocacong.server.security.auth.LoginUserEmail;
+import org.springframework.web.bind.annotation.*;
+
 @Tag(name = "Cafes", description = "카페")
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +31,16 @@ public class CafeController {
     public ResponseEntity<Void> cafeRegister(@RequestBody @Valid CafeRegisterRequest request) {
         cafeService.save(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "특정 카페 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/{mapId}")
+    public ResponseEntity<FindCafeResponse> findCafeByMapId(
+            @LoginUserEmail String email,
+            @PathVariable String mapId
+    ) {
+        FindCafeResponse response = cafeService.findCafeByMapId(email, mapId);
+        return ResponseEntity.ok(response);
     }
 }
