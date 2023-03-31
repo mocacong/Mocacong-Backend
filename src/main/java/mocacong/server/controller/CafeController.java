@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.CafeRegisterRequest;
+import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
@@ -35,6 +37,18 @@ public class CafeController {
             @PathVariable String mapId
     ) {
         FindCafeResponse response = cafeService.findCafeByMapId(email, mapId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "특정 카페 리뷰 작성")
+    @SecurityRequirement(name = "JWT")
+    @PostMapping("/{mapId}")
+    public ResponseEntity<CafeReviewResponse> saveCafeReview(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestBody CafeReviewRequest request
+    ) {
+        CafeReviewResponse response = cafeService.saveCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
 }
