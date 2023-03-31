@@ -35,8 +35,10 @@ public class StudyType {
         this.member = member;
         this.cafe = cafe;
         this.cafe.addStudyType(this);
-        validateValue(studyTypeValue);
-        this.studyTypeValue = studyTypeValue;
+
+        String lowerCaseStudyTypeValue = studyTypeValue.toLowerCase();
+        validateValue(lowerCaseStudyTypeValue);
+        this.studyTypeValue = lowerCaseStudyTypeValue;
     }
 
     private void validateValue(String studyTypeValue) {
