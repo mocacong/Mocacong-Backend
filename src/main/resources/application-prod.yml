@@ -12,8 +12,6 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-  profiles:
-    active: prod
 
 security.jwt.token:
   secret-key: ${JWT_SECRET_KEY}
