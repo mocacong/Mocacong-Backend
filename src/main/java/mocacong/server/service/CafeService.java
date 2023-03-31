@@ -93,24 +93,24 @@ public class CafeService {
     }
 
     private String findMostFrequentStudyTypes(Long cafeId) {
-        List<StudyType> soloStudyTypes = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, SOLO_STUDY_TYPE);
-        List<StudyType> groupStudyTypes = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, GROUP_STUDY_TYPE);
+        List<String> soloStudyTypeValues = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, SOLO_STUDY_TYPE);
+        List<String> groupStudyTypeValues = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, GROUP_STUDY_TYPE);
 
-        if (isEmptyStudyTypes(soloStudyTypes, groupStudyTypes)) {
+        if (isEmptyStudyTypes(soloStudyTypeValues, groupStudyTypeValues)) {
             return null;
         }
 
-        if (soloStudyTypes.size() > groupStudyTypes.size()) {
+        if (soloStudyTypeValues.size() > groupStudyTypeValues.size()) {
             return SOLO_STUDY_TYPE;
         }
-        if (soloStudyTypes.size() < groupStudyTypes.size()) {
+        if (soloStudyTypeValues.size() < groupStudyTypeValues.size()) {
             return GROUP_STUDY_TYPE;
         }
         return BOTH_STUDY_TYPE;
     }
 
-    private boolean isEmptyStudyTypes(List<StudyType> soloStudyTypes, List<StudyType> groupStudyTypes) {
-        return soloStudyTypes.isEmpty() && groupStudyTypes.isEmpty();
+    private boolean isEmptyStudyTypes(List<String> soloStudyTypeValues, List<String> groupStudyTypeValues) {
+        return soloStudyTypeValues.isEmpty() && groupStudyTypeValues.isEmpty();
     }
 
     private void saveCafeDetails(CafeReviewRequest request, Cafe cafe, Member member) {
