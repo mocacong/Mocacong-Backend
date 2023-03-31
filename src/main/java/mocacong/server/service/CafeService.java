@@ -1,8 +1,5 @@
 package mocacong.server.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -14,9 +11,14 @@ import mocacong.server.dto.response.ReviewResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -128,5 +130,35 @@ public class CafeService {
         );
         Review review = new Review(member, cafe, studyType, cafeDetail);
         reviewRepository.save(review);
+    }
+
+    public void updateCafeDetails(Long cafeId, CafeReviewRequest request, Member member) {
+        Cafe cafe = cafeRepository.findById(cafeId)
+                .orElseThrow(() -> new NotFoundCafeException());
+        checkExistingCafeReview(cafe, member);
+
+        Score score = scoreRepository.findByMemberAndCafe(member, cafe);
+        score.setScore(request.getMyScore());
+        scoreRepository.save(score);
+
+        StudyType studyType = studyTypeRepository.findByMemberAndCafe(member, cafe);
+        studyType.setStudyTypeValue(request.getMyStudyType());
+        studyTypeRepository.save(studyType);
+
+        CafeDetail cafeDetail = cafe.getCafeDetail();
+        cafeDetail.setWifi(Wifi.from(request.getMyWifi()));
+        cafeDetail.setParking(Parking.from(request.getMyParking()));
+        cafeDetail.setToilet(Toilet.from(request.getMyToilet()));
+        cafeDetail.setDesk(Desk.from(request.getMyDesk()));
+        cafeDetail.setPower(Power.from(request.getMyPower()));
+        cafeDetail.setSound(Sound.from(request.getMySound()));
+        cafe.setCafeDetail(cafeDetail);
+        cafeRepository.save(cafe);
+    }
+
+    private void checkExistingCafeReview(Cafe cafe, Member member) {
+        if (!reviewRepository.findIdByCafeIdAndMemberId(cafe.getId(), member.getId()).isPresent()) {
+            throw new NotFoundReviewException();
+        }
     }
 }

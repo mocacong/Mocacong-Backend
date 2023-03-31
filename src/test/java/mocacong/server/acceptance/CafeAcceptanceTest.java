@@ -1,17 +1,18 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class CafeAcceptanceTest extends AcceptanceTest {
 
