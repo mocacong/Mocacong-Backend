@@ -64,6 +64,7 @@ public class AcceptanceFixtures {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
+<<<<<<< HEAD
 
     public static ExtractableResponse<Response> 카페_리뷰_수정(String token, String mapId, CafeReviewRequest request) {
         return RestAssured.given().log().all()
@@ -77,4 +78,6 @@ public class AcceptanceFixtures {
     }
 
 
+=======
+>>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
 }

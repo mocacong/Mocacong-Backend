@@ -2,9 +2,18 @@ package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
 import mocacong.server.dto.request.CafeRegisterRequest;
+<<<<<<< HEAD
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
+=======
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
+import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.response.CafeReviewResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+>>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -99,6 +108,7 @@ public class CafeAcceptanceTest extends AcceptanceTest{
                 .then().log().all()
                 .statusCode(HttpStatus.BAD_REQUEST.value());
     }
+<<<<<<< HEAD
 
     @Test
     @DisplayName("등록한 카페에 대한 리뷰를 수정한다")
@@ -150,4 +160,6 @@ public class CafeAcceptanceTest extends AcceptanceTest{
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("code", equalTo(2006));
     }
+=======
+>>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
 }
