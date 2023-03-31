@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import mocacong.server.dto.request.AuthLoginRequest;
+import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.TokenResponse;
 import org.springframework.http.HttpStatus;
@@ -30,5 +31,25 @@ public class AcceptanceFixtures {
                 .extract()
                 .as(TokenResponse.class)
                 .getToken();
+    }
+
+    public static ExtractableResponse<Response> 카페_등록(CafeRegisterRequest request) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/cafes")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 카페_조회(String token, String mapId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/cafes/" + mapId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
     }
 }

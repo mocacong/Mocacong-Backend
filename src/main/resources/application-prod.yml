@@ -1,5 +1,6 @@
 spring:
   datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${RDS_URL}
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
@@ -11,14 +12,8 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-  h2:
-    console:
-      enabled: true
-      settings:
-        web-allow-others: true
-  config:
-    activate:
-      on-profile: prod
+  profiles:
+    active: prod
 
 security.jwt.token:
   secret-key: ${JWT_SECRET_KEY}
