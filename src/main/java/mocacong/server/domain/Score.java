@@ -1,14 +1,17 @@
 package mocacong.server.domain;
 
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mocacong.server.exception.badrequest.InvalidScoreException;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "score")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Score {
 

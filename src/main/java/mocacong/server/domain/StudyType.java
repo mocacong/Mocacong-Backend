@@ -1,14 +1,17 @@
 package mocacong.server.domain;
 
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import mocacong.server.exception.badrequest.InvalidStudyTypeException;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "study_type")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudyType {
 
@@ -35,8 +38,10 @@ public class StudyType {
         this.member = member;
         this.cafe = cafe;
         this.cafe.addStudyType(this);
-        validateValue(studyTypeValue);
-        this.studyTypeValue = studyTypeValue;
+
+        String lowerCaseStudyTypeValue = studyTypeValue.toLowerCase();
+        validateValue(lowerCaseStudyTypeValue);
+        this.studyTypeValue = lowerCaseStudyTypeValue;
     }
 
     private void validateValue(String studyTypeValue) {

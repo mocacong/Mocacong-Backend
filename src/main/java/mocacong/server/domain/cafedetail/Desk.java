@@ -1,13 +1,16 @@
 package mocacong.server.domain.cafedetail;
 
-import java.util.Arrays;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidDeskException;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public enum Desk {
 
     COMFORTABLE("편해요"),

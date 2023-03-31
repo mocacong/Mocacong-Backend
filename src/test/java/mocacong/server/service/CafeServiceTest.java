@@ -8,9 +8,13 @@ import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Score;
 import mocacong.server.dto.response.FindCafeResponse;
+import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.ScoreRepository;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -100,5 +104,74 @@ class CafeServiceTest {
         );
     }
 
-    // TODO: 리뷰, 코멘트 기능 추가되면 조회 테스트 추가할 것
+    @Test
+    @DisplayName("카페에 대한 리뷰를 작성하면 해당 카페 평점과 세부정보가 갱신된다")
+    void saveCafeReview() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+
+        CafeReviewResponse actual = cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "solo", "빵빵해요", "협소해요",
+                        "깨끗해요", "충분해요", "적당해요", "편해요"));
+
+        assertAll(
+                () -> assertThat(actual.getScore()).isEqualTo(3.0),
+                () -> assertThat(actual.getStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getWifi()).isEqualTo("빵빵해요"),
+                // `여유로워요`, `협소해요` 둘 중 무엇을 반환해도 괜찮지만 `없어요`는 불가능
+                () -> assertThat(actual.getParking()).isNotEqualTo("없어요"),
+                () -> assertThat(actual.getToilet()).isEqualTo("깨끗해요"),
+                () -> assertThat(actual.getPower()).isEqualTo("충분해요"),
+                () -> assertThat(actual.getSound()).isNotEqualTo("북적북적해요"),
+                () -> assertThat(actual.getDesk()).isEqualTo("편해요")
+        );
+    }
+
+    @Test
+    @DisplayName("카페 리뷰 작성 후 studyType의 타입 개수가 동일하면 both를 반환한다")
+    void saveCafeAndStudyTypesEquals() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+        CafeReviewResponse actual = cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "빵빵해요", "협소해요",
+                        "깨끗해요", "충분해요", "적당해요", "편해요"));
+
+        assertThat(actual.getStudyType()).isEqualTo("both");
+    }
+
+    @Test
+    @DisplayName("이미 리뷰를 작성했으면 수정만 가능하고 새로 작성은 불가능하다")
+    void cannotSaveManyReviews() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+
+        assertThatThrownBy(() -> cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "빵빵해요", "협소해요",
+                        "깨끗해요", "충분해요", "적당해요", "편해요")))
+                .isInstanceOf(AlreadyExistsCafeReview.class);
+    }
+
+    // TODO: 코멘트 기능 추가되면 조회 테스트 추가할 것
 }
