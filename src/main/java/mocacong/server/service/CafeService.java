@@ -86,7 +86,7 @@ public class CafeService {
     }
 
     private void checkAlreadySaveCafeReview(Cafe cafe, Member member) {
-        reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+        reviewRepository.findIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .ifPresent(review -> {
                     throw new AlreadyExistsCafeReview();
                 });
