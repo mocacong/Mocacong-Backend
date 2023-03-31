@@ -16,8 +16,9 @@ spring:
       enabled: true
       settings:
         web-allow-others: true
-  profiles:
-    active: prod
+  config:
+    activate:
+      on-profile: prod
 
 security.jwt.token:
   secret-key: ${JWT_SECRET_KEY}
