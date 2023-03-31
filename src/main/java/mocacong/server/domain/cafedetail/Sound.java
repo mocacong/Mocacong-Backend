@@ -3,11 +3,13 @@ package mocacong.server.domain.cafedetail;
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidSoundException;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public enum Sound {
 
     QUIET("조용해요"),

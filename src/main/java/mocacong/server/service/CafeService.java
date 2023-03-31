@@ -4,19 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.domain.Cafe;
-import mocacong.server.domain.Member;
-import mocacong.server.domain.Score;
-import mocacong.server.domain.StudyType;
+import mocacong.server.domain.*;
+import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
+import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.dto.response.ReviewResponse;
+import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
-import mocacong.server.repository.CafeRepository;
-import mocacong.server.repository.MemberRepository;
-import mocacong.server.repository.ScoreRepository;
-import mocacong.server.repository.StudyTypeRepository;
+import mocacong.server.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +30,7 @@ public class CafeService {
     private final MemberRepository memberRepository;
     private final StudyTypeRepository studyTypeRepository;
     private final ScoreRepository scoreRepository;
+    private final ReviewRepository reviewRepository;
 
     public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
@@ -70,24 +69,64 @@ public class CafeService {
         );
     }
 
-    private String findMostFrequentStudyTypes(Long cafeId) {
-        List<StudyType> soloStudyTypes = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, SOLO_STUDY_TYPE);
-        List<StudyType> groupStudyTypes = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, GROUP_STUDY_TYPE);
+    @Transactional
+    public CafeReviewResponse saveCafeReview(String email, String mapId, CafeReviewRequest request) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        checkAlreadySaveCafeReview(cafe, member);
 
-        if (isEmptyStudyTypes(soloStudyTypes, groupStudyTypes)) {
+        saveCafeDetails(request, cafe, member);
+
+        cafe.updateCafeDetails();
+        String updatedStudyType = findMostFrequentStudyTypes(cafe.getId());
+
+        return CafeReviewResponse.of(cafe.findAverageScore(), updatedStudyType, cafe);
+    }
+
+    private void checkAlreadySaveCafeReview(Cafe cafe, Member member) {
+        reviewRepository.findIdByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .ifPresent(review -> {
+                    throw new AlreadyExistsCafeReview();
+                });
+    }
+
+    private String findMostFrequentStudyTypes(Long cafeId) {
+        List<String> soloStudyTypeValues = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, SOLO_STUDY_TYPE);
+        List<String> groupStudyTypeValues = studyTypeRepository.findAllByCafeIdAndStudyTypeValue(cafeId, GROUP_STUDY_TYPE);
+
+        if (isEmptyStudyTypes(soloStudyTypeValues, groupStudyTypeValues)) {
             return null;
         }
 
-        if (soloStudyTypes.size() > groupStudyTypes.size()) {
+        if (soloStudyTypeValues.size() > groupStudyTypeValues.size()) {
             return SOLO_STUDY_TYPE;
         }
-        if (soloStudyTypes.size() < groupStudyTypes.size()) {
+        if (soloStudyTypeValues.size() < groupStudyTypeValues.size()) {
             return GROUP_STUDY_TYPE;
         }
         return BOTH_STUDY_TYPE;
     }
 
-    private boolean isEmptyStudyTypes(List<StudyType> soloStudyTypes, List<StudyType> groupStudyTypes) {
-        return soloStudyTypes.isEmpty() && groupStudyTypes.isEmpty();
+    private boolean isEmptyStudyTypes(List<String> soloStudyTypeValues, List<String> groupStudyTypeValues) {
+        return soloStudyTypeValues.isEmpty() && groupStudyTypeValues.isEmpty();
+    }
+
+    private void saveCafeDetails(CafeReviewRequest request, Cafe cafe, Member member) {
+        Score score = new Score(request.getMyScore(), member, cafe);
+        scoreRepository.save(score);
+        StudyType studyType = new StudyType(member, cafe, request.getMyStudyType());
+        studyTypeRepository.save(studyType);
+        CafeDetail cafeDetail = new CafeDetail(
+                Wifi.from(request.getMyWifi()),
+                Parking.from(request.getMyParking()),
+                Toilet.from(request.getMyToilet()),
+                Desk.from(request.getMyDesk()),
+                Power.from(request.getMyPower()),
+                Sound.from(request.getMySound())
+        );
+        Review review = new Review(member, cafe, studyType, cafeDetail);
+        reviewRepository.save(review);
     }
 }
