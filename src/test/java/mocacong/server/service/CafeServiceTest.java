@@ -1,12 +1,13 @@
 package mocacong.server.service;
 
-import java.util.List;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Score;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.request.CafeReviewUpdateRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundReviewException;
@@ -16,6 +17,8 @@ import mocacong.server.repository.ScoreRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -186,12 +189,12 @@ class CafeServiceTest {
         cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        CafeReviewRequest request = new CafeReviewRequest(5, "solo", "빵빵해요", "여유로워요",
+        CafeReviewUpdateRequest request = new CafeReviewUpdateRequest(5, "solo", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "불편해요");
 
         cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(), request);
-        CafeReviewResponse actual = cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(),
-                new CafeReviewRequest(5, "solo", "빵빵해요", "여유로워요",
+        CafeReviewUpdateResponse actual = cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(),
+                new CafeReviewUpdateRequest(5, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "불편해요"));
 
         assertAll(
@@ -214,7 +217,7 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        assertThatThrownBy(() -> cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(), new CafeReviewRequest(5,
+        assertThatThrownBy(() -> cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(), new CafeReviewUpdateRequest(5,
                 "solo", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "불편해요")))
                 .isInstanceOf(NotFoundReviewException.class);

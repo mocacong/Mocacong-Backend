@@ -10,7 +10,6 @@ import javax.persistence.Enumerated;
 
 @Embeddable
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class CafeDetail {
@@ -38,4 +37,28 @@ public class CafeDetail {
     @Column(name = "sound")
     @Enumerated(EnumType.STRING)
     private Sound sound;
+
+    public void setWifi(Wifi wifi) {
+        this.wifi = wifi;
+    }
+
+    public void setParking(Parking parking) {
+        this.parking = parking;
+    }
+
+    public void setToilet(Toilet toilet) {
+        this.toilet = toilet;
+    }
+
+    public void setDesk(Desk desk) {
+        this.desk = desk;
+    }
+
+    public void setPower(Power power) {
+        this.power = power;
+    }
+
+    public void setSound(Sound sound) {
+        this.sound = sound;
+    }
 }

@@ -3,7 +3,6 @@ package mocacong.server.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import mocacong.server.exception.badrequest.InvalidScoreException;
 
 import javax.persistence.*;
@@ -11,7 +10,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "score")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Score {
 
@@ -46,5 +44,9 @@ public class Score {
         if (score < MINIMUM_SCORE || score > MAXIMUM_SCORE) {
             throw new InvalidScoreException();
         }
+    }
+
+    public void setScore(int myScore) {
+        this.score = myScore;
     }
 }

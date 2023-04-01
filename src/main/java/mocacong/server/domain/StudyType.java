@@ -3,7 +3,6 @@ package mocacong.server.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import mocacong.server.exception.badrequest.InvalidStudyTypeException;
 
 import javax.persistence.*;
@@ -11,7 +10,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "study_type")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudyType {
 
@@ -48,5 +46,9 @@ public class StudyType {
         if (!studyTypeValue.equals(SOLO_STUDY_TYPE) && !studyTypeValue.equals(GROUP_STUDY_TYPE)) {
             throw new InvalidStudyTypeException();
         }
+    }
+
+    public void setStudyTypeValue(String myStudyType) {
+        this.studyTypeValue = myStudyType;
     }
 }

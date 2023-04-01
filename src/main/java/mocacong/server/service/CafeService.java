@@ -5,7 +5,9 @@ import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.request.CafeReviewUpdateRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.dto.response.ReviewResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
@@ -133,7 +135,7 @@ public class CafeService {
     }
 
     @Transactional
-    public CafeReviewResponse updateCafeReview(String email, String mapId, CafeReviewRequest request) {
+    public CafeReviewUpdateResponse updateCafeReview(String email, String mapId, CafeReviewUpdateRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
@@ -143,20 +145,18 @@ public class CafeService {
         cafe.updateCafeDetails();
         String updatedStudyType = findMostFrequentStudyTypes(cafe.getId());
 
-        return CafeReviewResponse.of(cafe.findAverageScore(), updatedStudyType, cafe);
+        return CafeReviewUpdateResponse.of(cafe.findAverageScore(), updatedStudyType, cafe);
     }
 
-    private void updateCafeReviewDetails(CafeReviewRequest request, Cafe cafe, Member member) {
+    private void updateCafeReviewDetails(CafeReviewUpdateRequest request, Cafe cafe, Member member) {
         Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElseThrow(NotFoundReviewException::new);
         Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElseThrow(NotFoundReviewException::new);
         score.setScore(request.getMyScore());
-        scoreRepository.save(score);
 
         StudyType studyType = review.getStudyType();
         studyType.setStudyTypeValue(request.getMyStudyType());
-        studyTypeRepository.save(studyType);
 
         CafeDetail cafeDetail = review.getCafeDetail();
         cafeDetail.setWifi(Wifi.from(request.getMyWifi()));
@@ -165,6 +165,5 @@ public class CafeService {
         cafeDetail.setDesk(Desk.from(request.getMyDesk()));
         cafeDetail.setPower(Power.from(request.getMyPower()));
         cafeDetail.setSound(Sound.from(request.getMySound()));
-        reviewRepository.save(review);
     }
 }

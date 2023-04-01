@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.request.CafeReviewUpdateRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
@@ -56,12 +58,12 @@ public class CafeController {
     @Operation(summary = "특정 카페 리뷰 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping("/{mapId}")
-    public ResponseEntity<CafeReviewResponse> updateCafeReview(
+    public ResponseEntity<CafeReviewUpdateResponse> updateCafeReview(
             @LoginUserEmail String email,
             @PathVariable String mapId,
-            @RequestBody CafeReviewRequest request
+            @RequestBody CafeReviewUpdateRequest request
     ) {
-        CafeReviewResponse response = cafeService.updateCafeReview(email, mapId, request);
+        CafeReviewUpdateResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
 }

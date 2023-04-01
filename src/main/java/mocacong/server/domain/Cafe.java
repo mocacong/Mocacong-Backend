@@ -3,7 +3,6 @@ package mocacong.server.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import mocacong.server.domain.cafedetail.*;
 
 import javax.persistence.*;
@@ -18,7 +17,6 @@ import java.util.stream.Stream;
 @Entity
 @Table(name = "cafe")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cafe {
 
