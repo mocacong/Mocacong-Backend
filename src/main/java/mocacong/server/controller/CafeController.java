@@ -52,6 +52,10 @@ public class CafeController {
         CafeReviewResponse response = cafeService.saveCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 074e404 (fix: 메서드 분리 및 파라미터 변경)
     @Operation(summary = "특정 카페 리뷰 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping("/{mapId}")
@@ -63,4 +67,8 @@ public class CafeController {
         CafeReviewResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 074e404 (fix: 메서드 분리 및 파라미터 변경)
 }

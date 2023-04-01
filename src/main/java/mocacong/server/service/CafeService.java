@@ -170,5 +170,8 @@ public class CafeService {
         cafeDetail.setSound(Sound.from(request.getMySound()));
         reviewRepository.save(review);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 074e404 (fix: 메서드 분리 및 파라미터 변경)
 }
