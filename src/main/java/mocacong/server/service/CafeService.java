@@ -1,6 +1,5 @@
 package mocacong.server.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +8,7 @@ import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.dto.response.CommentResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.dto.response.ReviewResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
@@ -52,21 +52,37 @@ public class CafeService {
                 .orElse(null);
         String studyType = findMostFrequentStudyTypes(cafe.getId());
 
-        List<ReviewResponse> reviewResponses = cafe.getReviews()
-                .stream()
-                .map(ReviewResponse::from)
-                .collect(Collectors.toList());
-
-        // TODO: 코멘트 기능 추가 시에 변경할 것
+        List<ReviewResponse> reviewResponses = findReviewResponses(cafe);
+        List<CommentResponse> commentResponses = findCommentResponses(cafe, member);
         return new FindCafeResponse(
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 studyType,
                 reviewResponses.size(),
                 reviewResponses,
-                0,
-                new ArrayList<>()
+                commentResponses.size(),
+                commentResponses
         );
+    }
+
+    private List<ReviewResponse> findReviewResponses(Cafe cafe) {
+        return cafe.getReviews()
+                .stream()
+                .map(ReviewResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    private List<CommentResponse> findCommentResponses(Cafe cafe, Member member) {
+        return cafe.getComments()
+                .stream()
+                .map(comment -> {
+                    if (comment.isWrittenByMember(member)) {
+                        return new CommentResponse("", member.getNickname(), comment.getContent(), true);
+                    } else {
+                        return new CommentResponse("", comment.getWriterNickname(), comment.getContent(), false);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -119,12 +135,12 @@ public class CafeService {
         StudyType studyType = new StudyType(member, cafe, request.getMyStudyType());
         studyTypeRepository.save(studyType);
         CafeDetail cafeDetail = new CafeDetail(
-                Wifi.from(request.getMyWifi()),
-                Parking.from(request.getMyParking()),
-                Toilet.from(request.getMyToilet()),
-                Desk.from(request.getMyDesk()),
-                Power.from(request.getMyPower()),
-                Sound.from(request.getMySound())
+                request.getMyWifi() == null ? null : Wifi.from(request.getMyWifi()),
+                request.getMyParking() == null ? null : Parking.from(request.getMyParking()),
+                request.getMyToilet() == null ? null : Toilet.from(request.getMyToilet()),
+                request.getMyDesk() == null ? null : Desk.from(request.getMyDesk()),
+                request.getMyPower() == null ? null : Power.from(request.getMyPower()),
+                request.getMySound() == null ? null : Sound.from(request.getMySound())
         );
         Review review = new Review(member, cafe, studyType, cafeDetail);
         reviewRepository.save(review);
