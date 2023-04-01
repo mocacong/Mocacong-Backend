@@ -75,6 +75,4 @@ public class AcceptanceFixtures {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
-
-
 }

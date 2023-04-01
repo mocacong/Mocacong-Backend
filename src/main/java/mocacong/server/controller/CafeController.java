@@ -64,5 +64,4 @@ public class CafeController {
         CafeReviewResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
-
 }
