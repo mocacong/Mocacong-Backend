@@ -75,4 +75,9 @@ public class AcceptanceFixtures {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 7fba802 (test: 카페 세부정보 수정 인수테스트 작성)
 }
