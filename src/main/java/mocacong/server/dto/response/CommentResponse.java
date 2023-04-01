@@ -13,5 +13,5 @@ public class CommentResponse {
     private String imgUrl;
     private String nickname;
     private String content;
-    private boolean isMe;
+    private Boolean isMe;
 }
