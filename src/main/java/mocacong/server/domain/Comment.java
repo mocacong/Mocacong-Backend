@@ -41,4 +41,12 @@ public class Comment {
             throw new ExceedCommentLengthException();
         }
     }
+
+    public String getWriterNickname() {
+        return this.member.getNickname();
+    }
+
+    public boolean isWrittenByMember(Member member) {
+        return this.member.equals(member);
+    }
 }
