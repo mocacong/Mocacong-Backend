@@ -64,4 +64,17 @@ public class AcceptanceFixtures {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 카페_리뷰_수정(String token, String mapId, CafeReviewRequest request) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .body(request)
+                .when().put("/cafes/" + mapId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+
 }
