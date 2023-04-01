@@ -76,6 +76,7 @@ public class CafeService {
         return cafe.getComments()
                 .stream()
                 .map(comment -> {
+                    // TODO: imgUrl 추가되면 해당 로직 변경할 것
                     if (comment.isWrittenByMember(member)) {
                         return new CommentResponse("", member.getNickname(), comment.getContent(), true);
                     } else {
