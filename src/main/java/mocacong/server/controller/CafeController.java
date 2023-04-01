@@ -52,4 +52,17 @@ public class CafeController {
         CafeReviewResponse response = cafeService.saveCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "특정 카페 리뷰 수정")
+    @SecurityRequirement(name = "JWT")
+    @PutMapping("/{mapId}")
+    public ResponseEntity<CafeReviewResponse> updateCafeReview(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestBody CafeReviewRequest request
+    ) {
+        CafeReviewResponse response = cafeService.updateCafeReview(email, mapId, request);
+        return ResponseEntity.ok(response);
+    }
+
 }
