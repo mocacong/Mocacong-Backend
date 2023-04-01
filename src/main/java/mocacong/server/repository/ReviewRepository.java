@@ -14,5 +14,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "where c.id = :cafeId and m.id = :memberId")
     Optional<Long> findIdByCafeIdAndMemberId(Long cafeId, Long memberId);
 
-    Review findByCafeIdAndMemberId(Long id, Long id1);
+    Optional<Review> findByCafeIdAndMemberId(Long id, Long id1);
 }

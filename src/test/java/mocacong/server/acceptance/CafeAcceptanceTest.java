@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 
 import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -149,6 +148,6 @@ public class CafeAcceptanceTest extends AcceptanceTest{
                 .when().put("/cafes/" + mapId)
                 .then().log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("code", equalTo(2006));
+                .body("code", equalTo(3008));
     }
 }

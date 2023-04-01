@@ -147,11 +147,8 @@ public class CafeService {
     }
 
     private void updateCafeReviewDetails(CafeReviewRequest request, Cafe cafe, Member member) {
-        Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId());
-        if (review == null) {
-            throw new NotFoundReviewException();
-        }
-
+        Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElseThrow(NotFoundReviewException::new);
         Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElseThrow(NotFoundReviewException::new);
         score.setScore(request.getMyScore());
