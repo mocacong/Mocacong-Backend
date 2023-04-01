@@ -132,33 +132,42 @@ public class CafeService {
         reviewRepository.save(review);
     }
 
-    public void updateCafeDetails(Long cafeId, CafeReviewRequest request, Member member) {
-        Cafe cafe = cafeRepository.findById(cafeId)
-                .orElseThrow(() -> new NotFoundCafeException());
-        checkExistingCafeReview(cafe, member);
+    @Transactional
+    public CafeReviewResponse updateCafeReview(String email, String mapId, CafeReviewRequest request) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
 
-        Score score = scoreRepository.findByMemberAndCafe(member, cafe);
+        updateCafeReviewDetails(request, cafe, member);
+        cafe.updateCafeDetails();
+        String updatedStudyType = findMostFrequentStudyTypes(cafe.getId());
+
+        return CafeReviewResponse.of(cafe.findAverageScore(), updatedStudyType, cafe);
+    }
+
+    private void updateCafeReviewDetails(CafeReviewRequest request, Cafe cafe, Member member) {
+        Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId());
+        if (review == null) {
+            throw new NotFoundReviewException();
+        }
+
+        Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElseThrow(NotFoundReviewException::new);
         score.setScore(request.getMyScore());
         scoreRepository.save(score);
 
-        StudyType studyType = studyTypeRepository.findByMemberAndCafe(member, cafe);
+        StudyType studyType = review.getStudyType();
         studyType.setStudyTypeValue(request.getMyStudyType());
         studyTypeRepository.save(studyType);
 
-        CafeDetail cafeDetail = cafe.getCafeDetail();
+        CafeDetail cafeDetail = review.getCafeDetail();
         cafeDetail.setWifi(Wifi.from(request.getMyWifi()));
         cafeDetail.setParking(Parking.from(request.getMyParking()));
         cafeDetail.setToilet(Toilet.from(request.getMyToilet()));
         cafeDetail.setDesk(Desk.from(request.getMyDesk()));
         cafeDetail.setPower(Power.from(request.getMyPower()));
         cafeDetail.setSound(Sound.from(request.getMySound()));
-        cafe.setCafeDetail(cafeDetail);
-        cafeRepository.save(cafe);
-    }
-
-    private void checkExistingCafeReview(Cafe cafe, Member member) {
-        if (!reviewRepository.findIdByCafeIdAndMemberId(cafe.getId(), member.getId()).isPresent()) {
-            throw new NotFoundReviewException();
-        }
+        reviewRepository.save(review);
     }
 }
