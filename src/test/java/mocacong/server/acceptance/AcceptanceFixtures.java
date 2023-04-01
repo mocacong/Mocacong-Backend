@@ -3,10 +3,7 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import mocacong.server.dto.request.AuthLoginRequest;
-import mocacong.server.dto.request.CafeRegisterRequest;
-import mocacong.server.dto.request.CafeReviewRequest;
-import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.TokenResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,6 +57,17 @@ public class AcceptanceFixtures {
                 .auth().oauth2(token)
                 .body(request)
                 .when().post("/cafes/" + mapId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 카페_코멘트_작성(String token, String mapId, CommentSaveRequest request) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .body(request)
+                .when().post("/cafes/" + mapId + "/comments")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
