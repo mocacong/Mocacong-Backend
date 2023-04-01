@@ -7,22 +7,11 @@ import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.FindCafeResponse;
-<<<<<<< HEAD
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.ScoreRepository;
-=======
-import mocacong.server.dto.request.CafeReviewRequest;
-import mocacong.server.dto.response.CafeReviewResponse;
-import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
-import mocacong.server.repository.MemberRepository;
-import mocacong.server.repository.ScoreRepository;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
->>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,7 +176,6 @@ class CafeServiceTest {
     }
 
     // TODO: 코멘트 기능 추가되면 조회 테스트 추가할 것
-<<<<<<< HEAD
 
     @Test
     @DisplayName("등록한 카페 리뷰를 성공적으로 수정한다")
@@ -232,6 +220,4 @@ class CafeServiceTest {
                 "깨끗해요", "충분해요", "조용해요", "불편해요")))
                 .isInstanceOf(NotFoundReviewException.class);
     }
-=======
->>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
 }

@@ -52,8 +52,6 @@ public class CafeController {
         CafeReviewResponse response = cafeService.saveCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
-<<<<<<< HEAD
-
     @Operation(summary = "특정 카페 리뷰 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping("/{mapId}")
@@ -65,7 +63,4 @@ public class CafeController {
         CafeReviewResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
     }
-
-=======
->>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
 }

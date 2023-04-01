@@ -132,7 +132,6 @@ public class CafeService {
         reviewRepository.save(review);
     }
 
-<<<<<<< HEAD
     @Transactional
     public CafeReviewResponse updateCafeReview(String email, String mapId, CafeReviewRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -163,39 +162,13 @@ public class CafeService {
         studyTypeRepository.save(studyType);
 
         CafeDetail cafeDetail = review.getCafeDetail();
-=======
-    public void updateCafeDetails(Long cafeId, CafeReviewRequest request, Member member) {
-        Cafe cafe = cafeRepository.findById(cafeId)
-                .orElseThrow(() -> new NotFoundCafeException());
-        checkExistingCafeReview(cafe, member);
-
-        Score score = scoreRepository.findByMemberAndCafe(member, cafe);
-        score.setScore(request.getMyScore());
-        scoreRepository.save(score);
-
-        StudyType studyType = studyTypeRepository.findByMemberAndCafe(member, cafe);
-        studyType.setStudyTypeValue(request.getMyStudyType());
-        studyTypeRepository.save(studyType);
-
-        CafeDetail cafeDetail = cafe.getCafeDetail();
->>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
         cafeDetail.setWifi(Wifi.from(request.getMyWifi()));
         cafeDetail.setParking(Parking.from(request.getMyParking()));
         cafeDetail.setToilet(Toilet.from(request.getMyToilet()));
         cafeDetail.setDesk(Desk.from(request.getMyDesk()));
         cafeDetail.setPower(Power.from(request.getMyPower()));
         cafeDetail.setSound(Sound.from(request.getMySound()));
-<<<<<<< HEAD
         reviewRepository.save(review);
-=======
-        cafe.setCafeDetail(cafeDetail);
-        cafeRepository.save(cafe);
     }
 
-    private void checkExistingCafeReview(Cafe cafe, Member member) {
-        if (!reviewRepository.findIdByCafeIdAndMemberId(cafe.getId(), member.getId()).isPresent()) {
-            throw new NotFoundReviewException();
-        }
->>>>>>> 91436bb (feat: 카페 세부정보 수정 비즈니스 로직 구현)
-    }
 }
