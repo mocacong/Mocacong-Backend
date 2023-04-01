@@ -98,4 +98,5 @@ class CafeTest {
                 () -> assertThat(actual.getSound()).isNull()
         );
     }
+
 }
