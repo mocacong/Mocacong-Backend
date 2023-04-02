@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class CafeReviewRequest {
+public class CafeReviewUpdateRequest {
 
     @NotBlank(message = "3009:공백일 수 없습니다.")
     private int myScore;

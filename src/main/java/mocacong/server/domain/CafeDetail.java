@@ -1,19 +1,16 @@
 package mocacong.server.domain;
 
+import lombok.*;
+import mocacong.server.domain.cafedetail.*;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import mocacong.server.domain.cafedetail.*;
 
 @Embeddable
+@NoArgsConstructor
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class CafeDetail {
 
     @Column(name = "wifi")
@@ -39,4 +36,13 @@ public class CafeDetail {
     @Column(name = "sound")
     @Enumerated(EnumType.STRING)
     private Sound sound;
+
+    public CafeDetail(Wifi wifi, Parking parking, Toilet toilet, Desk desk, Power power, Sound sound) {
+        this.wifi = wifi;
+        this.parking = parking;
+        this.toilet = toilet;
+        this.desk = desk;
+        this.power = power;
+        this.sound = sound;
+    }
 }

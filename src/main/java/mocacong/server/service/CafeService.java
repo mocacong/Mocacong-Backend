@@ -7,16 +7,23 @@ import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
+import mocacong.server.dto.request.CafeReviewUpdateRequest;
 import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.CommentResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.dto.response.ReviewResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -145,5 +152,39 @@ public class CafeService {
         );
         Review review = new Review(member, cafe, studyType, cafeDetail);
         reviewRepository.save(review);
+    }
+
+    @Transactional
+    public CafeReviewUpdateResponse updateCafeReview(String email, String mapId, CafeReviewUpdateRequest request) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+
+        updateCafeReviewDetails(request, cafe, member);
+        cafe.updateCafeDetails();
+        String updatedStudyType = findMostFrequentStudyTypes(cafe.getId());
+
+        return CafeReviewUpdateResponse.of(cafe.findAverageScore(), updatedStudyType, cafe);
+    }
+
+    private void updateCafeReviewDetails(CafeReviewUpdateRequest request, Cafe cafe, Member member) {
+        Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElseThrow(NotFoundReviewException::new);
+        Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElseThrow(NotFoundReviewException::new);
+
+        CafeDetail updatedCafeDetail = new CafeDetail(
+                request.getMyWifi() == null ? null : Wifi.from(request.getMyWifi()),
+                request.getMyParking() == null ? null : Parking.from(request.getMyParking()),
+                request.getMyToilet() == null ? null : Toilet.from(request.getMyToilet()),
+                request.getMyDesk() == null ? null : Desk.from(request.getMyDesk()),
+                request.getMyPower() == null ? null : Power.from(request.getMyPower()),
+                request.getMySound() == null ? null : Sound.from(request.getMySound())
+        );
+
+        score.updateScore(request.getMyScore());
+        review.updateStudyType(request.getMyStudyType());
+        review.updateReview(updatedCafeDetail);
     }
 }

@@ -1,10 +1,11 @@
 package mocacong.server.domain;
 
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.domain.cafedetail.*;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "review")
@@ -62,5 +63,13 @@ public class Review {
 
     public Sound getSound() {
         return cafeDetail.getSound();
+    }
+
+    public void updateReview(CafeDetail newCafeDetail) {
+        this.cafeDetail = newCafeDetail;
+    }
+
+    public void updateStudyType(String studyType) {
+        this.studyType.updateStudyTypeValue(studyType);
     }
 }

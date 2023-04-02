@@ -1,5 +1,11 @@
 package mocacong.server.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import mocacong.server.domain.cafedetail.*;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,11 +13,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import mocacong.server.domain.cafedetail.*;
 
 @Entity
 @Table(name = "cafe")

@@ -1,10 +1,11 @@
 package mocacong.server.domain;
 
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidStudyTypeException;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "study_type")
@@ -45,5 +46,11 @@ public class StudyType {
         if (!studyTypeValue.equals(SOLO_STUDY_TYPE) && !studyTypeValue.equals(GROUP_STUDY_TYPE)) {
             throw new InvalidStudyTypeException();
         }
+    }
+
+    public void updateStudyTypeValue(String studyTypeValue) {
+        String lowerCaseStudyTypeValue = studyTypeValue.toLowerCase();
+        validateValue(lowerCaseStudyTypeValue);
+        this.studyTypeValue = lowerCaseStudyTypeValue;
     }
 }
