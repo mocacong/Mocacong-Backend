@@ -46,7 +46,9 @@ public class Score {
         }
     }
 
-    public void setScore(int myScore) {
-        this.score = myScore;
+    public void delete() {
+        this.cafe.removeScore(this);
+        this.member = null;
+        this.cafe = null;
     }
 }

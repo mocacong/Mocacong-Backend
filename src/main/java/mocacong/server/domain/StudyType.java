@@ -47,8 +47,4 @@ public class StudyType {
             throw new InvalidStudyTypeException();
         }
     }
-
-    public void setStudyTypeValue(String myStudyType) {
-        this.studyTypeValue = myStudyType;
-    }
 }

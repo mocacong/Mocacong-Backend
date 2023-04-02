@@ -89,6 +89,10 @@ public class Cafe {
         this.score.add(score);
     }
 
+    public void removeScore(Score score) {
+        this.score.remove(score);
+    }
+
     public void addStudyType(StudyType studyType) {
         this.studyTypes.add(studyType);
     }
