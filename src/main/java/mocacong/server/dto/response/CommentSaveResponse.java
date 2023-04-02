@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CommentResponse {
+public class CommentSaveResponse {
 
-    private String imgUrl;
-    private String nickname;
-    private String content;
-    private Boolean isMe;
+    private Long id;
 }

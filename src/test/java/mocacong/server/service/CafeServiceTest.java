@@ -1,6 +1,7 @@
 package mocacong.server.service;
 
 import mocacong.server.domain.Cafe;
+import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Score;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -12,6 +13,7 @@ import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.CafeRepository;
+import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.ScoreRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -35,6 +37,8 @@ class CafeServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private ScoreRepository scoreRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Test
     @DisplayName("등록되지 않은 카페를 성공적으로 등록한다")
@@ -101,10 +105,46 @@ class CafeServiceTest {
                 () -> assertThat(actual.getScore()).isEqualTo(4.5),
                 () -> assertThat(actual.getMyScore()).isEqualTo(score1.getScore()),
                 () -> assertThat(actual.getStudyType()).isNull(),
-                () -> assertThat(actual.getCommentsCount()).isEqualTo(0),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(0),
                 () -> assertThat(actual.getReviews()).isEmpty(),
                 () -> assertThat(actual.getCommentsCount()).isEqualTo(0),
                 () -> assertThat(actual.getComments()).isEmpty()
+        );
+    }
+
+    @Test
+    @DisplayName("평점, 리뷰, 코멘트가 모두 존재하는 카페를 조회한다")
+    void findCafeWithAll() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(1, "group", "느려요", "없어요",
+                        "불편해요", "없어요", "북적북적해요", "불편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "느려요", "없어요",
+                        "깨끗해요", "없어요", null, "보통이에요"));
+        Comment comment1 = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
+        commentRepository.save(comment1);
+        Comment comment2 = new Comment(cafe, member2, "와이파이가 왜케 느릴까요...");
+        commentRepository.save(comment2);
+        Comment comment3 = new Comment(cafe, member1, "다시 와봐도 똑같네요. 리뷰 수정할까 하다가 그대로 남겨요..");
+        commentRepository.save(comment3);
+
+        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getScore()).isEqualTo(1.5),
+                () -> assertThat(actual.getMyScore()).isEqualTo(1),
+                () -> assertThat(actual.getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(2),
+                () -> assertThat(actual.getCommentsCount()).isEqualTo(3),
+                () -> assertThat(actual.getComments())
+                        .extracting("nickname")
+                        .containsExactlyInAnyOrder("케이", "메리", "케이")
         );
     }
 
@@ -176,8 +216,6 @@ class CafeServiceTest {
                         "깨끗해요", "충분해요", "적당해요", "편해요")))
                 .isInstanceOf(AlreadyExistsCafeReview.class);
     }
-
-    // TODO: 코멘트 기능 추가되면 조회 테스트 추가할 것
 
     @Test
     @DisplayName("등록한 카페 리뷰를 성공적으로 수정한다")
