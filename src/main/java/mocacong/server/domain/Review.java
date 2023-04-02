@@ -66,14 +66,10 @@ public class Review {
     }
 
     public void updateReview(CafeDetail newCafeDetail) {
-        CafeDetail updatedCafeDetail = new CafeDetail(
-                newCafeDetail.getWifi() != null ? newCafeDetail.getWifi() : cafeDetail.getWifi(),
-                newCafeDetail.getParking() != null ? newCafeDetail.getParking() : cafeDetail.getParking(),
-                newCafeDetail.getToilet() != null ? newCafeDetail.getToilet() : cafeDetail.getToilet(),
-                newCafeDetail.getDesk() != null ? newCafeDetail.getDesk() : cafeDetail.getDesk(),
-                newCafeDetail.getPower() != null ? newCafeDetail.getPower() : cafeDetail.getPower(),
-                newCafeDetail.getSound() != null ? newCafeDetail.getSound() : cafeDetail.getSound()
-        );
-        this.cafeDetail = updatedCafeDetail;
+        this.cafeDetail = newCafeDetail;
+    }
+
+    public void updateStudyType(String studyType) {
+        this.studyType.updateStudyTypeValue(studyType);
     }
 }

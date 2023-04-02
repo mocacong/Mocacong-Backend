@@ -189,10 +189,7 @@ class CafeServiceTest {
         cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        CafeReviewUpdateRequest request = new CafeReviewUpdateRequest(5, "group", "빵빵해요", "여유로워요",
-                "깨끗해요", "충분해요", "조용해요", "불편해요");
 
-        cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(), request);
         CafeReviewUpdateResponse actual = cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(),
                 new CafeReviewUpdateRequest(5, "group", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "불편해요"));

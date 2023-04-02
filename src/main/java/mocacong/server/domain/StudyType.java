@@ -47,4 +47,10 @@ public class StudyType {
             throw new InvalidStudyTypeException();
         }
     }
+
+    public void updateStudyTypeValue(String studyTypeValue) {
+        String lowerCaseStudyTypeValue = studyTypeValue.toLowerCase();
+        validateValue(lowerCaseStudyTypeValue);
+        this.studyTypeValue = lowerCaseStudyTypeValue;
+    }
 }

@@ -154,13 +154,6 @@ public class CafeService {
         Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElseThrow(NotFoundReviewException::new);
 
-        StudyType studyType = review.getStudyType();
-        String newStudyTypeValue = request.getMyStudyType();
-        studyType = new StudyType(studyType.getMember(), studyType.getCafe(), newStudyTypeValue);
-
-        score.delete();
-        Score newScore = new Score(request.getMyScore(), member, cafe);
-
         CafeDetail updatedCafeDetail = new CafeDetail(
                 Wifi.from(request.getMyWifi()),
                 Parking.from(request.getMyParking()),
@@ -170,6 +163,8 @@ public class CafeService {
                 Sound.from(request.getMySound())
         );
 
+        score.updateScore(request.getMyScore());
+        review.updateStudyType(request.getMyStudyType());
         review.updateReview(updatedCafeDetail);
     }
 }

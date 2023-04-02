@@ -46,9 +46,8 @@ public class Score {
         }
     }
 
-    public void delete() {
-        this.cafe.removeScore(this);
-        this.member = null;
-        this.cafe = null;
+    public void updateScore(int score) {
+        validateScoreRange(score);
+        this.score = score;
     }
 }
