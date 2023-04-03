@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Cafes", description = "카페")
 @RestController
@@ -65,5 +68,20 @@ public class CafeController {
     ) {
         CafeReviewUpdateResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "StudyType별로 카페 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping
+    public ResponseEntity<Map<String, List<String>>> getCafesByStudyType(@RequestParam(required = false) String studytype,
+                                                              @RequestBody Map<String, List<String>> requestBody) {
+        List<String> allCafeMapIds = requestBody.get("map_id");
+
+        List<String> filteredCafeMapIds = cafeService.filterCafesByStudyType(studytype, allCafeMapIds);
+
+        Map<String, List<String>> responseBody = new HashMap<>();
+        responseBody.put("map_id", filteredCafeMapIds);
+
+        return ResponseEntity.ok(responseBody);
     }
 }

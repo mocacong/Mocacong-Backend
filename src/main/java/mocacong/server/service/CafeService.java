@@ -1,18 +1,12 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
-import mocacong.server.dto.response.CafeReviewResponse;
-import mocacong.server.dto.response.CafeReviewUpdateResponse;
-import mocacong.server.dto.response.CommentResponse;
-import mocacong.server.dto.response.FindCafeResponse;
-import mocacong.server.dto.response.ReviewResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -21,8 +15,8 @@ import mocacong.server.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -186,5 +180,16 @@ public class CafeService {
         score.updateScore(request.getMyScore());
         review.updateStudyType(request.getMyStudyType());
         review.updateReview(updatedCafeDetail);
+    }
+
+    public List<String> filterCafesByStudyType(String studyTypeValue, List<String> allCafeMapIds){
+        List<Cafe> cafes = cafeRepository.findByStudyTypeValue(studyTypeValue);
+        Set<String> filteredCafeMapIds = cafes.stream()
+                .map(Cafe::getMapId)
+                .collect(Collectors.toSet());
+
+        return allCafeMapIds.stream()
+                .filter(filteredCafeMapIds::contains)
+                .collect(Collectors.toList());
     }
 }
