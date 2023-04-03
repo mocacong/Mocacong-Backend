@@ -3,6 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
+import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
@@ -182,14 +183,16 @@ public class CafeService {
         review.updateReview(updatedCafeDetail);
     }
 
-    public List<String> filterCafesByStudyType(String studyTypeValue, List<String> allCafeMapIds){
+    public CafeFilterResponse filterCafesByStudyType(String studyTypeValue, CafeFilterRequest requestBody) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(studyTypeValue);
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());
 
-        return allCafeMapIds.stream()
+        List<String> filteredIds = requestBody.getMapIds().stream()
                 .filter(filteredCafeMapIds::contains)
                 .collect(Collectors.toList());
+
+        return new CafeFilterResponse(filteredIds);
     }
 }

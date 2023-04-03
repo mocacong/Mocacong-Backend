@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
+import mocacong.server.dto.response.CafeFilterResponse;
 import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.FindCafeResponse;
@@ -16,9 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Tag(name = "Cafes", description = "카페")
 @RestController
@@ -73,13 +72,9 @@ public class CafeController {
     @Operation(summary = "StudyType별로 카페 조회")
     @SecurityRequirement(name = "JWT")
     @GetMapping
-    public ResponseEntity<Map<String, List<String>>> getCafesByStudyType(@RequestParam(required = false) String studytype,
-                                                              @RequestBody Map<String, List<String>> requestBody) {
-        List<String> allCafeMapIds = requestBody.get("map_id");
-        List<String> filteredCafeMapIds = cafeService.filterCafesByStudyType(studytype, allCafeMapIds);
-        Map<String, List<String>> responseBody = new HashMap<>();
-        responseBody.put("map_id", filteredCafeMapIds);
-
+    public ResponseEntity<CafeFilterResponse> getCafesByStudyType(@RequestParam(required = false) String studytype,
+                                                                  @RequestBody CafeFilterRequest requestBody) {
+        CafeFilterResponse responseBody = cafeService.filterCafesByStudyType(studytype, requestBody);
         return ResponseEntity.ok(responseBody);
     }
 }
