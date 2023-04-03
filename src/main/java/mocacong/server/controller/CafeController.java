@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
+import mocacong.server.dto.response.CafeFilterResponse;
 import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.FindCafeResponse;
@@ -65,5 +67,14 @@ public class CafeController {
     ) {
         CafeReviewUpdateResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "StudyType별로 카페 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping
+    public ResponseEntity<CafeFilterResponse> getCafesByStudyType(@RequestParam(required = false) String studytype,
+                                                                  @RequestBody CafeFilterRequest requestBody) {
+        CafeFilterResponse responseBody = cafeService.filterCafesByStudyType(studytype, requestBody);
+        return ResponseEntity.ok(responseBody);
     }
 }

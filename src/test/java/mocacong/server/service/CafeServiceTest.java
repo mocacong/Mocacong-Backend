@@ -4,9 +4,11 @@ import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Score;
+import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
+import mocacong.server.dto.response.CafeFilterResponse;
 import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.FindCafeResponse;
@@ -256,5 +258,59 @@ class CafeServiceTest {
                 "solo", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "불편해요")))
                 .isInstanceOf(NotFoundReviewException.class);
+    }
+
+    @Test
+    @DisplayName("studyTypeValue가 주어진 경우 해당 카페 목록을 필터링한다")
+    void getCafesFilter() {
+        Member member1 = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
+        Cafe cafe2 = new Cafe("2143154311111", "메리카페");
+        Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점");
+        Cafe cafe4 = new Cafe("1585656565441", "메리벅스");
+        cafeRepository.save(cafe1);
+        cafeRepository.save(cafe2);
+        cafeRepository.save(cafe3);
+        cafeRepository.save(cafe4);
+        cafeService.saveCafeReview(member1.getEmail(), cafe1.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+        cafeService.saveCafeReview(member1.getEmail(), cafe2.getMapId(),
+                new CafeReviewRequest(2, "group", "빵빵해요", "여유로워요",
+                        "깨끗해요", "없어요", "조용해요", "편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe3.getMapId(),
+                new CafeReviewRequest(5, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe4.getMapId(),
+                new CafeReviewRequest(4, "Solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+        CafeFilterRequest requestBody = new CafeFilterRequest(
+                List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId())
+        );
+
+        CafeFilterResponse filteredCafes = cafeService.filterCafesByStudyType("solo", requestBody);
+
+        assertThat(filteredCafes.getMapIds())
+                .containsExactlyInAnyOrder(cafe1.getMapId(), cafe3.getMapId(), cafe4.getMapId());
+    }
+
+    @Test
+    @DisplayName("studyTypeValue에 해당하는 카페가 없는 경우 빈 리스트를 반환한다")
+    void getCafesFilterWhenNoMatch() {
+        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe1);
+        cafeService.saveCafeReview(member.getEmail(), cafe1.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+        CafeFilterRequest requestBody = new CafeFilterRequest(List.of(cafe1.getMapId()));
+
+        CafeFilterResponse filteredCafes = cafeService.filterCafesByStudyType("group", requestBody);
+
+        assertThat(filteredCafes.getMapIds()).isEmpty();
     }
 }
