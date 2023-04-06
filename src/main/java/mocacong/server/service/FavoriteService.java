@@ -5,6 +5,7 @@ import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.FavoriteSaveResponse;
+import mocacong.server.exception.badrequest.AlreadyExistsFavorite;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CafeRepository;
@@ -27,7 +28,15 @@ public class FavoriteService {
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
+
+        validateDuplicateFavorite(cafe.getId(), member.getId());
         Favorite favorite = new Favorite(member, cafe);
         return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId());
+    }
+
+    private void validateDuplicateFavorite(Long cafeId, Long memberId) {
+        if (favoriteRepository.existsByCafeIdAndMemberId(cafeId, memberId)) {
+            throw new AlreadyExistsFavorite();
+        }
     }
 }
