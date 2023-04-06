@@ -53,14 +53,14 @@ public class CafeService {
         Score scoreByLoginUser = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
         String studyType = findMostFrequentStudyTypes(cafe.getId());
-        Favorite favorite = favoriteRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+        Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
 
         List<ReviewResponse> reviewResponses = findReviewResponses(cafe);
         List<CommentResponse> commentResponses = findCommentResponses(cafe, member);
         return new FindCafeResponse(
-                favorite != null,
-                favorite != null ? favorite.getId() : null,
+                favoriteId != null,
+                favoriteId,
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 studyType,

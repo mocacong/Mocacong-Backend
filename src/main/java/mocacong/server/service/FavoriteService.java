@@ -35,8 +35,9 @@ public class FavoriteService {
     }
 
     private void validateDuplicateFavorite(Long cafeId, Long memberId) {
-        if (favoriteRepository.existsByCafeIdAndMemberId(cafeId, memberId)) {
-            throw new AlreadyExistsFavorite();
-        }
+        favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafeId, memberId)
+                .ifPresent(fav -> {
+                    throw new AlreadyExistsFavorite();
+                });
     }
 }
