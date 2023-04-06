@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FindCafeResponse {
 
+    private Boolean favorite;
+    private Long favoriteId;
     private double score;
     private Integer myScore;
     private String studyType;

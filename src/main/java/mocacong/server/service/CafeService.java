@@ -1,5 +1,8 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -16,10 +19,6 @@ import mocacong.server.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class CafeService {
@@ -33,6 +32,7 @@ public class CafeService {
     private final StudyTypeRepository studyTypeRepository;
     private final ScoreRepository scoreRepository;
     private final ReviewRepository reviewRepository;
+    private final FavoriteRepository favoriteRepository;
 
     public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
@@ -53,10 +53,14 @@ public class CafeService {
         Score scoreByLoginUser = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
         String studyType = findMostFrequentStudyTypes(cafe.getId());
+        Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElse(null);
 
         List<ReviewResponse> reviewResponses = findReviewResponses(cafe);
         List<CommentResponse> commentResponses = findCommentResponses(cafe, member);
         return new FindCafeResponse(
+                favoriteId != null,
+                favoriteId,
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 studyType,
