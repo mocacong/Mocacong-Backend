@@ -3,6 +3,7 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.IsDuplicateEmailResponse;
@@ -11,10 +12,10 @@ import mocacong.server.dto.response.MemberGetAllResponse;
 import mocacong.server.dto.response.MemberSignUpResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.MemberService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -45,6 +46,16 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "프로필 이미지 수정")
+    @PutMapping(value = "/mypage/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateProfileImage(
+            @LoginUserEmail String email,
+            @RequestParam(value = "file", required = false) MultipartFile multipartFile
+    ) {
+        memberService.updateProfileImage(email, multipartFile);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "회원탈퇴")
     @SecurityRequirement(name = "JWT")
     @DeleteMapping
@@ -59,7 +70,7 @@ public class MemberController {
         memberService.deleteAll();
         return ResponseEntity.ok().build();
     }
-    
+
     @Operation(summary = "회원전체조회")
     @GetMapping("/all")
     public MemberGetAllResponse getAllMembers() {
