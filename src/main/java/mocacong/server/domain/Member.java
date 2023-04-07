@@ -14,7 +14,7 @@ import mocacong.server.exception.badrequest.InvalidPhoneException;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
 
-    private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Z가-힣]{2,6}$");
+    private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]{2,6}$");
     private static final Pattern PHONE_REGEX = Pattern.compile("^01[\\d\\-]{8,12}$");
 
     @Id
