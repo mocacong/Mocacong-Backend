@@ -20,6 +20,15 @@ class MemberTest {
     }
 
     @ParameterizedTest
+    @DisplayName("닉네임은 초성, 중성, 종성 분리하여 지을 수 있다")
+    @ValueSource(strings = {"ㄱㅁㄴㄷㄹ", "ㅏㅣㅓㅜ", "가ㅏ누ㅟ"})
+    void createMemberNicknameOnlyOnset(String nickname) {
+        assertDoesNotThrow(
+                () -> new Member("kth990303@naver.com", "a1b2c3d4", nickname, "010-1234-5678")
+        );
+    }
+
+    @ParameterizedTest
     @DisplayName("닉네임이 2~6자가 아니면 예외를 반환한다")
     @ValueSource(strings = {"일", "일이삼사오육칠"})
     void nicknameLengthValidation(String nickname) {
