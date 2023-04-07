@@ -46,6 +46,10 @@ public class Comment {
         return this.member.getNickname();
     }
 
+    public String getWriterImgUrl() {
+        return this.member.getImgUrl();
+    }
+
     public boolean isWrittenByMember(Member member) {
         return this.member.equals(member);
     }

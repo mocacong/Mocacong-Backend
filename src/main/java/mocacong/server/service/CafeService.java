@@ -82,11 +82,10 @@ public class CafeService {
         return cafe.getComments()
                 .stream()
                 .map(comment -> {
-                    // TODO: imgUrl 추가되면 해당 로직 변경할 것
                     if (comment.isWrittenByMember(member)) {
-                        return new CommentResponse("", member.getNickname(), comment.getContent(), true);
+                        return new CommentResponse(member.getImgUrl(), member.getNickname(), comment.getContent(), true);
                     } else {
-                        return new CommentResponse("", comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
                     }
                 })
                 .collect(Collectors.toList());
