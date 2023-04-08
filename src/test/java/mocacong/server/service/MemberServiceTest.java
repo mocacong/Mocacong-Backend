@@ -1,22 +1,29 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.IsDuplicateEmailResponse;
 import mocacong.server.dto.response.IsDuplicateNicknameResponse;
+import mocacong.server.dto.response.MemberGetAllResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.support.AwsS3Uploader;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ServiceTest
@@ -28,6 +35,9 @@ class MemberServiceTest {
     private MemberService memberService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private AwsS3Uploader awsS3Uploader;
 
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
@@ -160,14 +170,45 @@ class MemberServiceTest {
         List<Member> actual = memberRepository.findAll();
         assertThat(actual).hasSize(0);
     }
-    
+
+    @Test
     @DisplayName("회원을 전체 조회한다")
     void getAllMembers() {
         memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
         memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
 
-        List<Member> members = memberRepository.findAll();
+        MemberGetAllResponse actual = memberService.getAllMembers();
 
-        assertThat(members).hasSize(2);
+        assertThat(actual.getMembers()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("회원의 프로필 이미지를 변경하면 s3 서버와 연동하여 이미지를 업로드한다")
+    void updateProfileImg() throws IOException {
+        String expected = "test_img.jpg";
+        Member member = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        memberService.updateProfileImage(member.getEmail(), mockMultipartFile);
+
+        Member actual = memberRepository.findByEmail(member.getEmail())
+                .orElseThrow();
+        assertThat(actual.getImgUrl()).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("회원이 프로필 이미지를 삭제하거나 null로 설정하면 프로필 이미지는 null로 설정된다")
+    void updateProfileImgWithNull() {
+        Member member = memberRepository.save(
+                new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", "test.me.jpg")
+        );
+
+        memberService.updateProfileImage(member.getEmail(), null);
+
+        Member actual = memberRepository.findByEmail(member.getEmail())
+                .orElseThrow();
+        assertThat(actual.getImgUrl()).isNull();
     }
 }

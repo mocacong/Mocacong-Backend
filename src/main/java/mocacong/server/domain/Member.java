@@ -34,12 +34,20 @@ public class Member {
     @Column(name = "phone", nullable = false)
     private String phone;
 
-    public Member(String email, String password, String nickname, String phone) {
+    @Column(name = "img_url")
+    private String imgUrl;
+
+    public Member(String email, String password, String nickname, String phone, String imgUrl) {
         validateMemberInfo(nickname, phone);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phone = phone;
+        this.imgUrl = imgUrl;
+    }
+
+    public Member(String email, String password, String nickname, String phone) {
+        this(email, password, nickname, phone, null);
     }
 
     private void validateMemberInfo(String nickname, String phone) {
@@ -57,5 +65,9 @@ public class Member {
         if (!PHONE_REGEX.matcher(phone).matches()) {
             throw new InvalidPhoneException();
         }
+    }
+
+    public void updateProfileImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 }

@@ -14,9 +14,11 @@ import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.support.AwsS3Uploader;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AwsS3Uploader awsS3Uploader;
 
     public MemberSignUpResponse signUp(MemberSignUpRequest request) {
         validatePassword(request.getPassword());
@@ -93,6 +96,14 @@ public class MemberService {
         if (nickname.isBlank()) {
             throw new InvalidNicknameException();
         }
+    }
+
+    @Transactional
+    public void updateProfileImage(String email, MultipartFile profileImg) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        String profileImgUrl = profileImg == null ? null : awsS3Uploader.uploadImage(profileImg);
+        member.updateProfileImgUrl(profileImgUrl);
     }
 }
 

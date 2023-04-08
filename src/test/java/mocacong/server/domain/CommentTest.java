@@ -37,6 +37,16 @@ class CommentTest {
     }
 
     @Test
+    @DisplayName("댓글 작성자 프로필 이미지 url을 반환한다")
+    void getWriterImgUrl() {
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678", "test_img.jpg");
+        Cafe cafe = new Cafe("1", "케이카페");
+        Comment comment = new Comment(cafe, member, "안녕하세요");
+
+        assertThat(comment.getWriterImgUrl()).isEqualTo(member.getImgUrl());
+    }
+
+    @Test
     @DisplayName("코멘트가 해당 회원이 작성한 게 맞는지 여부를 반환한다")
     void isWrittenByMember() {
         Member member1 = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
