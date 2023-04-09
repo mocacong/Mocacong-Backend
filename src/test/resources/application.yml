@@ -29,3 +29,9 @@ cloud:
       auto: false
     stack:
       auto: false
+
+oauth:
+  apple:
+    iss: https://appleid.apple.com
+    client-id: test
+    nonce: nonce

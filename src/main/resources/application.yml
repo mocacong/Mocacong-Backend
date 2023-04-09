@@ -45,3 +45,16 @@ cloud:
     credentials:
       access-key: ${S3_ACCESS_KEY}
       secret-key: ${S3_SECRET_KEY}
+
+oauth:
+  apple:
+    iss: https://appleid.apple.com
+    client-id: test
+    nonce: test
+
+feign:
+  client:
+    config:
+      apple-public-key-client:
+        connectTimeout: 5000
+        readTimeout: 3000
