@@ -26,6 +26,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation platform("org.springframework.cloud:spring-cloud-dependencies:2021.0.5")
+	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -34,6 +36,6 @@ dependencies {
 	testImplementation 'io.rest-assured:rest-assured'
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }
