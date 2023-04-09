@@ -25,7 +25,7 @@ public class Member {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "nickname", nullable = false)
@@ -37,17 +37,33 @@ public class Member {
     @Column(name = "img_url")
     private String imgUrl;
 
-    public Member(String email, String password, String nickname, String phone, String imgUrl) {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "platform")
+    private Platform platform;
+
+    @Column(name = "platform_id")
+    private String platformId;
+
+    public Member(
+            String email, String password, String nickname, String phone, String imgUrl,
+            Platform platform, String platformId
+    ) {
         validateMemberInfo(nickname, phone);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.phone = phone;
         this.imgUrl = imgUrl;
+        this.platform = platform;
+        this.platformId = platformId;
+    }
+
+    public Member(String email, String password, String nickname, String phone, String imgUrl) {
+        this(email, password, nickname, phone, imgUrl, Platform.MOCACONG, null);
     }
 
     public Member(String email, String password, String nickname, String phone) {
-        this(email, password, nickname, phone, null);
+        this(email, password, nickname, phone, null, Platform.MOCACONG, null);
     }
 
     private void validateMemberInfo(String nickname, String phone) {
