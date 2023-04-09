@@ -1,5 +1,6 @@
 package mocacong.server.config;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.security.auth.AuthenticationPrincipalArgumentResolver;
 import mocacong.server.security.auth.LoginInterceptor;
@@ -7,8 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,9 +20,10 @@ public class AuthConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs", "/error")
-                .excludePathPatterns("/members", "/login", "/members/check-duplicate/email", "/members/check-duplicate/nickname",
-                        "/members/all", "/cafes");
-        }
+                .excludePathPatterns("/members", "/members/all", "/members/check-duplicate/**")
+                .excludePathPatterns("/login/**")
+                .excludePathPatterns("/cafes");
+    }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
