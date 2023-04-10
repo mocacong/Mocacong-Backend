@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class ApplePlatformMemberResponse {
 
     private String platformId;
+    private String email;
 }

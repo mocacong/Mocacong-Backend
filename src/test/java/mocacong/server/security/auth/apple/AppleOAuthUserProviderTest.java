@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.security.*;
 import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
@@ -37,6 +38,7 @@ class AppleOAuthUserProviderTest {
         String identityToken = Jwts.builder()
                 .setHeaderParam("kid", "W2R4HXF3K")
                 .claim("id", "12345678")
+                .claim("email", "kth@apple.com")
                 .setIssuer("iss")
                 .setIssuedAt(now)
                 .setAudience("aud")
@@ -51,6 +53,9 @@ class AppleOAuthUserProviderTest {
 
         ApplePlatformMemberResponse actual = appleOAuthUserProvider.getApplePlatformMember(identityToken);
 
-        assertThat(actual.getPlatformId()).isEqualTo(expected);
+        assertAll(
+                () -> assertThat(actual.getPlatformId()).isEqualTo(expected),
+                () -> assertThat(actual.getEmail()).isEqualTo("kth@apple.com")
+        );
     }
 }
