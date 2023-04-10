@@ -45,4 +45,28 @@ public class CafeDetail {
         this.power = power;
         this.sound = sound;
     }
+
+    public String getWifiValue() {
+        return wifi != null ? wifi.getValue() : null;
+    }
+
+    public String getParkingValue() {
+        return parking != null ? parking.getValue() : null;
+    }
+
+    public String getToiletValue() {
+        return toilet != null ? toilet.getValue() : null;
+    }
+
+    public String getDeskValue() {
+        return desk != null ? desk.getValue() : null;
+    }
+
+    public String getPowerValue() {
+        return power != null ? power.getValue() : null;
+    }
+
+    public String getSoundValue() {
+        return sound != null ? sound.getValue() : null;
+    }
 }
