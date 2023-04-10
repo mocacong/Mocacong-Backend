@@ -8,6 +8,7 @@ import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.IsDuplicateEmailResponse;
 import mocacong.server.dto.response.IsDuplicateNicknameResponse;
 import mocacong.server.dto.response.MemberGetAllResponse;
+import mocacong.server.dto.response.MyPageResponse;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
@@ -16,6 +17,7 @@ import mocacong.server.repository.MemberRepository;
 import mocacong.server.support.AwsS3Uploader;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -180,6 +182,22 @@ class MemberServiceTest {
         MemberGetAllResponse actual = memberService.getAllMembers();
 
         assertThat(actual.getMembers()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("마이페이지로 내 정보를 조회한다")
+    void findMyInfo() {
+        String imgUrl = "test_img.jpg";
+        String nickname = "케이";
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", nickname, "010-1234-5678", imgUrl);
+        memberRepository.save(member);
+
+        MyPageResponse actual = memberService.findMyInfo(member.getEmail());
+
+        assertAll(
+                () -> assertThat(actual.getImgUrl()).isEqualTo(imgUrl),
+                () -> assertThat(actual.getNickname()).isEqualTo(nickname)
+        );
     }
 
     @Test
