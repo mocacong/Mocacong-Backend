@@ -56,9 +56,9 @@ class BaseTimeTest {
         entityManager.flush();
         entityManager.clear();
 
-        Cafe cafe1 = cafeRepository.findByMapId("2143154352323").orElseThrow(NotFoundCafeException::new);
-        LocalDateTime createdTime = cafe1.getCreatedTime();
-        LocalDateTime modifiedTime = cafe1.getModifiedTime();
+        Cafe findCafe = cafeRepository.findByMapId("2143154352323").orElseThrow(NotFoundCafeException::new);
+        LocalDateTime createdTime = findCafe.getCreatedTime();
+        LocalDateTime modifiedTime = findCafe.getModifiedTime();
 
         assertThat(modifiedTime).isNotNull();
         assertThat(createdTime).isNotNull();

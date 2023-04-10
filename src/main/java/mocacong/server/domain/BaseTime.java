@@ -23,14 +23,14 @@ public class BaseTime {
     @Column(name = "modified_time", nullable = false)
     private LocalDateTime modifiedTime;
 
-    @PrePersist // (3)
+    @PrePersist
     public void before() {
         LocalDateTime now = LocalDateTime.now();
         this.createdTime = now;
         this.modifiedTime = now;
     }
 
-    @PreUpdate // (4)
+    @PreUpdate
     public void always() {
         this.modifiedTime = LocalDateTime.now();
     }
