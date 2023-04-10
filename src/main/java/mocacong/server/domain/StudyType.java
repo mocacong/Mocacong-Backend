@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "study_type")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class StudyType {
+public class StudyType extends BaseTime {
 
     private static final String SOLO_STUDY_TYPE = "solo";
     private static final String GROUP_STUDY_TYPE = "group";

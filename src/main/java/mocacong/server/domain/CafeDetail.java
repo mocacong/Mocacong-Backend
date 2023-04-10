@@ -11,7 +11,7 @@ import javax.persistence.Enumerated;
 @Embeddable
 @NoArgsConstructor
 @Getter
-public class CafeDetail {
+public class CafeDetail extends BaseTime {
 
     @Column(name = "wifi")
     @Enumerated(EnumType.STRING)

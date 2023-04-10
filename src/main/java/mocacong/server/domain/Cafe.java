@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 @Table(name = "cafe")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cafe {
+public class Cafe extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
