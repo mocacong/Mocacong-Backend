@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.response.IsDuplicateEmailResponse;
-import mocacong.server.dto.response.IsDuplicateNicknameResponse;
-import mocacong.server.dto.response.MemberGetAllResponse;
-import mocacong.server.dto.response.MemberSignUpResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.MemberService;
 import org.springframework.http.MediaType;
@@ -43,6 +40,14 @@ public class MemberController {
     @GetMapping("/check-duplicate/nickname")
     public ResponseEntity<IsDuplicateNicknameResponse> checkDuplicateNickname(@RequestParam String value) {
         IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(value);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "마이페이지 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/mypage")
+    public ResponseEntity<MyPageResponse> findMyInfo(@LoginUserEmail String email) {
+        MyPageResponse response = memberService.findMyInfo(email);
         return ResponseEntity.ok(response);
     }
 

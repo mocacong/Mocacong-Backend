@@ -1,17 +1,18 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
+import static mocacong.server.acceptance.AcceptanceFixtures.로그인_토큰_발급;
+import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.ErrorResponse;
+import mocacong.server.dto.response.MyPageResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import static mocacong.server.acceptance.AcceptanceFixtures.로그인_토큰_발급;
-import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
@@ -71,7 +72,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
     @Test
     @DisplayName("가입되어 있지 않은 이메일은 이메일 중복검사에서 걸리지 않는다")
-    void isDuplicateWithNonExistingEmail(){
+    void isDuplicateWithNonExistingEmail() {
         MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
 
         RestAssured.given().log().all()
@@ -85,7 +86,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
     @Test
     @DisplayName("이미 가입된 이메일은 이메일 중복검사에서 걸린다")
-    void isDuplicateWithExistingEmail(){
+    void isDuplicateWithExistingEmail() {
         MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
 
         회원_가입(request);
@@ -170,5 +171,27 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract()
                 .body();
+    }
+
+    @Test
+    @DisplayName("마이페이지로 내 정보를 조회한다")
+    void findMyInfo() {
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+
+        MyPageResponse actual = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/members/mypage")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(MyPageResponse.class);
+
+        assertAll(
+                () -> assertThat(actual.getNickname()).isEqualTo("케이"),
+                () -> assertThat(actual.getImgUrl()).isNull()
+        );
     }
 }
