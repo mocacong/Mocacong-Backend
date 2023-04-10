@@ -1,6 +1,6 @@
 package mocacong.server.repository;
 
-import mocacong.server.config.JpaAuditingConfiguration;
+import mocacong.server.config.BaseTimeConfig;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.StudyType;
@@ -15,7 +15,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(JpaAuditingConfiguration.class)
+@Import(BaseTimeConfig.class)
 class StudyTypeRepositoryTest {
 
     @Autowired

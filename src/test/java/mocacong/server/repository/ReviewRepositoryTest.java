@@ -1,6 +1,6 @@
 package mocacong.server.repository;
 
-import mocacong.server.config.JpaAuditingConfiguration;
+import mocacong.server.config.BaseTimeConfig;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import(JpaAuditingConfiguration.class)
+@Import(BaseTimeConfig.class)
 class ReviewRepositoryTest {
 
     @Autowired

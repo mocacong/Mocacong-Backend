@@ -1,6 +1,6 @@
 package mocacong.server.repository;
 
-import mocacong.server.config.JpaAuditingConfiguration;
+import mocacong.server.config.BaseTimeConfig;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
-@Import(JpaAuditingConfiguration.class)
+@Import(BaseTimeConfig.class)
 class FavoriteRepositoryTest {
 
     @Autowired

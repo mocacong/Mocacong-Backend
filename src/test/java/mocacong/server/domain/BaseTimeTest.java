@@ -1,5 +1,6 @@
 package mocacong.server.domain;
 
+import mocacong.server.config.BaseTimeConfig;
 import mocacong.server.domain.cafedetail.*;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.repository.CafeRepository;
@@ -8,14 +9,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DataJpaTest
+@Import(BaseTimeConfig.class)
 class BaseTimeTest {
 
     @Autowired
@@ -23,7 +26,7 @@ class BaseTimeTest {
     @Autowired
     CafeRepository cafeRepository;
     @Autowired
-    EntityManager entityManager;
+    TestEntityManager entityManager;
 
     @Test
     @DisplayName("멤버를 저장하면 생성 시각이 자동으로 저장된다")
@@ -42,18 +45,12 @@ class BaseTimeTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
         StudyType studyType = new StudyType(member, cafe, "solo");
         CafeDetail cafeDetail = new CafeDetail(Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.UNCOMFORTABLE, Power.MANY, Sound.LOUD);
         Review addReview = new Review(member, cafe, studyType, cafeDetail);
         cafe.addReview(addReview);
         cafe.updateCafeDetails();
         entityManager.flush();
-        entityManager.clear();
 
         Cafe findCafe = cafeRepository.findByMapId("2143154352323").orElseThrow(NotFoundCafeException::new);
         LocalDateTime createdTime = findCafe.getCreatedTime();
