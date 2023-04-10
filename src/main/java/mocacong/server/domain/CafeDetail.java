@@ -3,15 +3,12 @@ package mocacong.server.domain;
 import lombok.*;
 import mocacong.server.domain.cafedetail.*;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 @Embeddable
 @NoArgsConstructor
 @Getter
-public class CafeDetail extends BaseTime {
+public class CafeDetail {
 
     @Column(name = "wifi")
     @Enumerated(EnumType.STRING)
