@@ -48,6 +48,7 @@ public class CafeService {
     public FindCafeResponse findCafeByMapId(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
+        CafeDetail cafeDetail = cafe.getCafeDetail();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         Score scoreByLoginUser = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
@@ -55,7 +56,6 @@ public class CafeService {
         String studyType = findMostFrequentStudyTypes(cafe.getId());
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
-
         List<CommentResponse> commentResponses = findCommentResponses(cafe, member);
         return new FindCafeResponse(
                 favoriteId != null,
@@ -63,12 +63,12 @@ public class CafeService {
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 studyType,
-                cafe.getCafeDetail().getWifiValue(),
-                cafe.getCafeDetail().getParkingValue(),
-                cafe.getCafeDetail().getToiletValue(),
-                cafe.getCafeDetail().getPowerValue(),
-                cafe.getCafeDetail().getSoundValue(),
-                cafe.getCafeDetail().getDeskValue(),
+                cafeDetail.getWifiValue(),
+                cafeDetail.getParkingValue(),
+                cafeDetail.getToiletValue(),
+                cafeDetail.getPowerValue(),
+                cafeDetail.getSoundValue(),
+                cafeDetail.getDeskValue(),
                 cafe.getReviews().size(),
                 commentResponses.size(),
                 commentResponses

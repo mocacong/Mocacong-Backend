@@ -1,12 +1,12 @@
 package mocacong.server.domain;
 
-import lombok.*;
-import mocacong.server.domain.cafedetail.*;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import mocacong.server.domain.cafedetail.*;
 
 @Embeddable
 @NoArgsConstructor
