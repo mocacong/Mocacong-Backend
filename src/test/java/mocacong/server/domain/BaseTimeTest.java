@@ -1,6 +1,7 @@
 package mocacong.server.domain;
 
 import mocacong.server.domain.cafedetail.*;
+import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,9 +20,10 @@ class BaseTimeTest {
 
     @Autowired
     MemberRepository memberRepository;
-
     @Autowired
     CafeRepository cafeRepository;
+    @Autowired
+    EntityManager entityManager;
 
     @Test
     @DisplayName("멤버를 저장하면 생성 시각이 자동으로 저장된다")
@@ -34,7 +37,7 @@ class BaseTimeTest {
 
     @Test
     @DisplayName("카페 리뷰를 수정하면 수정 시각이 자동으로 저장된다")
-    public void updateCafeAtNow() {
+    public void updateCafeAtNow() throws InterruptedException {
         Member member = new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
@@ -43,14 +46,22 @@ class BaseTimeTest {
         CafeDetail cafeDetail = new CafeDetail(Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.UNCOMFORTABLE, Power.MANY, Sound.LOUD);
         Review addReview = new Review(member, cafe, studyType, cafeDetail);
         cafe.addReview(addReview);
+        cafe.updateCafeDetails();
+        Thread.sleep(2000);
         CafeDetail changedCafeDetail = new CafeDetail(Wifi.NORMAL, Parking.NONE, Toilet.CLEAN, Desk.NORMAL, Power.MANY, Sound.LOUD);
         Review updateReview = new Review(member, cafe, studyType, changedCafeDetail);
         cafe.addReview(updateReview);
-
         updateReview.updateReview(changedCafeDetail);
         cafe.updateCafeDetails();
-        LocalDateTime modifiedTime = cafe.getModifiedTime();
+        entityManager.flush();
+        entityManager.clear();
+
+        Cafe cafe1 = cafeRepository.findByMapId("2143154352323").orElseThrow(NotFoundCafeException::new);
+        LocalDateTime createdTime = cafe1.getCreatedTime();
+        LocalDateTime modifiedTime = cafe1.getModifiedTime();
 
         assertThat(modifiedTime).isNotNull();
+        assertThat(createdTime).isNotNull();
+        assertThat(modifiedTime).isAfter(createdTime);
     }
 }
