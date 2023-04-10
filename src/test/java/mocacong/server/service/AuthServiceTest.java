@@ -1,15 +1,23 @@
 package mocacong.server.service;
 
 import mocacong.server.domain.Member;
+import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.AuthLoginRequest;
+import mocacong.server.dto.request.AppleLoginRequest;
+import mocacong.server.dto.response.AppleTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.repository.MemberRepository;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
+import mocacong.server.security.auth.apple.ApplePlatformMemberResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ServiceTest
@@ -21,6 +29,9 @@ class AuthServiceTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthService authService;
+
+    @MockBean
+    private AppleOAuthUserProvider appleOAuthUserProvider;
 
     @Test
     @DisplayName("회원 로그인 요청이 옳다면 토큰을 발급한다")
@@ -50,5 +61,47 @@ class AuthServiceTest {
 
         assertThrows(PasswordMismatchException.class,
                 () -> authService.login(loginRequest));
+    }
+
+    @Test
+    @DisplayName("Apple OAuth 로그인 시 가입되지 않은 회원일 경우 이메일 값을 보내고 isRegistered 값을 false로 보낸다")
+    void appleOAuthNotRegistered() {
+        String expected = "kth@apple.com";
+        when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
+                .thenReturn(new ApplePlatformMemberResponse("1234321", expected));
+
+        AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+
+        assertAll(
+                () -> assertThat(actual.getToken()).isNull(),
+                () -> assertThat(actual.getEmail()).isEqualTo(expected),
+                () -> assertThat(actual.getIsRegistered()).isFalse()
+        );
+    }
+
+    @Test
+    @DisplayName("Apple OAuth 로그인 시 이미 가입된 회원일 경우 토큰과 이메일, 그리고 isRegistered 값을 true로 보낸다")
+    void appleOAuthRegistered() {
+        String expected = "kth@apple.com";
+        Member member = new Member(
+                expected,
+                passwordEncoder.encode("a1b2c3d4"),
+                "케이",
+                "010-1234-1234",
+                null,
+                Platform.APPLE,
+                "1234321"
+        );
+        memberRepository.save(member);
+        when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
+                .thenReturn(new ApplePlatformMemberResponse("1234321", expected));
+
+        AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+
+        assertAll(
+                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getEmail()).isEqualTo(expected),
+                () -> assertThat(actual.getIsRegistered()).isTrue()
+        );
     }
 }
