@@ -56,7 +56,6 @@ public class CafeService {
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
 
-        List<ReviewResponse> reviewResponses = findReviewResponses(cafe);
         List<CommentResponse> commentResponses = findCommentResponses(cafe, member);
         return new FindCafeResponse(
                 favoriteId != null,
@@ -64,18 +63,16 @@ public class CafeService {
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 studyType,
-                reviewResponses.size(),
-                reviewResponses,
+                cafe.getCafeDetail().getWifiValue(),
+                cafe.getCafeDetail().getParkingValue(),
+                cafe.getCafeDetail().getToiletValue(),
+                cafe.getCafeDetail().getPowerValue(),
+                cafe.getCafeDetail().getSoundValue(),
+                cafe.getCafeDetail().getDeskValue(),
+                cafe.getReviews().size(),
                 commentResponses.size(),
                 commentResponses
         );
-    }
-
-    private List<ReviewResponse> findReviewResponses(Cafe cafe) {
-        return cafe.getReviews()
-                .stream()
-                .map(ReviewResponse::from)
-                .collect(Collectors.toList());
     }
 
     private List<CommentResponse> findCommentResponses(Cafe cafe, Member member) {
