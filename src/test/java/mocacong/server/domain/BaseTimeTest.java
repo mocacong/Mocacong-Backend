@@ -36,22 +36,21 @@ class BaseTimeTest {
     }
 
     @Test
-    @DisplayName("카페 리뷰를 수정하면 수정 시각이 자동으로 저장된다")
-    public void updateCafeAtNow() throws InterruptedException {
+    @DisplayName("카페 객체를 수정하면 수정 시각이 자동으로 저장된다")
+    public void updateCafeAtNow() {
         Member member = new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         StudyType studyType = new StudyType(member, cafe, "solo");
         CafeDetail cafeDetail = new CafeDetail(Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.UNCOMFORTABLE, Power.MANY, Sound.LOUD);
         Review addReview = new Review(member, cafe, studyType, cafeDetail);
         cafe.addReview(addReview);
-        cafe.updateCafeDetails();
-        Thread.sleep(2000);
-        CafeDetail changedCafeDetail = new CafeDetail(Wifi.NORMAL, Parking.NONE, Toilet.CLEAN, Desk.NORMAL, Power.MANY, Sound.LOUD);
-        Review updateReview = new Review(member, cafe, studyType, changedCafeDetail);
-        cafe.addReview(updateReview);
-        updateReview.updateReview(changedCafeDetail);
         cafe.updateCafeDetails();
         entityManager.flush();
         entityManager.clear();
