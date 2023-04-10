@@ -37,6 +37,7 @@ public class AwsS3Uploader {
                     .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (IOException e) {
             log.error("S3 파일 업로드에 실패했습니다. {}", e.getMessage());
+            throw new IllegalStateException("S3 파일 업로드에 실패했습니다.");
         }
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
