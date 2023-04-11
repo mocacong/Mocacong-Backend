@@ -1,18 +1,19 @@
 package mocacong.server.domain;
 
-import java.util.regex.Pattern;
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
 
+import javax.persistence.*;
+import java.util.regex.Pattern;
+
 @Entity
 @Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseTime {
 
     private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]{2,6}$");
     private static final Pattern PHONE_REGEX = Pattern.compile("^01[\\d\\-]{8,12}$");
