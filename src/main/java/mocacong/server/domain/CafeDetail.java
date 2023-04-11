@@ -1,9 +1,12 @@
 package mocacong.server.domain;
 
-import lombok.*;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import mocacong.server.domain.cafedetail.*;
-
-import javax.persistence.*;
 
 @Embeddable
 @NoArgsConstructor
@@ -41,5 +44,29 @@ public class CafeDetail {
         this.desk = desk;
         this.power = power;
         this.sound = sound;
+    }
+
+    public String getWifiValue() {
+        return wifi != null ? wifi.getValue() : null;
+    }
+
+    public String getParkingValue() {
+        return parking != null ? parking.getValue() : null;
+    }
+
+    public String getToiletValue() {
+        return toilet != null ? toilet.getValue() : null;
+    }
+
+    public String getDeskValue() {
+        return desk != null ? desk.getValue() : null;
+    }
+
+    public String getPowerValue() {
+        return power != null ? power.getValue() : null;
+    }
+
+    public String getSoundValue() {
+        return sound != null ? sound.getValue() : null;
     }
 }

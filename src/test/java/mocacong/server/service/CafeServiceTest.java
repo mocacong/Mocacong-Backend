@@ -77,7 +77,7 @@ class CafeServiceTest {
                 () -> assertThat(actual.getMyScore()).isNull(),
                 () -> assertThat(actual.getStudyType()).isNull(),
                 () -> assertThat(actual.getCommentsCount()).isEqualTo(0),
-                () -> assertThat(actual.getReviews()).isEmpty(),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(0),
                 () -> assertThat(actual.getCommentsCount()).isEqualTo(0),
                 () -> assertThat(actual.getComments()).isEmpty()
         );
@@ -106,7 +106,6 @@ class CafeServiceTest {
                 () -> assertThat(actual.getMyScore()).isEqualTo(score1.getScore()),
                 () -> assertThat(actual.getStudyType()).isNull(),
                 () -> assertThat(actual.getReviewsCount()).isEqualTo(0),
-                () -> assertThat(actual.getReviews()).isEmpty(),
                 () -> assertThat(actual.getCommentsCount()).isEqualTo(0),
                 () -> assertThat(actual.getComments()).isEmpty()
         );

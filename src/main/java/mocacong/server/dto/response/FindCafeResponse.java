@@ -16,8 +16,13 @@ public class FindCafeResponse {
     private double score;
     private Integer myScore;
     private String studyType;
+    private String wifi;
+    private String parking;
+    private String toilet;
+    private String power;
+    private String sound;
+    private String desk;
     private int reviewsCount;
-    private List<ReviewResponse> reviews;
     private int commentsCount;
     private List<CommentResponse> comments;
 }
