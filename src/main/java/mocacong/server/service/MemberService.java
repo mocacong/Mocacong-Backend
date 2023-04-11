@@ -98,6 +98,12 @@ public class MemberService {
         }
     }
 
+    public MyPageResponse findMyInfo(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        return new MyPageResponse(member.getNickname(), member.getImgUrl());
+    }
+
     @Transactional
     public void updateProfileImage(String email, MultipartFile profileImg) {
         Member member = memberRepository.findByEmail(email)

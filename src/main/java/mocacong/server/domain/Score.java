@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "score")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Score {
+public class Score extends BaseTime {
 
     private static final int MAXIMUM_SCORE = 5;
     private static final int MINIMUM_SCORE = 1;
