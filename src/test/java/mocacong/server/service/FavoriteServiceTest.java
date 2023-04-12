@@ -1,20 +1,24 @@
 package mocacong.server.service;
 
-import java.util.List;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.FavoriteSaveResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsFavorite;
+import mocacong.server.exception.notfound.NotFoundFavoriteException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ServiceTest
 class FavoriteServiceTest {
@@ -56,5 +60,32 @@ class FavoriteServiceTest {
 
         assertThatThrownBy(() -> favoriteService.save(member.getEmail(), cafe.getMapId()))
                 .isInstanceOf(AlreadyExistsFavorite.class);
+    }
+
+    @Test
+    @DisplayName("회원이 카페를 즐겨찾기 삭제한다")
+    void delete() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Favorite favorite = new Favorite(member, cafe);
+        favoriteRepository.save(favorite);
+
+        favoriteService.delete(member.getEmail(), cafe.getMapId());
+
+        assertThat(favoriteRepository.findById(favorite.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("회원이 즐겨찾기를 안한 카페 즐겨찾기 삭제할 경우 예외를 던진다")
+    void deleteWithException() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+
+        assertThrows(NotFoundFavoriteException.class,
+                () -> favoriteService.delete(member.getEmail(), cafe.getMapId()));
     }
 }
