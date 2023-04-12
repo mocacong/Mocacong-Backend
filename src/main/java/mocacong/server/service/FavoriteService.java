@@ -42,16 +42,15 @@ public class FavoriteService {
                 });
     }
 
-    public void delete(String email, String mapId, Long favoriteId) {
+    @Transactional
+    public void delete(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        Favorite favorite = favoriteRepository.findByFavoriteId(favoriteId);
+        Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
+                        .orElseThrow(NotFoundFavoriteException::new);
 
-        if (favorite == null || !favorite.getMember().equals(member) || !favorite.getCafe().equals(cafe)) {
-            throw new NotFoundFavoriteException();
-        }
-        favoriteRepository.delete(favorite);
+        favoriteRepository.deleteById(favoriteId);
     }
 }

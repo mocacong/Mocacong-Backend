@@ -14,5 +14,4 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
             "join f.member m " +
             "where c.id = :cafeId and m.id = :memberId")
     Optional<Long> findFavoriteIdByCafeIdAndMemberId(Long cafeId, Long memberId);
-    Favorite findByFavoriteId(Long favoriteId);
 }

@@ -31,13 +31,12 @@ public class FavoriteController {
 
     @Operation(summary = "카페 즐겨찾기 삭제")
     @SecurityRequirement(name = "JWT")
-    @DeleteMapping
+    @DeleteMapping("/{favoriteId}")
     public ResponseEntity<Void> deleteFavoriteCafe(
             @LoginUserEmail String email,
-            @PathVariable String mapId,
-            @PathVariable Long favoriteId
+            @PathVariable String mapId
     ) {
-        favoriteService.delete(email, mapId, favoriteId);
+        favoriteService.delete(email, mapId);
         return ResponseEntity.ok().build();
     }
 
