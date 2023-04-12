@@ -39,5 +39,4 @@ public class FavoriteController {
         favoriteService.delete(email, mapId);
         return ResponseEntity.ok().build();
     }
-
 }
