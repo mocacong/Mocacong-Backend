@@ -12,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @RequiredArgsConstructor
 public class AuthConfig implements WebMvcConfigurer {
+
     private final LoginInterceptor loginInterceptor;
     private final AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver;
 
@@ -20,7 +21,7 @@ public class AuthConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs", "/error")
-                .excludePathPatterns("/members", "/members/all", "/members/check-duplicate/**")
+                .excludePathPatterns("/members", "/members/oauth", "/members/all", "/members/check-duplicate/**")
                 .excludePathPatterns("/login/**")
                 .excludePathPatterns("/cafes");
     }
