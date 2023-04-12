@@ -38,7 +38,7 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
-        Response response = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(token)
                 .when().post("/cafes/" + mapId + "/favorites")
@@ -46,12 +46,10 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract().response();
 
-        String favoriteId = response.path("id");
-
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(token)
-                .when().delete("/cafes/" + mapId + "/favorites/" + favoriteId)
+                .when().delete("/cafes/" + mapId + "/favorites")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
     }

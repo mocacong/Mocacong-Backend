@@ -31,7 +31,7 @@ public class FavoriteController {
 
     @Operation(summary = "카페 즐겨찾기 삭제")
     @SecurityRequirement(name = "JWT")
-    @DeleteMapping("/{favoriteId}")
+    @DeleteMapping
     public ResponseEntity<Void> deleteFavoriteCafe(
             @LoginUserEmail String email,
             @PathVariable String mapId
