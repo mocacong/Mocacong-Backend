@@ -60,7 +60,6 @@ class FavoriteServiceTest {
                 .isInstanceOf(AlreadyExistsFavorite.class);
     }
 
-
     @Test
     @DisplayName("회원이 카페를 즐겨찾기 삭제한다")
     void delete() {
