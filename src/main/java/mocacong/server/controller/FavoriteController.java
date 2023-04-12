@@ -8,10 +8,7 @@ import mocacong.server.dto.response.FavoriteSaveResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.FavoriteService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Favorites", description = "즐겨찾기")
 @RestController
@@ -30,5 +27,16 @@ public class FavoriteController {
     ) {
         FavoriteSaveResponse response = favoriteService.save(email, mapId);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "카페 즐겨찾기 삭제")
+    @SecurityRequirement(name = "JWT")
+    @DeleteMapping
+    public ResponseEntity<Void> deleteFavoriteCafe(
+            @LoginUserEmail String email,
+            @PathVariable String mapId
+    ) {
+        favoriteService.delete(email, mapId);
+        return ResponseEntity.ok().build();
     }
 }
