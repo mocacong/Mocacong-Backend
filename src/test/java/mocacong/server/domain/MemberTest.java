@@ -2,7 +2,9 @@ package mocacong.server.domain;
 
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,32 @@ class MemberTest {
     void createMember() {
         assertDoesNotThrow(
                 () -> new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678")
+        );
+    }
+
+    @Test
+    @DisplayName("OAuth 회원 가입 시에 입력받은 정보로 수정한다")
+    void registerOAuthMember() {
+        Member member = new Member("kth@apple.com", Platform.APPLE, "1234321");
+
+        member.registerOAuthMember("kth990303@apple.com", "케이");
+
+        assertAll(
+                () -> assertThat(member.getEmail()).isEqualTo("kth990303@apple.com"),
+                () -> assertThat(member.getNickname()).isEqualTo("케이")
+        );
+    }
+
+    @Test
+    @DisplayName("OAuth 회원 가입 시에 입력받은 정보 중 이메일이 null이면 이메일은 수정되지 않는다")
+    void registerOAuthMemberWhenEmailIsNull() {
+        Member member = new Member("kth@apple.com", Platform.APPLE, "1234321");
+
+        member.registerOAuthMember(null, "케이");
+
+        assertAll(
+                () -> assertThat(member.getEmail()).isNotNull(),
+                () -> assertThat(member.getNickname()).isEqualTo("케이")
         );
     }
 
