@@ -51,7 +51,7 @@ cloud:
 oauth:
   apple:
     iss: https://appleid.apple.com
-    client-id: test
+    client-id: ${OAUTH_APPLE_CLIENT_ID}
     nonce: test
 
 feign:
