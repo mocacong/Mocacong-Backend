@@ -5,6 +5,7 @@ import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.FavoriteSaveResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsFavorite;
+import mocacong.server.exception.notfound.NotFoundFavoriteException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
@@ -17,6 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ServiceTest
 class FavoriteServiceTest {
@@ -73,5 +75,17 @@ class FavoriteServiceTest {
         favoriteService.delete(member.getEmail(), cafe.getMapId());
 
         assertThat(favoriteRepository.findById(favorite.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("회원이 즐겨찾기를 안한 카페 즐겨찾기 삭제할 경우 예외를 던진다")
+    void deleteWithException() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+
+        assertThrows(NotFoundFavoriteException.class,
+                () -> favoriteService.delete(member.getEmail(), cafe.getMapId()));
     }
 }

@@ -49,7 +49,7 @@ public class FavoriteService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
-                        .orElseThrow(NotFoundFavoriteException::new);
+                .orElseThrow(NotFoundFavoriteException::new);
 
         favoriteRepository.deleteById(favoriteId);
     }
