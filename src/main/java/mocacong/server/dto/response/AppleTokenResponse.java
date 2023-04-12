@@ -13,4 +13,5 @@ public class AppleTokenResponse {
     private String token;
     private String email;
     private Boolean isRegistered;
+    private String platformId;
 }

@@ -3,8 +3,8 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
-import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.AppleLoginRequest;
+import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.AppleTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
@@ -38,15 +38,21 @@ public class AuthService {
     public AppleTokenResponse appleOAuthLogin(AppleLoginRequest request) {
         ApplePlatformMemberResponse applePlatformMember =
                 appleOAuthUserProvider.getApplePlatformMember(request.getToken());
+        String platformId = applePlatformMember.getPlatformId();
 
-        return memberRepository.findIdByPlatformAndPlatformId(Platform.APPLE, applePlatformMember.getPlatformId())
+        return memberRepository.findIdByPlatformAndPlatformId(Platform.APPLE, platformId)
                 .map(memberId -> {
                     Member findMember = memberRepository.findById(memberId)
                             .orElseThrow(NotFoundMemberException::new);
                     String token = issueToken(findMember);
-                    return new AppleTokenResponse(token, findMember.getEmail(), true);
+                    return new AppleTokenResponse(token, findMember.getEmail(), true, platformId);
                 })
-                .orElseGet(() -> new AppleTokenResponse(null, applePlatformMember.getEmail(), false));
+                .orElseGet(() -> {
+                    Member oauthMember = new Member(applePlatformMember.getEmail(), Platform.APPLE, platformId);
+                    Member savedMember = memberRepository.save(oauthMember);
+                    String token = issueToken(savedMember);
+                    return new AppleTokenResponse(token, applePlatformMember.getEmail(), false, platformId);
+                });
     }
 
     private String issueToken(final Member findMember) {

@@ -2,8 +2,8 @@ package mocacong.server.service;
 
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
-import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.AppleLoginRequest;
+import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.AppleTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
@@ -67,15 +67,17 @@ class AuthServiceTest {
     @DisplayName("Apple OAuth 로그인 시 가입되지 않은 회원일 경우 이메일 값을 보내고 isRegistered 값을 false로 보낸다")
     void appleOAuthNotRegistered() {
         String expected = "kth@apple.com";
+        String platformId = "1234321";
         when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
-                .thenReturn(new ApplePlatformMemberResponse("1234321", expected));
+                .thenReturn(new ApplePlatformMemberResponse(platformId, expected));
 
         AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNull(),
+                () -> assertThat(actual.getToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
-                () -> assertThat(actual.getIsRegistered()).isFalse()
+                () -> assertThat(actual.getIsRegistered()).isFalse(),
+                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
         );
     }
 
@@ -83,6 +85,7 @@ class AuthServiceTest {
     @DisplayName("Apple OAuth 로그인 시 이미 가입된 회원일 경우 토큰과 이메일, 그리고 isRegistered 값을 true로 보낸다")
     void appleOAuthRegistered() {
         String expected = "kth@apple.com";
+        String platformId = "1234321";
         Member member = new Member(
                 expected,
                 passwordEncoder.encode("a1b2c3d4"),
@@ -90,18 +93,19 @@ class AuthServiceTest {
                 "010-1234-1234",
                 null,
                 Platform.APPLE,
-                "1234321"
+                platformId
         );
         memberRepository.save(member);
         when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
-                .thenReturn(new ApplePlatformMemberResponse("1234321", expected));
+                .thenReturn(new ApplePlatformMemberResponse(platformId, expected));
 
         AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
                 () -> assertThat(actual.getToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
-                () -> assertThat(actual.getIsRegistered()).isTrue()
+                () -> assertThat(actual.getIsRegistered()).isTrue(),
+                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
         );
     }
 }
