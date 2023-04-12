@@ -7,6 +7,7 @@ import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.RepositoryTest;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,10 @@ class BaseTimeTest {
         LocalDateTime createdTime = findCafe.getCreatedTime();
         LocalDateTime modifiedTime = findCafe.getModifiedTime();
 
-        assertThat(modifiedTime).isNotNull();
-        assertThat(createdTime).isNotNull();
-        assertThat(modifiedTime).isAfter(createdTime);
+        assertAll(
+                () -> assertThat(modifiedTime).isNotNull(),
+                () -> assertThat(createdTime).isNotNull(),
+                () -> assertThat(modifiedTime).isAfter(createdTime)
+        );
     }
 }
