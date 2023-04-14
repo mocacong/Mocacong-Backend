@@ -32,6 +32,10 @@ cloud:
     stack:
       auto: false
 
+slack:
+  webhook:
+    url: test
+
 oauth:
   apple:
     iss: https://appleid.apple.com

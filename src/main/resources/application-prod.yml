@@ -45,6 +45,10 @@ cloud:
       access-key: ${S3_ACCESS_KEY}
       secret-key: ${S3_SECRET_KEY}
 
+slack:
+  webhook:
+    url: ${SLACK_WEBHOOK_URL}
+
 oauth:
   apple:
     iss: https://appleid.apple.com
