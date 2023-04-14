@@ -31,3 +31,7 @@ cloud:
       auto: false
     stack:
       auto: false
+
+slack:
+  webhook:
+    url: test
