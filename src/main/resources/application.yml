@@ -47,3 +47,7 @@ cloud:
     credentials:
       access-key: ${S3_ACCESS_KEY}
       secret-key: ${S3_SECRET_KEY}
+
+slack:
+  webhook:
+    url: test
