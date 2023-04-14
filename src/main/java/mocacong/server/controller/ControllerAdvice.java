@@ -69,7 +69,7 @@ public class ControllerAdvice {
                     )
             ));
         } catch (IOException slackError) {
-            throw new IllegalArgumentException(slackError.getMessage());
+            log.debug("Slack 통신과의 예외 발생");
         }
     }
 
