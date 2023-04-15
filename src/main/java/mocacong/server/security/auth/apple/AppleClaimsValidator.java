@@ -1,6 +1,7 @@
 package mocacong.server.security.auth.apple;
 
 import io.jsonwebtoken.Claims;
+import mocacong.server.security.EncryptUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,7 @@ public class AppleClaimsValidator {
     ) {
         this.iss = iss;
         this.clientId = clientId;
-        this.nonce = nonce;
+        this.nonce = EncryptUtils.encrypt(nonce);
     }
 
     public boolean isValid(Claims claims) {

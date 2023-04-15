@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import java.util.HashMap;
 import java.util.Map;
+import mocacong.server.security.EncryptUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,7 @@ class AppleClaimsValidatorTest {
     @DisplayName("올바른 Claims 이면 true 반환한다")
     void isValid() {
         Map<String, Object> claimsMap = new HashMap<>();
-        claimsMap.put(NONCE_KEY, NONCE);
+        claimsMap.put(NONCE_KEY, EncryptUtils.encrypt(NONCE));
 
         Claims claims = Jwts.claims(claimsMap)
                 .setIssuer(ISS)
@@ -41,7 +42,7 @@ class AppleClaimsValidatorTest {
     })
     void isInvalid(String nonce, String iss, String clientId) {
         Map<String, Object> claimsMap = new HashMap<>();
-        claimsMap.put(NONCE_KEY, nonce);
+        claimsMap.put(NONCE_KEY, EncryptUtils.encrypt(nonce));
 
         Claims claims = Jwts.claims(claimsMap)
                 .setIssuer(iss)
