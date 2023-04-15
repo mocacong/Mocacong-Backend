@@ -6,13 +6,16 @@ import java.security.NoSuchAlgorithmException;
 
 public class EncryptUtils {
 
+    private static final String ENCRYPT_ALGORITHM = "SHA-256";
+    private static final String FORMAT_CODE = "%02x";
+
     public static String encrypt(String value) {
         try {
-            MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+            MessageDigest sha256 = MessageDigest.getInstance(ENCRYPT_ALGORITHM);
             byte[] digest = sha256.digest(value.getBytes(StandardCharsets.UTF_8));
             StringBuilder hexString = new StringBuilder();
             for (byte b : digest) {
-                hexString.append(String.format("%02x", b));
+                hexString.append(String.format(FORMAT_CODE, b));
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
