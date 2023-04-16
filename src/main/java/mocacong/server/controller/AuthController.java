@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
+import mocacong.server.dto.response.AppleTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,13 @@ public class AuthController {
     @PostMapping
     public ResponseEntity<TokenResponse> login(@RequestBody @Valid AuthLoginRequest request) {
         TokenResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "애플 OAuth 로그인")
+    @PostMapping("/apple")
+    public ResponseEntity<AppleTokenResponse> loginApple(@RequestBody @Valid AppleLoginRequest request) {
+        AppleTokenResponse response = authService.appleOAuthLogin(request);
         return ResponseEntity.ok(response);
     }
 }

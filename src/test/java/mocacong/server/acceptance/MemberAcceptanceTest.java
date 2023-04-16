@@ -3,18 +3,29 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import static mocacong.server.acceptance.AcceptanceFixtures.로그인_토큰_발급;
 import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
+import mocacong.server.domain.Platform;
+import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.dto.response.MyPageResponse;
+import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
+import mocacong.server.security.auth.apple.ApplePlatformMemberResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
+
+    @MockBean
+    private AppleOAuthUserProvider appleOAuthUserProvider;
 
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
@@ -28,6 +39,30 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+
+    @Test
+    @DisplayName("OAuth 회원이 회원가입을 정상적으로 진행한다")
+    void signUpOauthMember() {
+        String platformId = "1234321";
+        String email = "kth@apple.com";
+        ApplePlatformMemberResponse oauthResponse = new ApplePlatformMemberResponse(platformId, email);
+        when(appleOAuthUserProvider.getApplePlatformMember(any())).thenReturn(oauthResponse);
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new AppleLoginRequest("token"))
+                .when().post("/login/apple")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+
+        OAuthMemberSignUpRequest request = new OAuthMemberSignUpRequest(null, "케이", Platform.APPLE.getValue(), platformId);
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/members/oauth")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test

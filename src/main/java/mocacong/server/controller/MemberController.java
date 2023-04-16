@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.MemberService;
@@ -26,6 +27,13 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<MemberSignUpResponse> signUp(@RequestBody @Valid MemberSignUpRequest request) {
         MemberSignUpResponse response = memberService.signUp(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "OAuth 회원가입")
+    @PostMapping("/oauth")
+    public ResponseEntity<OAuthMemberSignUpResponse> signUp(@RequestBody @Valid OAuthMemberSignUpRequest request) {
+        OAuthMemberSignUpResponse response = memberService.signUpByOAuthMember(request);
         return ResponseEntity.ok(response);
     }
 

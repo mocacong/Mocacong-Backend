@@ -6,7 +6,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
+import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberSignUpRequest;
+import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidEmailException;
@@ -49,6 +51,16 @@ public class MemberService {
                 .ifPresent(member -> {
                     throw new DuplicateMemberException();
                 });
+    }
+
+    @Transactional
+    public OAuthMemberSignUpResponse signUpByOAuthMember(OAuthMemberSignUpRequest request) {
+        Platform platform = Platform.from(request.getPlatform());
+        Member member = memberRepository.findByPlatformAndPlatformId(platform, request.getPlatformId())
+                .orElseThrow(NotFoundMemberException::new);
+
+        member.registerOAuthMember(request.getEmail(), request.getNickname());
+        return new OAuthMemberSignUpResponse(member.getId());
     }
 
     public void delete(String email) {

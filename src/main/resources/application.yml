@@ -51,3 +51,16 @@ cloud:
 slack:
   webhook:
     url: test
+
+oauth:
+  apple:
+    iss: https://appleid.apple.com
+    client-id: ${OAUTH_APPLE_CLIENT_ID}
+    nonce: ${OAUTH_APPLE_NONCE}
+
+feign:
+  client:
+    config:
+      apple-public-key-client:
+        connectTimeout: 5000
+        readTimeout: 3000
