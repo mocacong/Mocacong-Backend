@@ -46,9 +46,9 @@ public class ControllerAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleJsonException(HttpMessageNotReadableException e) {
-        log.error("Json Exception:errMessage={}\n", e.getMessage());
+        log.warn("Json Exception ErrMessage={}\n", e.getMessage());
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(9000, "Json 형식 또는 ContentType이 올바르지 않습니다."));
+        return ResponseEntity.badRequest().body(new ErrorResponse(9000, "Json 형식이 올바르지 않습니다."));
     }
 
     @ExceptionHandler(MocacongException.class)
