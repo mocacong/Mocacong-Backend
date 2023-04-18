@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -46,9 +47,16 @@ public class ControllerAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleJsonException(HttpMessageNotReadableException e) {
-        log.error("Json Exception:errMessage={}\n", e.getMessage());
+        log.warn("Json Exception ErrMessage={}\n", e.getMessage());
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(9000, "Json 형식 또는 ContentType이 올바르지 않습니다."));
+        return ResponseEntity.badRequest().body(new ErrorResponse(9000, "Json 형식이 올바르지 않습니다."));
+    }
+
+    @ExceptionHandler(HttpMediaTypeException.class)
+    public ResponseEntity<ErrorResponse> handleContentTypeException(HttpMediaTypeException e) {
+        log.warn("ContentType Exception ErrMessage={}\n", e.getMessage());
+
+        return ResponseEntity.badRequest().body(new ErrorResponse(9001, "ContentType 값이 올바르지 않습니다."));
     }
 
     @ExceptionHandler(MocacongException.class)
