@@ -31,6 +31,14 @@ cloud:
       auto: false
     stack:
       auto: false
+    credentials:
+      access-key: test
+      secret-key: test
+
+aws:
+  ses:
+    access-key: test
+    secret-key: test
 
 slack:
   webhook:
