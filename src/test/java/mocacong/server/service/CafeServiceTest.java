@@ -324,7 +324,7 @@ class CafeServiceTest {
                 new CafeReviewRequest(5, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
         cafeService.saveCafeReview(member2.getEmail(), cafe4.getMapId(),
-                new CafeReviewRequest(4, "Solo", "빵빵해요", "여유로워요",
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
         CafeFilterRequest requestBody = new CafeFilterRequest(
                 List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId())

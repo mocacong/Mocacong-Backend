@@ -33,9 +33,6 @@ public class Cafe extends BaseTime {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
 
-    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StudyType> studyTypes;
-
     @Embedded
     private CafeDetail cafeDetail;
 
@@ -50,12 +47,12 @@ public class Cafe extends BaseTime {
         this.name = name;
         this.cafeDetail = new CafeDetail();
         this.score = new ArrayList<>();
-        this.studyTypes = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.comments = new ArrayList<>();
     }
 
     public void updateCafeDetails() {
+        StudyType studyType = getMostFrequentStudyType();
         Wifi wifi = (Wifi) getMostFrequentType(reviews.stream().map(Review::getWifi));
         Parking parking = (Parking) getMostFrequentType(reviews.stream().map(Review::getParking));
         Toilet toilet = (Toilet) getMostFrequentType(reviews.stream().map(Review::getToilet));
@@ -63,7 +60,21 @@ public class Cafe extends BaseTime {
         Power power = (Power) getMostFrequentType(reviews.stream().map(Review::getPower));
         Sound sound = (Sound) getMostFrequentType(reviews.stream().map(Review::getSound));
 
-        this.cafeDetail = new CafeDetail(wifi, parking, toilet, desk, power, sound);
+        this.cafeDetail = new CafeDetail(studyType, wifi, parking, toilet, desk, power, sound);
+    }
+
+    private StudyType getMostFrequentStudyType() {
+        int solo = 0, group = 0;
+        for (Review review : reviews) {
+            StudyType studyType = review.getStudyType();
+            if (studyType == StudyType.SOLO) solo++;
+            else if (studyType == StudyType.GROUP) group++;
+        }
+
+        if (solo == 0 && group == 0) return null;
+        else if (solo == group) return StudyType.BOTH;
+        else if (solo > group) return StudyType.SOLO;
+        else return StudyType.GROUP;
     }
 
     private Object getMostFrequentType(Stream<Object> stream) {
@@ -86,10 +97,6 @@ public class Cafe extends BaseTime {
 
     public void addScore(Score score) {
         this.score.add(score);
-    }
-
-    public void addStudyType(StudyType studyType) {
-        this.studyTypes.add(studyType);
     }
 
     public void addReview(Review review) {
