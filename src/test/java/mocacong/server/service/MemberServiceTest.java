@@ -17,6 +17,7 @@ import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.support.AwsS3Uploader;
+import mocacong.server.support.AwsSESSender;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -24,7 +25,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
@@ -42,6 +44,8 @@ class MemberServiceTest {
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
+    @MockBean
+    private AwsSESSender awsSESSender;
 
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
@@ -117,6 +121,16 @@ class MemberServiceTest {
     void passwordConfigureValidation(String password) {
         assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest("kth990303@naver.com", password, "케이", "010-1234-5678")))
                 .isInstanceOf(InvalidPasswordException.class);
+    }
+
+    @Test
+    @DisplayName("회원의 이메일 인증을 위한 인증코드를 이메일로 전송한다")
+    void sendEmailVerifyCode() {
+        doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
+
+        memberService.sendEmailVerifyCode("kth990303@naver.com");
+
+        verify(awsSESSender, times(1)).sendToVerifyEmail(anyString(), anyString());
     }
 
     @Test
