@@ -110,13 +110,13 @@ public class CafeService {
         Score score = new Score(request.getMyScore(), member, cafe);
         scoreRepository.save(score);
         CafeDetail cafeDetail = new CafeDetail(
-                request.getMyStudyType() == null ? null : StudyType.from(request.getMyStudyType()),
-                request.getMyWifi() == null ? null : Wifi.from(request.getMyWifi()),
-                request.getMyParking() == null ? null : Parking.from(request.getMyParking()),
-                request.getMyToilet() == null ? null : Toilet.from(request.getMyToilet()),
-                request.getMyDesk() == null ? null : Desk.from(request.getMyDesk()),
-                request.getMyPower() == null ? null : Power.from(request.getMyPower()),
-                request.getMySound() == null ? null : Sound.from(request.getMySound())
+                StudyType.from(request.getMyStudyType()),
+                Wifi.from(request.getMyWifi()),
+                Parking.from(request.getMyParking()),
+                Toilet.from(request.getMyToilet()),
+                Desk.from(request.getMyDesk()),
+                Power.from(request.getMyPower()),
+                Sound.from(request.getMySound())
         );
         Review review = new Review(member, cafe, cafeDetail);
         reviewRepository.save(review);
@@ -140,15 +140,14 @@ public class CafeService {
                 .orElseThrow(NotFoundReviewException::new);
         Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElseThrow(NotFoundReviewException::new);
-
         CafeDetail updatedCafeDetail = new CafeDetail(
-                request.getMyStudyType() == null ? null : StudyType.from(request.getMyStudyType()),
-                request.getMyWifi() == null ? null : Wifi.from(request.getMyWifi()),
-                request.getMyParking() == null ? null : Parking.from(request.getMyParking()),
-                request.getMyToilet() == null ? null : Toilet.from(request.getMyToilet()),
-                request.getMyDesk() == null ? null : Desk.from(request.getMyDesk()),
-                request.getMyPower() == null ? null : Power.from(request.getMyPower()),
-                request.getMySound() == null ? null : Sound.from(request.getMySound())
+                StudyType.from(request.getMyStudyType()),
+                Wifi.from(request.getMyWifi()),
+                Parking.from(request.getMyParking()),
+                Toilet.from(request.getMyToilet()),
+                Desk.from(request.getMyDesk()),
+                Power.from(request.getMyPower()),
+                Sound.from(request.getMySound())
         );
 
         score.updateScore(request.getMyScore());
