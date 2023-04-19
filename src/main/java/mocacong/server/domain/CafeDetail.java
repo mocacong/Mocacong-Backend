@@ -13,6 +13,10 @@ import mocacong.server.domain.cafedetail.*;
 @Getter
 public class CafeDetail {
 
+    @Column(name = "study_type")
+    @Enumerated(EnumType.STRING)
+    private StudyType studyType;
+
     @Column(name = "wifi")
     @Enumerated(EnumType.STRING)
     private Wifi wifi;
@@ -37,13 +41,18 @@ public class CafeDetail {
     @Enumerated(EnumType.STRING)
     private Sound sound;
 
-    public CafeDetail(Wifi wifi, Parking parking, Toilet toilet, Desk desk, Power power, Sound sound) {
+    public CafeDetail(StudyType studyType, Wifi wifi, Parking parking, Toilet toilet, Desk desk, Power power, Sound sound) {
+        this.studyType = studyType;
         this.wifi = wifi;
         this.parking = parking;
         this.toilet = toilet;
         this.desk = desk;
         this.power = power;
         this.sound = sound;
+    }
+
+    public String getStudyTypeValue() {
+        return studyType != null ? studyType.getValue() : null;
     }
 
     public String getWifiValue() {

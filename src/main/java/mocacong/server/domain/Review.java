@@ -1,11 +1,10 @@
 package mocacong.server.domain;
 
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.domain.cafedetail.*;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "review")
@@ -26,19 +25,18 @@ public class Review extends BaseTime {
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "study_type_id", nullable = false)
-    private StudyType studyType;
-
     @Embedded
     private CafeDetail cafeDetail;
 
-    public Review(Member member, Cafe cafe, StudyType studyType, CafeDetail cafeDetail) {
+    public Review(Member member, Cafe cafe, CafeDetail cafeDetail) {
         this.member = member;
         this.cafe = cafe;
-        this.studyType = studyType;
         this.cafe.addReview(this);
         this.cafeDetail = cafeDetail;
+    }
+
+    public StudyType getStudyType() {
+        return cafeDetail.getStudyType();
     }
 
     public Wifi getWifi() {
@@ -67,9 +65,5 @@ public class Review extends BaseTime {
 
     public void updateReview(CafeDetail newCafeDetail) {
         this.cafeDetail = newCafeDetail;
-    }
-
-    public void updateStudyType(String studyType) {
-        this.studyType.updateStudyTypeValue(studyType);
     }
 }

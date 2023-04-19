@@ -40,9 +40,8 @@ class BaseTimeTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        StudyType studyType = new StudyType(member, cafe, "solo");
-        CafeDetail cafeDetail = new CafeDetail(Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.UNCOMFORTABLE, Power.MANY, Sound.LOUD);
-        Review addReview = new Review(member, cafe, studyType, cafeDetail);
+        CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.UNCOMFORTABLE, Power.MANY, Sound.LOUD);
+        Review addReview = new Review(member, cafe, cafeDetail);
         cafe.addReview(addReview);
         cafe.updateCafeDetails();
         entityManager.flush();
