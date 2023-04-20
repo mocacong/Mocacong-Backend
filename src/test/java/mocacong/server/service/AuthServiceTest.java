@@ -83,7 +83,7 @@ class AuthServiceTest {
 
     @Test
     @DisplayName("Apple OAuth 로그인 시 이미 가입된 회원일 경우 토큰과 이메일, 그리고 isRegistered 값을 true로 보낸다")
-    void appleOAuthRegistered() {
+    void appleOAuthRegisteredAndMocacongMember() {
         String expected = "kth@apple.com";
         String platformId = "1234321";
         Member member = new Member(
@@ -105,6 +105,26 @@ class AuthServiceTest {
                 () -> assertThat(actual.getToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isTrue(),
+                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
+        );
+    }
+
+    @Test
+    @DisplayName("Apple OAuth 로그인 시 등록은 완료됐지만 회원가입 절차에 실패해 닉네임이 없으면 isRegistered 값을 false로 보낸다")
+    void appleOAuthRegisteredButNotMocacongMember() {
+        String expected = "kth@apple.com";
+        String platformId = "1234321";
+        Member member = new Member("kth@apple.com", Platform.APPLE, "1234321");
+        memberRepository.save(member);
+        when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
+                .thenReturn(new ApplePlatformMemberResponse(platformId, expected));
+
+        AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+
+        assertAll(
+                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getEmail()).isEqualTo(expected),
+                () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
         );
     }
