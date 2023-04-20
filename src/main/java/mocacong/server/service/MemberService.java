@@ -102,11 +102,12 @@ public class MemberService {
         }
     }
 
-    public void sendEmailVerifyCode(String to) {
+    public EmailVerifyCodeResponse sendEmailVerifyCode(String to) {
         Random random = new Random();
         int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
         String code = String.format("%04d", randomNumber);
         awsSESSender.sendToVerifyEmail(to, code);
+        return new EmailVerifyCodeResponse(code);
     }
 
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
