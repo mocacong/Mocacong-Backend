@@ -45,6 +45,12 @@ public class AuthService {
                     Member findMember = memberRepository.findById(memberId)
                             .orElseThrow(NotFoundMemberException::new);
                     String token = issueToken(findMember);
+
+                    // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
+                    if (!findMember.isRegisteredOAuthMember()) {
+                        return new AppleTokenResponse(token, findMember.getEmail(), false, platformId);
+                    }
+
                     return new AppleTokenResponse(token, findMember.getEmail(), true, platformId);
                 })
                 .orElseGet(() -> {
