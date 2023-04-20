@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -35,6 +36,7 @@ public class AwsSESSender {
                 .build();
     }
 
+    @Async
     public void sendToVerifyEmail(String to, String code) {
         try {
             File file = new File(VERIFY_EMAIL_FILE_PATH);
