@@ -47,6 +47,14 @@ class MemberTest {
         );
     }
 
+    @Test
+    @DisplayName("OAuth 회원이 등록은 돼있지만, 닉네임이 없는 경우 회원가입 절차가 진행되지 않은 것으로 판단한다")
+    void isRegisterMember() {
+        Member member = new Member("kth@apple.com", Platform.APPLE, "1234321");
+
+        assertThat(member.isRegisteredOAuthMember()).isFalse();
+    }
+
     @ParameterizedTest
     @DisplayName("닉네임은 초성, 중성, 종성 분리하여 지을 수 있다")
     @ValueSource(strings = {"ㄱㅁㄴㄷㄹ", "ㅏㅣㅓㅜ", "가ㅏ누ㅟ"})
