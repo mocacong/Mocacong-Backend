@@ -80,6 +80,10 @@ public class Member extends BaseTime {
         }
     }
 
+    public boolean isRegisteredOAuthMember() {
+        return nickname != null;
+    }
+
     private void validateMemberInfo(String nickname, String phone) {
         validateNickname(nickname);
         validatePhone(phone);
