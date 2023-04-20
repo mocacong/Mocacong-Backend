@@ -2,15 +2,13 @@ package mocacong.server.service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import static java.lang.Integer.parseInt;
 import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
-import mocacong.server.dto.response.IsDuplicateEmailResponse;
-import mocacong.server.dto.response.IsDuplicateNicknameResponse;
-import mocacong.server.dto.response.MemberGetAllResponse;
-import mocacong.server.dto.response.MyPageResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
@@ -128,9 +126,12 @@ class MemberServiceTest {
     void sendEmailVerifyCode() {
         doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
 
-        memberService.sendEmailVerifyCode("kth990303@naver.com");
+        EmailVerifyCodeResponse actual = memberService.sendEmailVerifyCode("kth990303@naver.com");
 
-        verify(awsSESSender, times(1)).sendToVerifyEmail(anyString(), anyString());
+        assertAll(
+                () -> verify(awsSESSender, times(1)).sendToVerifyEmail(anyString(), anyString()),
+                () -> assertThat(parseInt(actual.getCode())).isLessThanOrEqualTo(9999)
+        );
     }
 
     @Test
