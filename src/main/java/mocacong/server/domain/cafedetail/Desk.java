@@ -20,6 +20,7 @@ public enum Desk {
     private String value;
 
     public static Desk from(String value) {
+        if (value == null) return null;
         return Arrays.stream(values())
                 .filter(it -> Objects.equals(it.value, value))
                 .findFirst()

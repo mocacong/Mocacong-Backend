@@ -5,24 +5,24 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mocacong.server.exception.badrequest.InvalidToiletException;
+import mocacong.server.exception.badrequest.InvalidStudyTypeException;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public enum Toilet {
+public enum StudyType {
 
-    CLEAN("깨끗해요"),
-    NORMAL("평범해요"),
-    UNCOMFORTABLE("불편해요");
+    SOLO("solo"),
+    GROUP("group"),
+    BOTH("both");
 
     private String value;
 
-    public static Toilet from(String value) {
+    public static StudyType from(String value) {
         if (value == null) return null;
         return Arrays.stream(values())
                 .filter(it -> Objects.equals(it.value, value))
                 .findFirst()
-                .orElseThrow(InvalidToiletException::new);
+                .orElseThrow(InvalidStudyTypeException::new);
     }
 }

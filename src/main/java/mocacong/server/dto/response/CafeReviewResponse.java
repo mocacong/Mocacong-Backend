@@ -21,17 +21,17 @@ public class CafeReviewResponse {
     private String sound;
     private String desk;
 
-    public static CafeReviewResponse of(double score, String studyType, Cafe cafe) {
+    public static CafeReviewResponse of(double score, Cafe cafe) {
         CafeDetail cafeDetail = cafe.getCafeDetail();
         return new CafeReviewResponse(
                 score,
-                studyType,
-                cafeDetail.getWifi().getValue(),
-                cafeDetail.getParking().getValue(),
-                cafeDetail.getToilet().getValue(),
-                cafeDetail.getPower().getValue(),
-                cafeDetail.getSound().getValue(),
-                cafeDetail.getDesk().getValue()
+                cafeDetail.getStudyTypeValue(),
+                cafeDetail.getWifiValue(),
+                cafeDetail.getParkingValue(),
+                cafeDetail.getToiletValue(),
+                cafeDetail.getPowerValue(),
+                cafeDetail.getSoundValue(),
+                cafeDetail.getDeskValue()
         );
     }
 }

@@ -21,11 +21,11 @@ public class CafeReviewUpdateResponse {
     private String sound;
     private String desk;
 
-    public static CafeReviewUpdateResponse of(double score, String studyType, Cafe cafe) {
+    public static CafeReviewUpdateResponse of(double score, Cafe cafe) {
         CafeDetail cafeDetail = cafe.getCafeDetail();
         return new CafeReviewUpdateResponse(
                 score,
-                studyType,
+                cafeDetail.getStudyTypeValue(),
                 cafeDetail.getWifi().getValue(),
                 cafeDetail.getParking().getValue(),
                 cafeDetail.getToilet().getValue(),
