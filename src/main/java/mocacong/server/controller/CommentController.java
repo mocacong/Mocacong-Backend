@@ -23,7 +23,7 @@ public class CommentController {
     @Operation(summary = "카페 코멘트 작성")
     @SecurityRequirement(name = "JWT")
     @PostMapping
-    public ResponseEntity<CommentSaveResponse> saveCafeReview(
+    public ResponseEntity<CommentSaveResponse> saveComment(
             @LoginUserEmail String email,
             @PathVariable String mapId,
             @RequestBody CommentSaveRequest request
