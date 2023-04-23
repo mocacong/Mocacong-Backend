@@ -43,6 +43,6 @@ public class CommentService {
                 .findFirst()
                 .orElseThrow(NotFoundCommentException::new);
 
-        comment.updateContent(member, content);
+        comment.updateComment(member, content);
     }
 }

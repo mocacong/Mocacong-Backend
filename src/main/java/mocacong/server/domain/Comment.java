@@ -56,8 +56,9 @@ public class Comment extends BaseTime {
         return this.member.equals(member);
     }
 
-    public void updateContent(Member member, String content) {
+    public void updateComment(Member member, String content) {
         if (this.member.equals(member)) {
+            validateCommentLength(content);
             this.content = content;
         } else {
             throw new NotFoundMemberException();
