@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.ExceedCommentLengthException;
-import mocacong.server.exception.notfound.NotFoundMemberException;
 
 @Entity
 @Table(name = "comment")
@@ -55,13 +54,9 @@ public class Comment extends BaseTime {
         return this.member != null && this.member.equals(member);
     }
 
-    public void updateComment(Member member, String content) {
-        if (isWrittenByMember(member)) {
-            validateCommentLength(content);
-            this.content = content;
-        } else {
-            throw new NotFoundMemberException();
-        }
+    public void updateComment(String content) {
+        validateCommentLength(content);
+        this.content = content;
     }
 
     public void removeMember() {

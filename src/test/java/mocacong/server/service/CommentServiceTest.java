@@ -4,18 +4,18 @@ import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentSaveResponse;
+import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
 class CommentServiceTest {
@@ -111,5 +111,23 @@ class CommentServiceTest {
         commentService.update(email, mapId, expected, savedComment.getId());
 
         assertDoesNotThrow(() -> commentService.update(email, mapId, expected, savedComment.getId()));
+    }
+
+    @Test
+    @DisplayName("댓글 작성자가 아닌 사람이 특정 댓글 수정에 접근할 경우 예외를 반환한다")
+    void updateByNonWriter() {
+        String email1 = "kth990303@naver.com";
+        String email2 = "mery@naver.com";
+        String mapId = "2143154352323";
+        Member member1 = new Member(email1, "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member(email2, "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        CommentSaveResponse savedComment = commentService.save(email1, mapId, "조용하고 좋네요");
+
+        assertThatThrownBy(() -> commentService.update(email2, mapId, "몰래 이 코멘트를 바꿔", savedComment.getId()))
+                .isInstanceOf(InvalidCommentUpdateException.class);
     }
 }
