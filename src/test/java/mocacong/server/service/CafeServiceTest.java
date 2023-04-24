@@ -32,9 +32,13 @@ class CafeServiceTest {
     @Autowired
     private ScoreRepository scoreRepository;
     @Autowired
+    private ReviewRepository reviewRepository;
+    @Autowired
     private CommentRepository commentRepository;
     @Autowired
     private FavoriteRepository favoriteRepository;
+    @Autowired
+    private MemberService memberService;
 
     @Test
     @DisplayName("등록되지 않은 카페를 성공적으로 등록한다")
@@ -113,7 +117,7 @@ class CafeServiceTest {
 
     @Test
     @DisplayName("평점, 리뷰, 코멘트가 모두 존재하는 카페를 조회한다")
-    void findFavoriteCafeWithAll() {
+    void findCafeWithReviewsAndComments() {
         Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
@@ -146,6 +150,36 @@ class CafeServiceTest {
                 () -> assertThat(actual.getComments())
                         .extracting("nickname")
                         .containsExactlyInAnyOrder("케이", "메리", "케이")
+        );
+    }
+
+    @Test
+    @DisplayName("탈퇴한 회원이 작성한 리뷰와 코멘트가 존재하는 카페를 조회한다")
+    void findCafeWithReviewsAndCommentsByDeleteMember() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(), new CafeReviewRequest(1, "group", "느려요", "없어요",
+                "불편해요", "없어요", "북적북적해요", "불편해요"));
+        Comment comment = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
+        commentRepository.save(comment);
+        memberService.delete(member1.getEmail());
+        memberRepository.delete(member1);
+
+        FindCafeResponse actual = cafeService.findCafeByMapId(member2.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getFavorite()).isFalse(),
+                () -> assertThat(actual.getFavoriteId()).isNull(),
+                () -> assertThat(actual.getScore()).isEqualTo(1.0),
+                () -> assertThat(actual.getMyScore()).isNull(),
+                () -> assertThat(actual.getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(1),
+                () -> assertThat(actual.getCommentsCount()).isEqualTo(1),
+                () -> assertThat(actual.getComments().get(0).getNickname()).isNull()
         );
     }
 
