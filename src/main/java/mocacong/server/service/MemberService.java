@@ -17,8 +17,10 @@ import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final AwsS3Uploader awsS3Uploader;
     private final AwsSESSender awsSESSender;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public MemberSignUpResponse signUp(MemberSignUpRequest request) {
         validatePassword(request.getPassword());
@@ -68,15 +71,18 @@ public class MemberService {
         return new OAuthMemberSignUpResponse(member.getId());
     }
 
+    @Transactional
     public void delete(String email) {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
+        applicationEventPublisher.publishEvent(new MemberEvent(findMember));
         memberRepository.delete(findMember);
     }
 
     @Transactional
     public void deleteAll() {
-        memberRepository.deleteAll();
+        memberRepository.findAll()
+                .forEach(member -> delete(member.getEmail()));
     }
 
     @Transactional(readOnly = true)

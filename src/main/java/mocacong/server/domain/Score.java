@@ -24,7 +24,7 @@ public class Score extends BaseTime {
     private int score;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,5 +48,9 @@ public class Score extends BaseTime {
     public void updateScore(int score) {
         validateScoreRange(score);
         this.score = score;
+    }
+
+    public void removeMember() {
+        this.member = null;
     }
 }

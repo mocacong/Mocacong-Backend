@@ -64,4 +64,8 @@ public class Comment extends BaseTime {
             throw new NotFoundMemberException();
         }
     }
+
+    public void removeMember() {
+        this.member = null;
+    }
 }

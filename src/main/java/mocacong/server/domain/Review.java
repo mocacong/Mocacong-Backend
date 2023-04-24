@@ -66,4 +66,8 @@ public class Review extends BaseTime {
     public void updateReview(CafeDetail newCafeDetail) {
         this.cafeDetail = newCafeDetail;
     }
+
+    public void removeMember() {
+        this.member = null;
+    }
 }

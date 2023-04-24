@@ -17,6 +17,8 @@ import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
+import mocacong.server.service.event.MemberEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -152,6 +154,16 @@ public class CafeService {
 
         score.updateScore(request.getMyScore());
         review.updateReview(updatedCafeDetail);
+    }
+
+    @EventListener
+    public void updateReviewWhenMemberDelete(MemberEvent event) {
+        Long memberId = event.getMember()
+                .getId();
+        reviewRepository.findAllByMemberId(memberId)
+                .forEach(Review::removeMember);
+        scoreRepository.findAllByMemberId(memberId)
+                .forEach(Score::removeMember);
     }
 
     public CafeFilterResponse filterCafesByStudyType(String studyTypeValue, CafeFilterRequest requestBody) {
