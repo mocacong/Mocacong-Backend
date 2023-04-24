@@ -5,18 +5,22 @@ import static mocacong.server.acceptance.AcceptanceFixtures.로그인_토큰_발
 import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.AppleLoginRequest;
+import mocacong.server.dto.request.EmailVerifyCodeRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.dto.response.MyPageResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.apple.ApplePlatformMemberResponse;
+import mocacong.server.support.AwsSESSender;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -26,6 +30,8 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
     @MockBean
     private AppleOAuthUserProvider appleOAuthUserProvider;
+    @MockBean
+    private AwsSESSender awsSESSender;
 
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
@@ -103,6 +109,20 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .as(ErrorResponse.class);
 
         assertThat(response.getCode()).isEqualTo(1007);
+    }
+
+    @Test
+    @DisplayName("회원은 이메일 인증을 요청할 수 있다")
+    void verifyEmail() {
+        doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
+        EmailVerifyCodeRequest request = new EmailVerifyCodeRequest("kth990303@naver.com");
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/members/email-verification")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test

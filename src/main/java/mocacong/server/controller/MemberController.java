@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mocacong.server.dto.request.EmailVerifyCodeRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
@@ -34,6 +35,13 @@ public class MemberController {
     @PostMapping("/oauth")
     public ResponseEntity<OAuthMemberSignUpResponse> signUp(@RequestBody @Valid OAuthMemberSignUpRequest request) {
         OAuthMemberSignUpResponse response = memberService.signUpByOAuthMember(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "이메일 인증코드 발송")
+    @PostMapping("/email-verification")
+    public ResponseEntity<EmailVerifyCodeResponse> emailVerify(@RequestBody @Valid EmailVerifyCodeRequest request) {
+        EmailVerifyCodeResponse response = memberService.sendEmailVerifyCode(request.getEmail());
         return ResponseEntity.ok(response);
     }
 

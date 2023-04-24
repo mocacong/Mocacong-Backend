@@ -2,21 +2,20 @@ package mocacong.server.service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import static java.lang.Integer.parseInt;
 import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
-import mocacong.server.dto.response.IsDuplicateEmailResponse;
-import mocacong.server.dto.response.IsDuplicateNicknameResponse;
-import mocacong.server.dto.response.MemberGetAllResponse;
-import mocacong.server.dto.response.MyPageResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.support.AwsS3Uploader;
+import mocacong.server.support.AwsSESSender;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -24,7 +23,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
@@ -42,6 +42,8 @@ class MemberServiceTest {
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
+    @MockBean
+    private AwsSESSender awsSESSender;
 
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
@@ -117,6 +119,19 @@ class MemberServiceTest {
     void passwordConfigureValidation(String password) {
         assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest("kth990303@naver.com", password, "케이", "010-1234-5678")))
                 .isInstanceOf(InvalidPasswordException.class);
+    }
+
+    @Test
+    @DisplayName("회원의 이메일 인증을 위한 인증코드를 이메일로 전송한다")
+    void sendEmailVerifyCode() {
+        doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
+
+        EmailVerifyCodeResponse actual = memberService.sendEmailVerifyCode("kth990303@naver.com");
+
+        assertAll(
+                () -> verify(awsSESSender, times(1)).sendToVerifyEmail(anyString(), anyString()),
+                () -> assertThat(parseInt(actual.getCode())).isLessThanOrEqualTo(9999)
+        );
     }
 
     @Test

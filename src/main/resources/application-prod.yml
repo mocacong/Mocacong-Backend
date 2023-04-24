@@ -18,6 +18,12 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
+  task:
+    execution:
+      pool:
+        core-size: ${THREAD_POOL_CORE_SIZE}
+        max-size: ${THREAD_POOL_MAX_SIZE}
+        queue-capacity: ${THREAD_POOL_QUEUE_CAPACITY}
 
 security.jwt.token:
   secret-key: ${JWT_SECRET_KEY}
@@ -44,6 +50,11 @@ cloud:
     credentials:
       access-key: ${S3_ACCESS_KEY}
       secret-key: ${S3_SECRET_KEY}
+
+aws:
+  ses:
+    access-key: ${SES_ACCESS_KEY}
+    secret-key: ${SES_SECRET_KEY}
 
 slack:
   webhook:

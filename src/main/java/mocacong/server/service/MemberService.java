@@ -2,6 +2,7 @@ package mocacong.server.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.support.AwsS3Uploader;
+import mocacong.server.support.AwsSESSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+
     private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
+    private static final int EMAIL_VERIFY_CODE_MAXIMUM_NUMBER = 9999;
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AwsS3Uploader awsS3Uploader;
+    private final AwsSESSender awsSESSender;
 
     public MemberSignUpResponse signUp(MemberSignUpRequest request) {
         validatePassword(request.getPassword());
@@ -95,6 +100,14 @@ public class MemberService {
         if (email.isBlank()) {
             throw new InvalidEmailException();
         }
+    }
+
+    public EmailVerifyCodeResponse sendEmailVerifyCode(String to) {
+        Random random = new Random();
+        int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
+        String code = String.format("%04d", randomNumber);
+        awsSESSender.sendToVerifyEmail(to, code);
+        return new EmailVerifyCodeResponse(code);
     }
 
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
