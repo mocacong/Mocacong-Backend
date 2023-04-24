@@ -100,14 +100,16 @@ class CommentServiceTest {
     void updateManyTimes() {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
+        String comment = "공부하기 좋아요~🥰";
         Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse savedComment = commentService.save(email, mapId, "공부하기 좋아요~🥰");
+        CommentSaveResponse savedComment = commentService.save(email, mapId, comment);
+        String expected = "조용하고 좋네요";
 
-        commentService.update(email, mapId, "조용하고 좋네요.", savedComment.getId());
+        commentService.update(email, mapId, expected, savedComment.getId());
 
-        assertDoesNotThrow(() -> commentService.update(email, mapId, "조용하고 좋네요.", savedComment.getId()));
+        assertDoesNotThrow(() -> commentService.update(email, mapId, expected, savedComment.getId()));
     }
 }

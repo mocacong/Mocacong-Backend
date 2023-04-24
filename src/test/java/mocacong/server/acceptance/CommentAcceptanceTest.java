@@ -19,6 +19,8 @@ import java.util.List;
 
 import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommentAcceptanceTest extends AcceptanceTest {
 
@@ -62,7 +64,6 @@ public class CommentAcceptanceTest extends AcceptanceTest {
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
         CommentSaveRequest saveRequest = new CommentSaveRequest(content);
         ExtractableResponse<Response> response = 카페_코멘트_작성(token, mapId, saveRequest);
-
         String expected = "조용하고 좋네요.";
         Long commentId = response.as(CommentSaveResponse.class).getId();
         CommentUpdateRequest updateRequest = new CommentUpdateRequest(expected);
@@ -75,11 +76,13 @@ public class CommentAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
-
         List<CommentResponse> comments = 카페_조회(token, mapId)
                 .as(FindCafeResponse.class)
                 .getComments();
-        assertThat(comments).hasSize(1);
-        assertThat(comments.get(0).getContent()).isEqualTo(expected);
+
+        assertAll("comments",
+                () -> assertEquals(1, comments.size()),
+                () -> assertEquals(expected, comments.get(0).getContent())
+        );
     }
 }
