@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.ExceedCommentLengthException;
+import mocacong.server.exception.notfound.NotFoundMemberException;
 
 import javax.persistence.*;
 
@@ -53,5 +54,14 @@ public class Comment extends BaseTime {
 
     public boolean isWrittenByMember(Member member) {
         return this.member.equals(member);
+    }
+
+    public void updateComment(Member member, String content) {
+        if (isWrittenByMember(member)) {
+            validateCommentLength(content);
+            this.content = content;
+        } else {
+            throw new NotFoundMemberException();
+        }
     }
 }
