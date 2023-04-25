@@ -14,8 +14,11 @@ import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.MemberEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @RequiredArgsConstructor
@@ -61,5 +64,12 @@ public class FavoriteService {
         Member member = event.getMember();
         favoriteRepository.findAllByMemberId(member.getId())
                 .forEach(Favorite::removeMember);
+    }
+
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener
+    public void deleteFavoritesWhenMemberDeleted(MemberEvent event) {
+        favoriteRepository.deleteAllByMemberIdIsNull();
     }
 }
