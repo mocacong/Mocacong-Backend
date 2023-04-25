@@ -1,13 +1,9 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import static mocacong.server.acceptance.AcceptanceFixtures.로그인_토큰_발급;
-import static mocacong.server.acceptance.AcceptanceFixtures.회원_가입;
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
-import mocacong.server.dto.request.AppleLoginRequest;
-import mocacong.server.dto.request.EmailVerifyCodeRequest;
-import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.request.OAuthMemberSignUpRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.dto.response.MyPageResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
@@ -77,6 +73,27 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         회원_가입(request);
         String token = 로그인_토큰_발급(request.getEmail(), request.getPassword());
+
+        RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .when().delete("/members")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    @Test
+    @DisplayName("리뷰나 코멘트를 달은 회원이 정상적으로 탈퇴한다")
+    void deleteWhenSaveReviewsAndComments() {
+        String mapId = "1234";
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_리뷰_작성(token, mapId, new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                "깨끗해요", "충분해요", "조용해요", "편해요"));
+        카페_코멘트_작성(token, mapId, new CommentSaveRequest("좋아요~"));
 
         RestAssured.given().log().all()
                 .auth().oauth2(token)

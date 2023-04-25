@@ -5,12 +5,15 @@ import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentSaveResponse;
+import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.service.event.MemberEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +36,7 @@ public class CommentService {
         return new CommentSaveResponse(commentRepository.save(comment).getId());
     }
 
+    @Transactional
     public void update(String email, String mapId, String content, Long commentId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
@@ -43,6 +47,16 @@ public class CommentService {
                 .findFirst()
                 .orElseThrow(NotFoundCommentException::new);
 
-        comment.updateComment(member, content);
+        if (!comment.isWrittenByMember(member)) {
+            throw new InvalidCommentUpdateException();
+        }
+        comment.updateComment(content);
+    }
+
+    @EventListener
+    public void updateCommentWhenMemberDelete(MemberEvent event) {
+        Member member = event.getMember();
+        commentRepository.findAllByMemberId(member.getId())
+                .forEach(Comment::removeMember);
     }
 }

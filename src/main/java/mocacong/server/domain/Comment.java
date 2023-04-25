@@ -1,12 +1,10 @@
 package mocacong.server.domain;
 
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.ExceedCommentLengthException;
-import mocacong.server.exception.notfound.NotFoundMemberException;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "comment")
@@ -45,23 +43,23 @@ public class Comment extends BaseTime {
     }
 
     public String getWriterNickname() {
-        return this.member.getNickname();
+        return this.member != null ? this.member.getNickname() : null;
     }
 
     public String getWriterImgUrl() {
-        return this.member.getImgUrl();
+        return this.member != null ? this.member.getImgUrl() : null;
     }
 
     public boolean isWrittenByMember(Member member) {
-        return this.member.equals(member);
+        return this.member != null && this.member.equals(member);
     }
 
-    public void updateComment(Member member, String content) {
-        if (isWrittenByMember(member)) {
-            validateCommentLength(content);
-            this.content = content;
-        } else {
-            throw new NotFoundMemberException();
-        }
+    public void updateComment(String content) {
+        validateCommentLength(content);
+        this.content = content;
+    }
+
+    public void removeMember() {
+        this.member = null;
     }
 }
