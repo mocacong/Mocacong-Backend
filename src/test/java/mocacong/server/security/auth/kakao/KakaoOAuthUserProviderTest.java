@@ -16,7 +16,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 class KakaoOAuthUserProviderTest {
 
     private static final String AUTHORIZATION_CODE = "test";
-    private static final String REDIRECT_URI = "test";
 
     @Autowired
     private KakaoOAuthUserProvider kakaoOAuthUserProvider;
@@ -36,7 +35,7 @@ class KakaoOAuthUserProviderTest {
         when(kakaoUserClient.getUser(any(), anyString())).thenReturn(mockKakaoUser);
 
         OAuthPlatformMemberResponse actual =
-                kakaoOAuthUserProvider.getKakaoPlatformMember(AUTHORIZATION_CODE, REDIRECT_URI);
+                kakaoOAuthUserProvider.getKakaoPlatformMember(AUTHORIZATION_CODE);
 
         assertAll(
                 () -> assertThat(actual.getEmail()).isEqualTo(email),

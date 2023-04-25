@@ -11,20 +11,23 @@ public class KakaoOAuthUserProvider {
     private final KakaoUserClient kakaoUserClient;
     private final String kakaoClientId;
     private final String kakaoClientSecret;
+    private final String redirectUri;
 
     public KakaoOAuthUserProvider(
             KakaoAccessTokenClient kakaoAccessTokenClient,
             KakaoUserClient kakaoUserClient,
             @Value("${oauth.kakao.client-id}") String kakaoClientId,
-            @Value("${oauth.kakao.client-secret}") String kakaoClientSecret
+            @Value("${oauth.kakao.client-secret}") String kakaoClientSecret,
+            @Value("${oauth.kakao.redirect-uri}") String redirectUri
     ) {
         this.kakaoAccessTokenClient = kakaoAccessTokenClient;
         this.kakaoUserClient = kakaoUserClient;
         this.kakaoClientId = kakaoClientId;
         this.kakaoClientSecret = kakaoClientSecret;
+        this.redirectUri = redirectUri;
     }
 
-    public OAuthPlatformMemberResponse getKakaoPlatformMember(String authorizationCode, String redirectUri) {
+    public OAuthPlatformMemberResponse getKakaoPlatformMember(String authorizationCode) {
         KakaoAccessTokenRequest kakaoAccessTokenRequest =
                 new KakaoAccessTokenRequest(authorizationCode, kakaoClientId, kakaoClientSecret, redirectUri);
         KakaoAccessToken token = kakaoAccessTokenClient.getToken(kakaoAccessTokenRequest);
