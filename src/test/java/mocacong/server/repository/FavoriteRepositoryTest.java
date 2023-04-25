@@ -1,5 +1,6 @@
 package mocacong.server.repository;
 
+import java.util.List;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
@@ -34,5 +35,18 @@ class FavoriteRepositoryTest {
                 () -> assertThat(actual).isNotNull(),
                 () -> assertThat(actual).isEqualTo(favorite.getId())
         );
+    }
+
+    @Test
+    @DisplayName("멤버 id가 null인 즐겨찾기들을 모두 삭제한다")
+    void deleteAllByMemberIdIsNull() {
+        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페"));
+        Favorite favorite = new Favorite(null, savedCafe);
+        favoriteRepository.save(favorite);
+
+        favoriteRepository.deleteAllByMemberIdIsNull();
+
+        List<Favorite> actual = favoriteRepository.findAll();
+        assertThat(actual).isEmpty();
     }
 }

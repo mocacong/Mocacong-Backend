@@ -1,10 +1,9 @@
 package mocacong.server.domain;
 
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "favorite")
@@ -18,15 +17,19 @@ public class Favorite extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_id", nullable = false)
+    @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 
     public Favorite(Member member, Cafe cafe) {
         this.member = member;
         this.cafe = cafe;
+    }
+
+    public void removeMember() {
+        this.member = null;
     }
 }

@@ -104,6 +104,25 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @DisplayName("즐겨찾기를 등록한 회원이 정상적으로 탈퇴한다")
+    void deleteWhenSaveFavorites() {
+        String mapId = "1234";
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        즐겨찾기_등록(token, mapId);
+
+        RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .when().delete("/members")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    @Test
     @DisplayName("모든 회원을 전체 삭제한다")
     void deleteAll() {
         MemberSignUpRequest request1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");

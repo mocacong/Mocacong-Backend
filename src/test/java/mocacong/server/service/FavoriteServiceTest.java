@@ -1,5 +1,6 @@
 package mocacong.server.service;
 
+import java.util.List;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
@@ -9,16 +10,13 @@ import mocacong.server.exception.notfound.NotFoundFavoriteException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
 class FavoriteServiceTest {

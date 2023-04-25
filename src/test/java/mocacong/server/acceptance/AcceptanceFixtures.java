@@ -72,7 +72,7 @@ public class AcceptanceFixtures {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
-    
+
     public static ExtractableResponse<Response> 카페_코멘트_작성(String token, String mapId, CommentSaveRequest request) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -84,12 +84,22 @@ public class AcceptanceFixtures {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 카페_코멘트_수정 (String token, String mapId, Long commentId, CommentUpdateRequest request) {
+    public static ExtractableResponse<Response> 카페_코멘트_수정(String token, String mapId, Long commentId, CommentUpdateRequest request) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(token)
                 .body(request)
                 .when().put("/cafes/" + mapId + "/comments/" + commentId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    public static ExtractableResponse<Response> 즐겨찾기_등록(String token, String mapId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().post("/cafes/" + mapId + "/favorites/")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
