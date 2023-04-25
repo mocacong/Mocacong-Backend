@@ -4,10 +4,10 @@ import io.restassured.RestAssured;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.response.AppleTokenResponse;
+import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
-import mocacong.server.security.auth.apple.ApplePlatformMemberResponse;
+import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -54,18 +54,18 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     @DisplayName("회원이 Apple OAuth 로그인을 정상적으로 진행한다")
     void loginAppleOAuth() {
         String expected = "kth@apple.com";
-        ApplePlatformMemberResponse oauthResponse = new ApplePlatformMemberResponse("1234321", expected);
+        OAuthPlatformMemberResponse oauthResponse = new OAuthPlatformMemberResponse("1234321", expected);
         when(appleOAuthUserProvider.getApplePlatformMember(any())).thenReturn(oauthResponse);
         AppleLoginRequest request = new AppleLoginRequest("token");
 
-        AppleTokenResponse actual = RestAssured.given().log().all()
+        OAuthTokenResponse actual = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
                 .when().post("/login/apple")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
-                .as(AppleTokenResponse.class);
+                .as(OAuthTokenResponse.class);
 
         assertThat(actual.getEmail()).isEqualTo(expected);
     }

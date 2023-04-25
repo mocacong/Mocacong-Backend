@@ -4,12 +4,12 @@ import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
-import mocacong.server.dto.response.AppleTokenResponse;
+import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
-import mocacong.server.security.auth.apple.ApplePlatformMemberResponse;
+import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
@@ -69,9 +69,9 @@ class AuthServiceTest {
         String expected = "kth@apple.com";
         String platformId = "1234321";
         when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
-                .thenReturn(new ApplePlatformMemberResponse(platformId, expected));
+                .thenReturn(new OAuthPlatformMemberResponse(platformId, expected));
 
-        AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+        OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
                 () -> assertThat(actual.getToken()).isNotNull(),
@@ -97,9 +97,9 @@ class AuthServiceTest {
         );
         memberRepository.save(member);
         when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
-                .thenReturn(new ApplePlatformMemberResponse(platformId, expected));
+                .thenReturn(new OAuthPlatformMemberResponse(platformId, expected));
 
-        AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+        OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
                 () -> assertThat(actual.getToken()).isNotNull(),
@@ -117,9 +117,9 @@ class AuthServiceTest {
         Member member = new Member("kth@apple.com", Platform.APPLE, "1234321");
         memberRepository.save(member);
         when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
-                .thenReturn(new ApplePlatformMemberResponse(platformId, expected));
+                .thenReturn(new OAuthPlatformMemberResponse(platformId, expected));
 
-        AppleTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+        OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
                 () -> assertThat(actual.getToken()).isNotNull(),

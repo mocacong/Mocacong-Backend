@@ -7,7 +7,7 @@ import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.dto.response.MyPageResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
-import mocacong.server.security.auth.apple.ApplePlatformMemberResponse;
+import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.support.AwsSESSender;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,7 +48,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void signUpOauthMember() {
         String platformId = "1234321";
         String email = "kth@apple.com";
-        ApplePlatformMemberResponse oauthResponse = new ApplePlatformMemberResponse(platformId, email);
+        OAuthPlatformMemberResponse oauthResponse = new OAuthPlatformMemberResponse(platformId, email);
         when(appleOAuthUserProvider.getApplePlatformMember(any())).thenReturn(oauthResponse);
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
