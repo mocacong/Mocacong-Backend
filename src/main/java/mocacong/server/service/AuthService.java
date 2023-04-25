@@ -5,17 +5,17 @@ import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
+import mocacong.server.dto.request.KakaoLoginRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
-import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
+import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 @Service
 @RequiredArgsConstructor
@@ -38,26 +38,32 @@ public class AuthService {
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
         OAuthPlatformMemberResponse applePlatformMember =
                 appleOAuthUserProvider.getApplePlatformMember(request.getToken());
-        String platformId = applePlatformMember.getPlatformId();
+        return generateOAuthTokenResponse(applePlatformMember.getEmail(), applePlatformMember.getPlatformId());
+    }
 
+    public OAuthTokenResponse kakaoOAuthLogin(KakaoLoginRequest request) {
+        OAuthPlatformMemberResponse applePlatformMember =
+                appleOAuthUserProvider.getApplePlatformMember(request.getCode());
+        return generateOAuthTokenResponse(applePlatformMember.getEmail(), applePlatformMember.getPlatformId());
+    }
+
+    private OAuthTokenResponse generateOAuthTokenResponse(String email, String platformId) {
         return memberRepository.findIdByPlatformAndPlatformId(Platform.APPLE, platformId)
                 .map(memberId -> {
                     Member findMember = memberRepository.findById(memberId)
                             .orElseThrow(NotFoundMemberException::new);
                     String token = issueToken(findMember);
-
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
                     if (!findMember.isRegisteredOAuthMember()) {
                         return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId);
                     }
-
                     return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId);
                 })
                 .orElseGet(() -> {
-                    Member oauthMember = new Member(applePlatformMember.getEmail(), Platform.APPLE, platformId);
+                    Member oauthMember = new Member(email, Platform.APPLE, platformId);
                     Member savedMember = memberRepository.save(oauthMember);
                     String token = issueToken(savedMember);
-                    return new OAuthTokenResponse(token, applePlatformMember.getEmail(), false, platformId);
+                    return new OAuthTokenResponse(token, email, false, platformId);
                 });
     }
 
