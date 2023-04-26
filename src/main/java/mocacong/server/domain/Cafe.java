@@ -112,6 +112,6 @@ public class Cafe extends BaseTime {
         if (this.cafeImage == null) {
             this.cafeImage = new CafeImage();
         }
-        this.cafeImage = new CafeImage(this.cafeImage.getMember(), imgUrl);
+        this.cafeImage = new CafeImage(this.cafeImage.getMemberId(), imgUrl);
     }
 }
