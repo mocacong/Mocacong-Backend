@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CafeService {
 
+    private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
+
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
     private final ScoreRepository scoreRepository;
@@ -68,7 +70,7 @@ public class CafeService {
                 cafeDetail.getSoundValue(),
                 cafeDetail.getDeskValue(),
                 cafe.getReviews().size(),
-                commentResponses.size(),
+                cafe.getComments().size(),
                 commentResponses
         );
     }
@@ -76,6 +78,7 @@ public class CafeService {
     private List<CommentResponse> findCommentResponses(Cafe cafe, Member member) {
         return cafe.getComments()
                 .stream()
+                .limit(CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS)
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
                         return new CommentResponse(member.getImgUrl(), member.getNickname(), comment.getContent(), true);

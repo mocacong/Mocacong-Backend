@@ -154,6 +154,30 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("카페를 조회할 때 댓글은 3개까지만 보여준다")
+    void findCafeAndShowLimitComments() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Comment comment1 = new Comment(cafe, member, "댓글1");
+        commentRepository.save(comment1);
+        Comment comment2 = new Comment(cafe, member, "댓글2");
+        commentRepository.save(comment2);
+        Comment comment3 = new Comment(cafe, member, "댓글3");
+        commentRepository.save(comment3);
+        Comment comment4 = new Comment(cafe, member, "댓글4");
+        commentRepository.save(comment4);
+
+        FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getCommentsCount()).isEqualTo(4),
+                () -> assertThat(actual.getComments()).hasSize(3)
+        );
+    }
+
+    @Test
     @DisplayName("탈퇴한 회원이 작성한 리뷰와 코멘트가 존재하는 카페를 조회한다")
     void findCafeWithReviewsAndCommentsByDeleteMember() {
         Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
