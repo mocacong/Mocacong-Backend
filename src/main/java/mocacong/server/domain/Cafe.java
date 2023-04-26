@@ -56,6 +56,16 @@ public class Cafe extends BaseTime {
         this.comments = new ArrayList<>();
     }
 
+    public Cafe(String mapId, String name) {
+        this.mapId = mapId;
+        this.name = name;
+        this.imgUrl = null;
+        this.cafeDetail = new CafeDetail();
+        this.score = new ArrayList<>();
+        this.reviews = new ArrayList<>();
+        this.comments = new ArrayList<>();
+    }
+
     public void updateCafeDetails() {
         StudyType studyType = getMostFrequentStudyType();
         Wifi wifi = (Wifi) getMostFrequentType(reviews.stream().map(Review::getWifi));
