@@ -1,5 +1,11 @@
 package mocacong.server.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import mocacong.server.domain.cafedetail.*;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,11 +13,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import mocacong.server.domain.cafedetail.*;
 
 @Entity
 @Table(name = "cafe")
@@ -30,6 +31,9 @@ public class Cafe extends BaseTime {
     @Column(name = "map_id", nullable = false)
     private String mapId;
 
+    @Column(name = "img_url")
+    private String imgUrl;
+
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
 
@@ -42,9 +46,10 @@ public class Cafe extends BaseTime {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String mapId, String name) {
+    public Cafe(String mapId, String name, String imgUrl) {
         this.mapId = mapId;
         this.name = name;
+        this.imgUrl = imgUrl;
         this.cafeDetail = new CafeDetail();
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
