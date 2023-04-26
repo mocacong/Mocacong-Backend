@@ -53,6 +53,26 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @DisplayName("카페 코멘트 목록을 조회한다")
+    void findComments() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        카페_코멘트_작성(token, mapId, new CommentSaveRequest("댓글"));
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/cafes/" + mapId + "/comments?page=0&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    @Test
     @DisplayName("카페에 작성한 코멘트를 수정한다")
     void updateComment() {
         String content = "공부하기 좋아요~🥰";
