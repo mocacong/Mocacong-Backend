@@ -4,6 +4,7 @@ import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentSaveResponse;
+import mocacong.server.dto.response.CommentsResponse;
 import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
@@ -12,6 +13,7 @@ import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -73,6 +75,31 @@ class CommentServiceTest {
         commentService.save(email, mapId, "공부하기 좋아요~🥰");
 
         assertDoesNotThrow(() -> commentService.save(email, mapId, "공부하기 좋아요~🥰"));
+    }
+
+    @Test
+    @DisplayName("특정 카페에 달린 댓글 목록을 조회한다")
+    void findComments() {
+        String email = "kth990303@naver.com";
+        String mapId = "2143154352323";
+        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        commentRepository.save(new Comment(cafe, member, "댓글1"));
+        commentRepository.save(new Comment(cafe, member, "댓글2"));
+        commentRepository.save(new Comment(cafe, member, "댓글3"));
+        commentRepository.save(new Comment(cafe, member, "댓글4"));
+
+        CommentsResponse actual = commentService.findAll(email, mapId, 0, 3);
+
+        assertAll(
+                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getComments()).hasSize(3),
+                () -> assertThat(actual.getComments())
+                        .extracting("content")
+                        .containsExactly("댓글1", "댓글2", "댓글3")
+        );
     }
 
     @Test
