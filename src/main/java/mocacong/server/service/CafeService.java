@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -18,9 +14,16 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.MemberEvent;
+import mocacong.server.support.AwsS3Uploader;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class CafeService {
     private final ReviewRepository reviewRepository;
     private final FavoriteRepository favoriteRepository;
     private final EntityManager em;
+    private final AwsS3Uploader awsS3Uploader;
 
     public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
@@ -177,5 +181,17 @@ public class CafeService {
                 .collect(Collectors.toList());
 
         return new CafeFilterResponse(filteredIds);
+    }
+
+    @Transactional
+    public void saveCafeImage(String email, String mapId, MultipartFile cafeImg) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+
+        String imgUrl = cafeImg == null ? null : awsS3Uploader.uploadImage(cafeImg);
+        CafeImage cafeImage = new CafeImage(member, imgUrl);
+        cafe.updateCafeImgUrl(cafeImage.getImgUrl());
     }
 }

@@ -14,8 +14,10 @@ import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import mocacong.server.dto.response.FindCafeResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -76,5 +78,17 @@ public class CafeController {
                                                                   @RequestBody CafeFilterRequest requestBody) {
         CafeFilterResponse responseBody = cafeService.filterCafesByStudyType(studytype, requestBody);
         return ResponseEntity.ok(responseBody);
+    }
+
+    @Operation(summary = "카페 이미지 업로드")
+    @SecurityRequirement(name = "JWT")
+    @PostMapping(value = "/{mapId}/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateCafeImage(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestParam(value = "file", required = false) MultipartFile multipartFile
+    ) {
+        cafeService.saveCafeImage(email, mapId, multipartFile);
+        return ResponseEntity.ok().build();
     }
 }

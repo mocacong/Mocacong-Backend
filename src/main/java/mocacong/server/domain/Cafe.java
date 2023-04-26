@@ -31,14 +31,14 @@ public class Cafe extends BaseTime {
     @Column(name = "map_id", nullable = false)
     private String mapId;
 
-    @Column(name = "img_url")
-    private String imgUrl;
-
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
 
     @Embedded
     private CafeDetail cafeDetail;
+
+    @Embedded
+    private CafeImage cafeImage;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Review> reviews;
@@ -46,21 +46,11 @@ public class Cafe extends BaseTime {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String mapId, String name, String imgUrl) {
-        this.mapId = mapId;
-        this.name = name;
-        this.imgUrl = imgUrl;
-        this.cafeDetail = new CafeDetail();
-        this.score = new ArrayList<>();
-        this.reviews = new ArrayList<>();
-        this.comments = new ArrayList<>();
-    }
-
     public Cafe(String mapId, String name) {
         this.mapId = mapId;
         this.name = name;
-        this.imgUrl = null;
         this.cafeDetail = new CafeDetail();
+        this.cafeImage = new CafeImage();
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.comments = new ArrayList<>();
@@ -116,5 +106,12 @@ public class Cafe extends BaseTime {
 
     public void addReview(Review review) {
         this.reviews.add(review);
+    }
+
+    public void updateCafeImgUrl(String imgUrl) {
+        if (this.cafeImage == null) {
+            this.cafeImage = new CafeImage();
+        }
+        this.cafeImage = new CafeImage(this.cafeImage.getMember(), imgUrl);
     }
 }
