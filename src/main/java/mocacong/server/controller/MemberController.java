@@ -10,6 +10,7 @@ import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
+import mocacong.server.service.CafeService;
 import mocacong.server.service.MemberService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
 
     private final MemberService memberService;
+    private final CafeService cafeService;
 
     @Operation(summary = "회원가입")
     @PostMapping
@@ -64,6 +66,18 @@ public class MemberController {
     @GetMapping("/mypage")
     public ResponseEntity<MyPageResponse> findMyInfo(@LoginUserEmail String email) {
         MyPageResponse response = memberService.findMyInfo(email);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "마이페이지 - 즐겨찾기 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/mypage/stars")
+    public ResponseEntity<MyFavoriteCafesResponse> findMyInfo(
+            @LoginUserEmail String email,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        MyFavoriteCafesResponse response = cafeService.findMyFavoriteCafes(email, page, count);
         return ResponseEntity.ok(response);
     }
 

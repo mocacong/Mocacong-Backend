@@ -285,4 +285,23 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(actual.getImgUrl()).isNull()
         );
     }
+
+    @Test
+    @DisplayName("마이페이지에서 즐겨찾기 등록한 카페 목록을 조회한다")
+    void findMyFavoriteCafes() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        즐겨찾기_등록(token, mapId);
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/members/mypage/stars?page=0&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
 }

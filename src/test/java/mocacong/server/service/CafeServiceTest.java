@@ -6,10 +6,7 @@ import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
-import mocacong.server.dto.response.CafeFilterResponse;
-import mocacong.server.dto.response.CafeReviewResponse;
-import mocacong.server.dto.response.CafeReviewUpdateResponse;
-import mocacong.server.dto.response.FindCafeResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
@@ -244,6 +241,32 @@ class CafeServiceTest {
                 () -> assertThat(actual.getComments())
                         .extracting("nickname")
                         .containsExactlyInAnyOrder("케이", "메리", "케이")
+        );
+    }
+
+    @Test
+    @DisplayName("회원이 즐겨찾기한 카페 목록들을 보여준다")
+    void findMyFavoriteCafes() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(1, "group", "느려요", "없어요",
+                        "불편해요", "없어요", "북적북적해요", "불편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "느려요", "없어요",
+                        "깨끗해요", "없어요", null, "보통이에요"));
+        Favorite favorite = new Favorite(member1, cafe);
+        favoriteRepository.save(favorite);
+
+        MyFavoriteCafesResponse actual = cafeService.findMyFavoriteCafes(member1.getEmail(), 0, 3);
+
+        assertAll(
+                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getCafes().get(0).getScore()).isEqualTo(1.5)
         );
     }
 

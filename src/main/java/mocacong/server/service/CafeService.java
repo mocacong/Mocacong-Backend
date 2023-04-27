@@ -19,6 +19,8 @@ import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.MemberEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +89,17 @@ public class CafeService {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public MyFavoriteCafesResponse findMyFavoriteCafes(String email, Integer page, int count) {
+        Slice<Cafe> myFavoriteCafes = cafeRepository.findByMyFavoriteCafes(email, PageRequest.of(page, count));
+        List<MyFavoriteCafeResponse> responses = myFavoriteCafes
+                .getContent()
+                .stream()
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getName(), cafe.findAverageScore()))
+                .collect(Collectors.toList());
+        return new MyFavoriteCafesResponse(myFavoriteCafes.getNumber(), responses);
     }
 
     @Transactional
