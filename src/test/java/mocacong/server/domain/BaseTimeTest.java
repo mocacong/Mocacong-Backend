@@ -1,6 +1,6 @@
 package mocacong.server.domain;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import mocacong.server.domain.cafedetail.*;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.repository.CafeRepository;
@@ -47,8 +47,8 @@ class BaseTimeTest {
         entityManager.flush();
 
         Cafe findCafe = cafeRepository.findByMapId("2143154352323").orElseThrow(NotFoundCafeException::new);
-        LocalDateTime createdTime = findCafe.getCreatedTime();
-        LocalDateTime modifiedTime = findCafe.getModifiedTime();
+        Timestamp createdTime = findCafe.getCreatedTime();
+        Timestamp modifiedTime = findCafe.getModifiedTime();
 
         assertAll(
                 () -> assertThat(modifiedTime).isNotNull(),

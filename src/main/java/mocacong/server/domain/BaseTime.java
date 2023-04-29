@@ -1,6 +1,6 @@
 package mocacong.server.domain;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
@@ -16,9 +16,9 @@ public class BaseTime {
 
     @CreatedDate
     @Column(name = "created_time", updatable = false)
-    private LocalDateTime createdTime;
+    private Timestamp createdTime;
 
     @LastModifiedDate
     @Column(name = "modified_time")
-    private LocalDateTime modifiedTime;
+    private Timestamp modifiedTime;
 }
