@@ -191,6 +191,6 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         String imgUrl = cafeImg == null ? null : awsS3Uploader.uploadImage(cafeImg);
-        cafe.addCafeImgUrl(member.getId(), imgUrl);
+        cafe.saveCafeImgUrl(member.getId(), imgUrl);
     }
 }

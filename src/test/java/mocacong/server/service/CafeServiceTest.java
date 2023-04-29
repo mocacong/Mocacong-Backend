@@ -14,7 +14,6 @@ import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.support.AwsS3Uploader;
-import mocacong.server.support.AwsSESSender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +53,6 @@ class CafeServiceTest {
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
-    @MockBean
-    private AwsSESSender awsSESSender;
 
     @Test
     @DisplayName("등록되지 않은 카페를 성공적으로 등록한다")
@@ -422,8 +419,8 @@ class CafeServiceTest {
 
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         assertAll(
-                () -> assertThat(actual.getCafeImage()).hasSize(1),
-                () -> assertThat(actual.getCafeImage().get(0).getImgUrl()).isEqualTo(expected)
+                () -> assertThat(actual.getCafeImages()).hasSize(1),
+                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected)
         );
     }
 
@@ -446,9 +443,9 @@ class CafeServiceTest {
         assertDoesNotThrow(() -> cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile));
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         assertAll(
-                () -> assertThat(actual.getCafeImage()).hasSize(2),
-                () -> assertThat(actual.getCafeImage().get(0).getImgUrl()).isEqualTo(expected),
-                () -> assertThat(actual.getCafeImage().get(1).getImgUrl()).isEqualTo(expected)
+                () -> assertThat(actual.getCafeImages()).hasSize(2),
+                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected),
+                () -> assertThat(actual.getCafeImages().get(1).getImgUrl()).isEqualTo(expected)
         );
     }
 }

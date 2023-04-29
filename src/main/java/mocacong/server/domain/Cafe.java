@@ -108,7 +108,7 @@ public class Cafe extends BaseTime {
         this.reviews.add(review);
     }
 
-    public void addCafeImgUrl(Long memberId, String imgUrl) {
+    public void saveCafeImgUrl(Long memberId, String imgUrl) {
         if (this.cafeImages == null) {
             this.cafeImages = new ArrayList<>();
         }
