@@ -37,8 +37,8 @@ public class Cafe extends BaseTime {
     @Embedded
     private CafeDetail cafeDetail;
 
-    @Embedded
-    private CafeImage cafeImage;
+    @ElementCollection
+    private List<CafeImage> cafeImages;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Review> reviews;
@@ -50,7 +50,7 @@ public class Cafe extends BaseTime {
         this.mapId = mapId;
         this.name = name;
         this.cafeDetail = new CafeDetail();
-        this.cafeImage = new CafeImage();
+        this.cafeImages = new ArrayList<>();
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.comments = new ArrayList<>();
@@ -108,10 +108,11 @@ public class Cafe extends BaseTime {
         this.reviews.add(review);
     }
 
-    public void updateCafeImgUrl(String imgUrl) {
-        if (this.cafeImage == null) {
-            this.cafeImage = new CafeImage();
+    public void addCafeImgUrl(Long memberId, String imgUrl) {
+        if (this.cafeImages == null) {
+            this.cafeImages = new ArrayList<>();
         }
-        this.cafeImage = new CafeImage(this.cafeImage.getMemberId(), imgUrl);
+        CafeImage cafeImage = new CafeImage(memberId, imgUrl);
+        this.cafeImages.add(cafeImage);
     }
 }

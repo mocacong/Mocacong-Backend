@@ -83,7 +83,7 @@ public class CafeController {
     @Operation(summary = "카페 이미지 업로드")
     @SecurityRequirement(name = "JWT")
     @PostMapping(value = "/{mapId}/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateCafeImage(
+    public ResponseEntity<Void> updateCafeImage(
             @LoginUserEmail String email,
             @PathVariable String mapId,
             @RequestParam(value = "file", required = false) MultipartFile multipartFile

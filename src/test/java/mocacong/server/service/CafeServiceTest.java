@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -404,6 +405,7 @@ class CafeServiceTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("카페 이미지를 성공적으로 저장한다")
     void saveCafeImage() throws IOException {
         String expected = "test_img.jpg";
@@ -419,10 +421,14 @@ class CafeServiceTest {
         cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
 
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
-        assertThat(actual.getCafeImage().getImgUrl()).isEqualTo(expected);
+        assertAll(
+                () -> assertThat(actual.getCafeImage()).hasSize(1),
+                () -> assertThat(actual.getCafeImage().get(0).getImgUrl()).isEqualTo(expected)
+        );
     }
 
     @Test
+    @Transactional
     @DisplayName("사용자가 카페 이미지를 여러번 저장한다")
     void saveCafeImages() throws IOException {
         String expected = "test_img.jpg";
@@ -438,5 +444,11 @@ class CafeServiceTest {
         cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
 
         assertDoesNotThrow(() -> cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile));
+        Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        assertAll(
+                () -> assertThat(actual.getCafeImage()).hasSize(2),
+                () -> assertThat(actual.getCafeImage().get(0).getImgUrl()).isEqualTo(expected),
+                () -> assertThat(actual.getCafeImage().get(1).getImgUrl()).isEqualTo(expected)
+        );
     }
 }
