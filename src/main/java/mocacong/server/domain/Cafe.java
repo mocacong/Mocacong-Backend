@@ -1,5 +1,11 @@
 package mocacong.server.domain;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import mocacong.server.domain.cafedetail.*;
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,11 +13,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import mocacong.server.domain.cafedetail.*;
 
 @Entity
 @Table(name = "cafe")
@@ -36,6 +37,10 @@ public class Cafe extends BaseTime {
     @Embedded
     private CafeDetail cafeDetail;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "cafe_image")
+    private List<CafeImage> cafeImages;
+
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Review> reviews;
 
@@ -46,6 +51,7 @@ public class Cafe extends BaseTime {
         this.mapId = mapId;
         this.name = name;
         this.cafeDetail = new CafeDetail();
+        this.cafeImages = new ArrayList<>();
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.comments = new ArrayList<>();
@@ -101,5 +107,10 @@ public class Cafe extends BaseTime {
 
     public void addReview(Review review) {
         this.reviews.add(review);
+    }
+
+    public void saveCafeImgUrl(Long memberId, String imgUrl) {
+        CafeImage cafeImage = new CafeImage(memberId, imgUrl);
+        this.cafeImages.add(cafeImage);
     }
 }

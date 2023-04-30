@@ -1,6 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -8,14 +7,25 @@ import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import mocacong.server.support.AwsS3Uploader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.when;
 
 @ServiceTest
 class CafeServiceTest {
@@ -36,6 +46,9 @@ class CafeServiceTest {
     private FavoriteRepository favoriteRepository;
     @Autowired
     private MemberService memberService;
+
+    @MockBean
+    private AwsS3Uploader awsS3Uploader;
 
     @Test
     @DisplayName("등록되지 않은 카페를 성공적으로 등록한다")
@@ -432,5 +445,51 @@ class CafeServiceTest {
         CafeFilterResponse filteredCafes = cafeService.filterCafesByStudyType("group", requestBody);
 
         assertThat(filteredCafes.getMapIds()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("카페 이미지를 성공적으로 저장한다")
+    void saveCafeImage() throws IOException {
+        String expected = "test_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+
+        Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        assertAll(
+                () -> assertThat(actual.getCafeImages()).hasSize(1),
+                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected)
+        );
+    }
+
+    @Test
+    @DisplayName("사용자가 카페 이미지를 여러번 저장한다")
+    void saveCafeImages() throws IOException {
+        String expected = "test_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+
+        Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        assertAll(
+                () -> assertDoesNotThrow(() -> cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile)),
+                () -> assertThat(actual.getCafeImages()).hasSize(2),
+                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected),
+                () -> assertThat(actual.getCafeImages().get(1).getImgUrl()).isEqualTo(expected)
+        );
     }
 }
