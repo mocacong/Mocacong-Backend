@@ -190,7 +190,7 @@ public class CafeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
 
-        String imgUrl = cafeImg == null ? null : awsS3Uploader.uploadImage(cafeImg);
+        String imgUrl = awsS3Uploader.uploadImage(cafeImg);
         cafe.saveCafeImgUrl(member.getId(), imgUrl);
     }
 }
