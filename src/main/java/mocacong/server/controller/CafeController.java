@@ -86,7 +86,7 @@ public class CafeController {
     public ResponseEntity<Void> updateCafeImage(
             @LoginUserEmail String email,
             @PathVariable String mapId,
-            @RequestParam(value = "file", required = false) MultipartFile multipartFile
+            @RequestParam(value = "file") MultipartFile multipartFile
     ) {
         cafeService.saveCafeImage(email, mapId, multipartFile);
         return ResponseEntity.ok().build();

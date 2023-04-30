@@ -38,6 +38,7 @@ public class Cafe extends BaseTime {
     private CafeDetail cafeDetail;
 
     @ElementCollection
+    @CollectionTable(name = "cafe_image")
     private List<CafeImage> cafeImages;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
@@ -109,9 +110,6 @@ public class Cafe extends BaseTime {
     }
 
     public void saveCafeImgUrl(Long memberId, String imgUrl) {
-        if (this.cafeImages == null) {
-            this.cafeImages = new ArrayList<>();
-        }
         CafeImage cafeImage = new CafeImage(memberId, imgUrl);
         this.cafeImages.add(cafeImage);
     }
