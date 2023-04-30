@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.when;
 
 @ServiceTest
@@ -401,7 +401,6 @@ class CafeServiceTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("카페 이미지를 성공적으로 저장한다")
     void saveCafeImage() throws IOException {
         String expected = "test_img.jpg";
@@ -424,7 +423,6 @@ class CafeServiceTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("사용자가 카페 이미지를 여러번 저장한다")
     void saveCafeImages() throws IOException {
         String expected = "test_img.jpg";
@@ -438,10 +436,10 @@ class CafeServiceTest {
 
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
         cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
 
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         assertAll(
+                () -> assertDoesNotThrow(() -> cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile)),
                 () -> assertThat(actual.getCafeImages()).hasSize(2),
                 () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected),
                 () -> assertThat(actual.getCafeImages().get(1).getImgUrl()).isEqualTo(expected)
