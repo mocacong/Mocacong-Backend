@@ -79,12 +79,6 @@ public class MemberService {
         memberRepository.delete(findMember);
     }
 
-    @Transactional
-    public void deleteAll() {
-        memberRepository.findAll()
-                .forEach(member -> delete(member.getEmail()));
-    }
-
     @Transactional(readOnly = true)
     public MemberGetAllResponse getAllMembers() {
         List<Member> members = memberRepository.findAll();
