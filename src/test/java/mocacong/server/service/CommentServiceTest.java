@@ -103,6 +103,33 @@ class CommentServiceTest {
     }
 
     @Test
+    @DisplayName("특정 카페에 달린 댓글 목록 중 내가 작성한 댓글만을 조회한다")
+    void findOnlyMyComments() {
+        String email = "kth990303@naver.com";
+        String mapId = "2143154352323";
+        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        commentRepository.save(new Comment(cafe, member, "댓글1"));
+        commentRepository.save(new Comment(cafe, member2, "댓글2"));
+        commentRepository.save(new Comment(cafe, member, "댓글3"));
+        commentRepository.save(new Comment(cafe, member2, "댓글4"));
+
+        CommentsResponse actual = commentService.findCafeCommentsOnlyMyComments(email, mapId, 0, 3);
+
+        assertAll(
+                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getComments()).hasSize(2),
+                () -> assertThat(actual.getComments())
+                        .extracting("content")
+                        .containsExactly("댓글1", "댓글3")
+        );
+    }
+
+    @Test
     @DisplayName("특정 카페에 작성한 댓글을 수정한다")
     void updateComment() {
         String email = "kth990303@naver.com";
