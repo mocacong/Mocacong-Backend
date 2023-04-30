@@ -46,6 +46,19 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "카페 코멘트 중 나의 코멘트만 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/me")
+    public ResponseEntity<CommentsResponse> findCommentsByMe(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        CommentsResponse response = commentService.findCafeCommentsOnlyMyComments(email, mapId, page, count);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "카페 코멘트 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping("/{commentId}")
