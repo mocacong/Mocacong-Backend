@@ -79,7 +79,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         회원_가입(signUpRequest);
-        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("mery@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("mery@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
         회원_가입(signUpRequest2);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
         String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest.getPassword());

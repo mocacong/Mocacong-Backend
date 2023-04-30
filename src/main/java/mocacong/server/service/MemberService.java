@@ -55,7 +55,7 @@ public class MemberService {
     }
 
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
-        memberRepository.findByEmail(memberSignUpRequest.getEmail())
+        memberRepository.findByEmailOrNickname(memberSignUpRequest.getEmail(), memberSignUpRequest.getNickname())
                 .ifPresent(member -> {
                     throw new DuplicateMemberException();
                 });

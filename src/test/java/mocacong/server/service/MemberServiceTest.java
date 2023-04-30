@@ -59,11 +59,22 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("이미 가입된 회원이 존재하면 회원 가입 시에 예외를 반환한다")
-    void signUpByDuplicateMember() {
-        String expected = "kth990303@naver.com";
-        MemberSignUpRequest request = new MemberSignUpRequest(expected, "a1b2c3d4", "케이", "010-1234-5678");
-        memberRepository.save(new Member(expected, "1234", "케이", "010-1234-5678"));
+    @DisplayName("이미 가입된 이메일이 존재하면 회원 가입 시에 예외를 반환한다")
+    void signUpByDuplicateEmailMember() {
+        String email = "kth990303@naver.com";
+        memberRepository.save(new Member(email, "1234", "케이", "010-1234-5678"));
+        MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+
+        assertThatThrownBy(() -> memberService.signUp(request))
+                .isInstanceOf(DuplicateMemberException.class);
+    }
+
+    @Test
+    @DisplayName("이미 가입된 닉네임이 존재하면 회원 가입 시에 예외를 반환한다")
+    void signUpByDuplicateNicknameMember() {
+        String nickname = "케이";
+        memberRepository.save(new Member("kth2@naver.com", "1234", nickname, "010-1234-5678"));
+        MemberSignUpRequest request = new MemberSignUpRequest("kth@naver.com", "a1b2c3d4", nickname, "010-1234-5678");
 
         assertThatThrownBy(() -> memberService.signUp(request))
                 .isInstanceOf(DuplicateMemberException.class);
