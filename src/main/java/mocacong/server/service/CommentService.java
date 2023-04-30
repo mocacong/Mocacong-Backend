@@ -53,6 +53,18 @@ public class CommentService {
         return new CommentsResponse(comments.getNumber(), responses);
     }
 
+    @Transactional(readOnly = true)
+    public CommentsResponse findCafeCommentsOnlyMyComments(String email, String mapId, Integer page, int count) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        Slice<Comment> comments =
+                commentRepository.findAllByCafeIdAndMemberId(cafe.getId(), member.getId(), PageRequest.of(page, count));
+        List<CommentResponse> responses = findCommentResponses(member, comments);
+        return new CommentsResponse(comments.getNumber(), responses);
+    }
+
     private List<CommentResponse> findCommentResponses(Member member, Slice<Comment> comments) {
         return comments.stream()
                 .map(comment -> {

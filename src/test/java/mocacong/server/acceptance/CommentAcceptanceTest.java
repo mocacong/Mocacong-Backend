@@ -3,24 +3,23 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import java.util.List;
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CommentSaveRequest;
 import mocacong.server.dto.request.CommentUpdateRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.CommentResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
+import mocacong.server.dto.response.CommentsResponse;
 import mocacong.server.dto.response.FindCafeResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-
-import java.util.List;
-
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommentAcceptanceTest extends AcceptanceTest {
 
@@ -70,6 +69,33 @@ public class CommentAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+
+    @Test
+    @DisplayName("카페 코멘트 목록 중 내가 작성한 코멘트만을 조회한다")
+    void findOnlyMyComments() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("mery@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest2);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest.getPassword());
+        카페_코멘트_작성(token, mapId, new CommentSaveRequest("댓글"));
+        카페_코멘트_작성(token2, mapId, new CommentSaveRequest("댓글2"));
+
+        CommentsResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/cafes/" + mapId + "/comments/me?page=0&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CommentsResponse.class);
+
+        assertThat(response.getComments()).hasSize(1);
     }
 
     @Test
