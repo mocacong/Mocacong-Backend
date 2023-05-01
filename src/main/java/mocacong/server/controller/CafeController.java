@@ -8,10 +8,7 @@ import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
-import mocacong.server.dto.response.CafeFilterResponse;
-import mocacong.server.dto.response.CafeReviewResponse;
-import mocacong.server.dto.response.CafeReviewUpdateResponse;
-import mocacong.server.dto.response.FindCafeResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
 import org.springframework.http.MediaType;
@@ -90,5 +87,18 @@ public class CafeController {
     ) {
         cafeService.saveCafeImage(email, mapId, multipartFile);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "카페 이미지 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping(value = "/{mapId}/img", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CafeImageResponse> getCafeImages(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        CafeImageResponse response = cafeService.findCafeImages(email, mapId, page, count);
+        return ResponseEntity.ok(response);
     }
 }

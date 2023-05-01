@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public class CafeService {
 
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
+    private static final int CAFE_SHOW_PAGE_IMAGES_LIMIT_COUNTS = 10;
 
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
@@ -208,5 +209,21 @@ public class CafeService {
 
         String imgUrl = awsS3Uploader.uploadImage(cafeImg);
         cafe.saveCafeImgUrl(member.getId(), imgUrl);
+    }
+
+    @Transactional
+    public CafeImageResponse findCafeImages(String email, String mapId, Integer page, int count) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        List<CafeImage> cafeImages = cafe.getCafeImages();
+
+        int startIndex = page * count;
+        int endIndex = Math.min(startIndex + count, cafeImages.size());
+        endIndex = Math.min(endIndex, startIndex + CAFE_SHOW_PAGE_IMAGES_LIMIT_COUNTS);
+        List<CafeImage> cafeImageList = cafeImages.subList(startIndex, endIndex);
+
+        return new CafeImageResponse(page, cafeImageList);
     }
 }

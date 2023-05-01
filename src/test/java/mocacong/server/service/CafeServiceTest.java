@@ -1,6 +1,7 @@
 package mocacong.server.service;
 
 import mocacong.server.domain.*;
+import mocacong.server.dto.repository.*;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
