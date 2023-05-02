@@ -211,7 +211,6 @@ public class CafeService {
         cafe.saveCafeImgUrl(member.getId(), imgUrl);
     }
 
-    @Transactional
     public CafeImageResponse findCafeImages(String email, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
