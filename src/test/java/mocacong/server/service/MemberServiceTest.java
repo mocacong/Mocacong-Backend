@@ -10,6 +10,7 @@ import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
+import mocacong.server.exception.badrequest.DuplicateNicknameException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -77,7 +78,7 @@ class MemberServiceTest {
         MemberSignUpRequest request = new MemberSignUpRequest("kth@naver.com", "a1b2c3d4", nickname, "010-1234-5678");
 
         assertThatThrownBy(() -> memberService.signUp(request))
-                .isInstanceOf(DuplicateMemberException.class);
+                .isInstanceOf(DuplicateNicknameException.class);
     }
 
     @Test
