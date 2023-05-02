@@ -11,10 +11,7 @@ import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
-import mocacong.server.exception.badrequest.DuplicateMemberException;
-import mocacong.server.exception.badrequest.InvalidEmailException;
-import mocacong.server.exception.badrequest.InvalidNicknameException;
-import mocacong.server.exception.badrequest.InvalidPasswordException;
+import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.MemberEvent;
@@ -58,6 +55,10 @@ public class MemberService {
         memberRepository.findByEmail(memberSignUpRequest.getEmail())
                 .ifPresent(member -> {
                     throw new DuplicateMemberException();
+                });
+        memberRepository.findByNickname(memberSignUpRequest.getNickname())
+                .ifPresent(member -> {
+                    throw new DuplicateNicknameException();
                 });
     }
 
