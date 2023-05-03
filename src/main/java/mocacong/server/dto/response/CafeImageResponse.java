@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mocacong.server.domain.CafeImage;
 
 import java.util.List;
 
@@ -13,5 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CafeImageResponse {
     private int currentPage;
-    private List<CafeImage> cafeImages;
+    private List<CafeImageResponse> cafeImages;
+    private boolean isMe;
 }
