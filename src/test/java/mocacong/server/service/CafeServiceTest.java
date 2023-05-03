@@ -510,12 +510,18 @@ class CafeServiceTest {
 
         CafeImageResponse actual = cafeService.findCafeImages("dlawotn3@naver.com", mapId, 0, 3);
 
-        List<CafeImage> cafeImages = actual.getCafeImages();
+        List<CafeImageResponse> cafeImages = actual.getCafeImages();
+
+//        assertAll(
+//                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+//                () -> assertThat(cafeImages).hasSize(3)
+//        );
         assertAll(
                 () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
                 () -> assertThat(cafeImages).hasSize(3)
         );
     }
+
 
     @Test
     @DisplayName("카페를 조회할 때 이미지는 10개까지만 보여준다")
@@ -536,7 +542,7 @@ class CafeServiceTest {
         Cafe actualCafe = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         CafeImageResponse actual = cafeService.findCafeImages("dlawotn3@naver.com", mapId, 0, 10);
 
-        List<CafeImage> cafeImages = actual.getCafeImages();
+        List<CafeImageResponse> cafeImages = actual.getCafeImages();
         assertAll(
                 () -> assertThat(cafeImages).hasSize(10),
                 () -> assertThat(actualCafe.getCafeImages()).hasSize(11)

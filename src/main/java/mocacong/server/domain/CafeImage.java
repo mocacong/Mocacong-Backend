@@ -21,4 +21,8 @@ public class CafeImage {
         this.memberId = memberId;
         this.imgUrl = imgUrl;
     }
+
+    public boolean isOwnedBy(Member member) {
+        return this.memberId.equals(member);
+    }
 }

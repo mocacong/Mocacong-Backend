@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,13 +34,13 @@ import java.util.stream.Collectors;
 public class CafeService {
 
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
-    private static final int CAFE_SHOW_PAGE_IMAGES_LIMIT_COUNTS = 10;
 
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
     private final ScoreRepository scoreRepository;
     private final ReviewRepository reviewRepository;
     private final FavoriteRepository favoriteRepository;
+    private final CafeImageRepository cafeImageRepository;
     private final EntityManager em;
     private final AwsS3Uploader awsS3Uploader;
 
@@ -214,15 +216,24 @@ public class CafeService {
     public CafeImageResponse findCafeImages(String email, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        memberRepository.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        List<CafeImage> cafeImages = cafe.getCafeImages();
+        PageRequest pageRequest = PageRequest.of(page, count);
+        Slice<CafeImage> cafeImagePage = cafeImageRepository.findByCafe(cafe, pageRequest);
+        List<CafeImage> cafeImageList = cafeImagePage.getContent();
 
-        int startIndex = page * count;
-        int endIndex = Math.min(startIndex + count, cafeImages.size());
-        endIndex = Math.min(endIndex, startIndex + CAFE_SHOW_PAGE_IMAGES_LIMIT_COUNTS);
-        List<CafeImage> cafeImageList = cafeImages.subList(startIndex, endIndex);
+        List<CafeImageResponse> cafeImageResponseList = new ArrayList<>();
+        for (CafeImage cafeImage : cafeImageList) {
+            CafeImageResponse cafeImageResponse = CafeImageResponse.of(
+                    cafeImagePage.getNumber(),
+                    Collections.singletonList(CafeImageResponse.of(0, Collections.emptyList(), cafeImage.isOwnedBy(member))),
+                    cafeImage.isOwnedBy(member));
+            cafeImageResponseList.add(cafeImageResponse);
+        }
 
-        return new CafeImageResponse(page, cafeImageList);
+        boolean hasOwnedCafeImages = cafeImageList.stream()
+                .anyMatch(image -> image.isOwnedBy(member));
+
+        return CafeImageResponse.of(cafeImagePage.getNumber(), cafeImageResponseList, hasOwnedCafeImages);
     }
 }
