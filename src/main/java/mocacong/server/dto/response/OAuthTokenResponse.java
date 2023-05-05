@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
-public class AppleTokenResponse {
+public class OAuthTokenResponse {
 
     private String token;
     private String email;
