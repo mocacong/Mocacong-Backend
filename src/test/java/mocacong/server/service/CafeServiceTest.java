@@ -350,14 +350,14 @@ class CafeServiceTest {
         CafeMyReviewResponse actual = cafeService.findMyCafeReview(member1.getEmail(), cafe.getMapId());
 
         assertAll(
-                () -> assertThat(actual.getScore()).isEqualTo(4),
-                () -> assertThat(actual.getStudyType()).isEqualTo("solo"),
-                () -> assertThat(actual.getWifi()).isEqualTo("빵빵해요"),
-                () -> assertThat(actual.getParking()).isEqualTo("여유로워요"),
-                () -> assertThat(actual.getToilet()).isEqualTo("깨끗해요"),
-                () -> assertThat(actual.getPower()).isEqualTo("충분해요"),
-                () -> assertThat(actual.getSound()).isEqualTo("조용해요"),
-                () -> assertThat(actual.getDesk()).isEqualTo("편해요")
+                () -> assertThat(actual.getMyScore()).isEqualTo(4),
+                () -> assertThat(actual.getMyStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getMyWifi()).isEqualTo("빵빵해요"),
+                () -> assertThat(actual.getMyParking()).isEqualTo("여유로워요"),
+                () -> assertThat(actual.getMyToilet()).isEqualTo("깨끗해요"),
+                () -> assertThat(actual.getMyPower()).isEqualTo("충분해요"),
+                () -> assertThat(actual.getMySound()).isEqualTo("조용해요"),
+                () -> assertThat(actual.getMyDesk()).isEqualTo("편해요")
         );
     }
 

@@ -13,14 +13,14 @@ import mocacong.server.domain.Score;
 @AllArgsConstructor
 public class CafeMyReviewResponse {
 
-    private Integer score;
-    private String studyType;
-    private String wifi;
-    private String parking;
-    private String toilet;
-    private String power;
-    private String sound;
-    private String desk;
+    private Integer myScore;
+    private String myStudyType;
+    private String myWifi;
+    private String myParking;
+    private String myToilet;
+    private String myPower;
+    private String mySound;
+    private String myDesk;
 
     public static CafeMyReviewResponse of(Score score, Review review) {
         CafeDetail cafeDetail = review.getCafeDetail();
