@@ -17,7 +17,7 @@ public class LoggingTracer {
         loggingStatusManager.syncStatus();
         if (log.isInfoEnabled()) {
             log.info(
-                    "[{}] {}> {} args={}",
+                    "[{}] {}-> {} args={}",
                     loggingStatusManager.getTaskId(),
                     getDepthSpace(loggingStatusManager.getDepthLevel()),
                     message,
@@ -31,7 +31,7 @@ public class LoggingTracer {
             long stopTimeMillis = System.currentTimeMillis();
             long resultTimeMillis = stopTimeMillis - loggingStatusManager.getStartTimeMillis();
             log.info(
-                    "[{}] <{} {} time={}ms",
+                    "[{}] <-{} {} time={}ms",
                     loggingStatusManager.getTaskId(),
                     getDepthSpace(loggingStatusManager.getDepthLevel()),
                     message,
