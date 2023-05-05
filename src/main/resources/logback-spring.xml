@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <timestamp key="BY_DATE" datePattern="yyyy-MM-dd"/>
+    <property name="LOG_PATH" value="./logs"/>
+    <property name="ARCHIVE_PATH" value="./archive"/>
+    <property name="LOG_PATTERN"
+              value="[%d{yyyy-MM-dd HH:mm:ss}:%-4relative] %green([%thread]) %highlight(%-5level) [%C.%M:%line] - %msg%n"/>
+
+    <springProfile name="!prod">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+        </appender>
+
+        <!-- 로컬 환경에서는 기본 로그레벨 INFO -->
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <!-- 운영 환경에서는 로그를 파일로 저장 -->
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_PATH}/mocacong-${BY_DATE}.log</file>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- rolling(백업) 파일 저장 위치 -->
+                <fileNamePattern>${ARCHIVE_PATH}/mocacong-${BY_DATE}-%i.log</fileNamePattern>
+                <!-- 로그 파일이 10MB 넘으면 백업하고 새로운 파일 생성 -->
+                <maxFileSize>10MB</maxFileSize>
+                <!-- 백업 로그 파일은 7일 이후 삭제 -->
+                <maxHistory>7</maxHistory>
+                <!-- 로그 파일과 백업 로그 파일의 최대 크기는 100MB -->
+                <!-- 초과 시 가장 오래된 백업 파일부터 삭제 -->
+                <totalSizeCap>100MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_PATH}/error/mocacong-error-${BY_DATE}.log</file>
+            <!-- ERROR 로깅 레벨만 필터링 -->
+            <filter class = "ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- 에러 rolling(백업) 파일 저장 위치 -->
+                <fileNamePattern>${ARCHIVE_PATH}/error/mocacong-error-${BY_DATE}-%i.log</fileNamePattern>
+                <!-- 에러 로그 파일이 10MB 넘으면 백업하고 새로운 파일 생성 -->
+                <maxFileSize>10MB</maxFileSize>
+                <!-- 에러 백업 로그 파일은 20일 이후 삭제 -->
+                <maxHistory>20</maxHistory>
+                <!-- 에러 관련 로그 파일과 백업 로그 파일의 최대 크기는 500MB -->
+                <!-- 초과 시 가장 오래된 백업 파일부터 삭제 -->
+                <totalSizeCap>500MB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <!-- 운영 환경에서는 기본 로그레벨 INFO -->
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="FILE_ERROR"/>
+        </root>
+    </springProfile>
+</configuration>
