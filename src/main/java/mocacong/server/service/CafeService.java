@@ -17,14 +17,13 @@ import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -210,30 +209,27 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         String imgUrl = awsS3Uploader.uploadImage(cafeImg);
-        cafe.saveCafeImgUrl(member.getId(), imgUrl);
+        cafe.saveCafeImgUrl(imgUrl, cafe, member);
     }
 
+    @Transactional(readOnly = true)
     public CafeImageResponse findCafeImages(String email, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        PageRequest pageRequest = PageRequest.of(page, count);
-        Slice<CafeImage> cafeImagePage = cafeImageRepository.findByCafe(cafe, pageRequest);
-        List<CafeImage> cafeImageList = cafeImagePage.getContent();
+        Pageable pageable = PageRequest.of(page, count);
+        Slice<CafeImage> cafeImages = cafeImageRepository.findByCafe(cafe, pageable);
 
-        List<CafeImageResponse> cafeImageResponseList = new ArrayList<>();
-        for (CafeImage cafeImage : cafeImageList) {
-            CafeImageResponse cafeImageResponse = CafeImageResponse.of(
-                    cafeImagePage.getNumber(),
-                    Collections.singletonList(CafeImageResponse.of(0, Collections.emptyList(), cafeImage.isOwnedBy(member))),
-                    cafeImage.isOwnedBy(member));
-            cafeImageResponseList.add(cafeImageResponse);
-        }
+        List<CafeImageResponse> cafeImageResponse = cafeImages.getContent().stream()
+                .map(cafeImage -> new CafeImage(cafeImage, isMe))
+                .collect(Collectors.toList());
 
-        boolean hasOwnedCafeImages = cafeImageList.stream()
-                .anyMatch(image -> image.isOwnedBy(member));
+        boolean isMe = cafeImages.getContent().stream()
+                .anyMatch(cafeImage -> cafeImage.getMember().equals(member));
 
-        return CafeImageResponse.of(cafeImagePage.getNumber(), cafeImageResponseList, hasOwnedCafeImages);
+
+        return new CafeImageResponse(cafeImages.getNumber(), cafeImageResponse, isMe);
     }
+
 }

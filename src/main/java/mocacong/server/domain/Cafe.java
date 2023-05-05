@@ -37,8 +37,9 @@ public class Cafe extends BaseTime {
     @Embedded
     private CafeDetail cafeDetail;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "cafe_image")
+    //@ElementCollection(fetch = FetchType.EAGER)
+    //@CollectionTable(name = "cafe_image")
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<CafeImage> cafeImages;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
@@ -109,8 +110,8 @@ public class Cafe extends BaseTime {
         this.reviews.add(review);
     }
 
-    public void saveCafeImgUrl(Long memberId, String imgUrl) {
-        CafeImage cafeImage = new CafeImage(memberId, imgUrl);
+    public void saveCafeImgUrl(String imgUrl, Cafe cafe, Member member) {
+        CafeImage cafeImage = new CafeImage(imgUrl, cafe, member);
         this.cafeImages.add(cafeImage);
     }
 }
