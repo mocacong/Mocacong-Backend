@@ -152,7 +152,9 @@ public class CafeService {
 
         Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElseThrow(NotFoundReviewException::new);
-        return CafeMyReviewResponse.from(review);
+        Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElse(null);
+        return CafeMyReviewResponse.of(score, review);
     }
 
     @Transactional

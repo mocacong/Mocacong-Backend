@@ -350,6 +350,7 @@ class CafeServiceTest {
         CafeMyReviewResponse actual = cafeService.findMyCafeReview(member1.getEmail(), cafe.getMapId());
 
         assertAll(
+                () -> assertThat(actual.getScore()).isEqualTo(4),
                 () -> assertThat(actual.getStudyType()).isEqualTo("solo"),
                 () -> assertThat(actual.getWifi()).isEqualTo("빵빵해요"),
                 () -> assertThat(actual.getParking()).isEqualTo("여유로워요"),
