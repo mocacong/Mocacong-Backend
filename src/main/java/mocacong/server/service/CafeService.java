@@ -213,7 +213,7 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public CafeImageResponse findCafeImages(String email, String mapId, Integer page, int count) {
+    public CafeImagesResponse findCafeImages(String email, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
@@ -221,15 +221,13 @@ public class CafeService {
         Pageable pageable = PageRequest.of(page, count);
         Slice<CafeImage> cafeImages = cafeImageRepository.findByCafe(cafe, pageable);
 
-        List<CafeImageResponse> cafeImageResponse = cafeImages.getContent().stream()
-                .map(cafeImage -> new CafeImage(cafeImage, isMe))
+        List<CafeImageResponse> responses = cafeImages.getContent().stream()
+                .map(cafeImage -> {
+                    boolean isMe = cafeImage.getMember().equals(member);
+                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
+                })
                 .collect(Collectors.toList());
 
-        boolean isMe = cafeImages.getContent().stream()
-                .anyMatch(cafeImage -> cafeImage.getMember().equals(member));
-
-
-        return new CafeImageResponse(cafeImages.getNumber(), cafeImageResponse, isMe);
+        return new CafeImagesResponse(cafeImages.getNumber(), responses);
     }
-
 }

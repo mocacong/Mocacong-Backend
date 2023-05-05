@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CafeImageResponse {
-    private String imageUrl;
-    private boolean isMe;
+public class CafeImagesResponse {
+    private int currentPage;
+    private List<CafeImageResponse> cafeImages;
 }
