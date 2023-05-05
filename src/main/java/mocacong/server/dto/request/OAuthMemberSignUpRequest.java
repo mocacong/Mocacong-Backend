@@ -1,14 +1,12 @@
 package mocacong.server.dto.request;
 
 import javax.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@ToString
 public class OAuthMemberSignUpRequest {
 
     private String email;

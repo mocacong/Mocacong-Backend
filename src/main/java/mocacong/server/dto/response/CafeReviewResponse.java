@@ -1,15 +1,13 @@
 package mocacong.server.dto.response;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.CafeDetail;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString
 public class CafeReviewResponse {
 
     private double score;

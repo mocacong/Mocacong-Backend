@@ -1,15 +1,13 @@
 package mocacong.server.dto.request;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@ToString
 public class CafeReviewUpdateRequest {
 
     @NotBlank(message = "3009:공백일 수 없습니다.")
