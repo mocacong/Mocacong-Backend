@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name = "cafe_image")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CafeImage {
+public class CafeImage extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
