@@ -86,7 +86,7 @@ public class MemberController {
     @Operation(summary = "프로필 이미지 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/mypage/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateProfileImage(
+    public ResponseEntity<Void> updateProfileImage(
             @LoginUserEmail String email,
             @RequestParam(value = "file", required = false) MultipartFile multipartFile
     ) {
