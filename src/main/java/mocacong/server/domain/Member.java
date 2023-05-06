@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.util.regex.Pattern;
@@ -111,6 +112,9 @@ public class Member extends BaseTime {
     }
 
     public void validateUpdateInfo(String nickname, String password, String phone) {
+        if (StringUtils.isBlank(nickname) || StringUtils.isBlank(password) || StringUtils.isBlank(phone)) {
+            throw new IllegalArgumentException("1012:공백일 수 없습니다.");
+        }
         validateNickname(nickname);
         validatePassword(password);
         validatePhone(phone);

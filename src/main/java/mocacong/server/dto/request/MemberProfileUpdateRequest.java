@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class ProfileInfoUpdateRequest {
+public class MemberProfileUpdateRequest {
 
     @NotBlank(message = "1012:공백일 수 없습니다.")
     private String nickname;

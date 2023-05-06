@@ -1,26 +1,27 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.dto.response.MyPageResponse;
-import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
+import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.support.AwsSESSender;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
@@ -288,5 +289,32 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+
+    @Test
+    @DisplayName("회원이 정상적으로 회원정보를 수정한다")
+    void updateProfileInfo() {
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+        String newNickname = "메리";
+        String newPassword = "jisu1234";
+        String newPhone = "010-1234-5678";
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPassword, newPhone);
+
+        RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().put("/members/mypage/info")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
+        MyPageResponse actual = 회원정보_조회(token).as(MyPageResponse.class);
+        assertAll(
+                () -> assertThat(actual.getNickname()).isEqualTo("메리"),
+                () -> assertThat(로그인_토큰_발급(memberSignUpRequest.getEmail(), newPassword)).isNotNull()
+        );
     }
 }
