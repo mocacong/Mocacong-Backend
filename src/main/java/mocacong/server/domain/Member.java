@@ -3,6 +3,7 @@ package mocacong.server.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import mocacong.server.exception.badrequest.InvalidArgumentException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
@@ -113,7 +114,7 @@ public class Member extends BaseTime {
 
     public void validateUpdateInfo(String nickname, String password, String phone) {
         if (StringUtils.isBlank(nickname) || StringUtils.isBlank(password) || StringUtils.isBlank(phone)) {
-            throw new IllegalArgumentException("1012:공백일 수 없습니다.");
+            throw new InvalidArgumentException();
         }
         validateNickname(nickname);
         validatePassword(password);
