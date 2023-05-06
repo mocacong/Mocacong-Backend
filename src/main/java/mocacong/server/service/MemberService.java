@@ -139,9 +139,13 @@ public class MemberService {
         member.updateProfileImgUrl(profileImgUrl);
     }
 
+    @Transactional
     public void updateProfileInfo(String email, String nickname, String password, String phone) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
+        member.validateUpdateInfo(nickname, password, phone);
+        String encryptedPassword = passwordEncoder.encode(password);
+        member.updateProfileInfo(nickname, encryptedPassword, phone);
     }
 }
 

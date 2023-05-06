@@ -1,12 +1,14 @@
 package mocacong.server.domain;
 
-import java.util.regex.Pattern;
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
+import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
+
+import javax.persistence.*;
+import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "member")
@@ -16,6 +18,7 @@ public class Member extends BaseTime {
 
     private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]{2,6}$");
     private static final Pattern PHONE_REGEX = Pattern.compile("^01[\\d\\-]{8,12}$");
+    private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -101,7 +104,25 @@ public class Member extends BaseTime {
         }
     }
 
+    private void validatePassword(String password) {
+        if (!PASSWORD_REGEX.matcher(password).matches()) {
+            throw new InvalidPasswordException();
+        }
+    }
+
+    public void validateUpdateInfo(String nickname, String password, String phone) {
+        validateNickname(nickname);
+        validatePassword(password);
+        validatePhone(phone);
+    }
+
     public void updateProfileImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public void updateProfileInfo(String nickname, String password, String phone) {
+        this.nickname = nickname;
+        this.password = password;
+        this.phone = phone;
     }
 }
