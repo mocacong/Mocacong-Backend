@@ -1,23 +1,21 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
+import java.util.List;
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.CafeFilterResponse;
 import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.CafeReviewUpdateResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.List;
-
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-public class CafeAcceptanceTest extends AcceptanceTest{
+public class CafeAcceptanceTest extends AcceptanceTest {
 
     @Test
     @DisplayName("카페를 정상적으로 등록한다")
@@ -77,6 +75,26 @@ public class CafeAcceptanceTest extends AcceptanceTest{
                 () -> assertThat(actual.getScore()).isEqualTo(4),
                 () -> assertThat(actual.getStudyType()).isEqualTo("solo")
         );
+    }
+
+    @Test
+    @DisplayName("카페에 대해 내가 작성한 리뷰를 조회한다")
+    void findMyCafeReview() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        카페_리뷰_작성(token, mapId, new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                "깨끗해요", "충분해요", "조용해요", "편해요"));
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/cafes/" + mapId + "/me")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
