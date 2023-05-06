@@ -1,10 +1,11 @@
 package mocacong.server.dto.response;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,4 +26,5 @@ public class FindCafeResponse {
     private int reviewsCount;
     private int commentsCount;
     private List<CommentResponse> comments;
+    private List<CafeImageResponse> cafeImages;
 }

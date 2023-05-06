@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 public class CafeService {
 
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
+    private static final int CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS = 3;
 
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
@@ -65,6 +66,7 @@ public class CafeService {
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
         List<CommentResponse> commentResponses = findCommentResponses(cafe, member);
+        List<CafeImageResponse> cafeImageResponses = findCafeImageResponses(cafe, member);
         return new FindCafeResponse(
                 favoriteId != null,
                 favoriteId,
@@ -79,7 +81,8 @@ public class CafeService {
                 cafeDetail.getDeskValue(),
                 cafe.getReviews().size(),
                 cafe.getComments().size(),
-                commentResponses
+                commentResponses,
+                cafeImageResponses
         );
     }
 
@@ -226,11 +229,22 @@ public class CafeService {
                 .getContent()
                 .stream()
                 .map(cafeImage -> {
-                    boolean isMe = cafeImage.getMember().equals(member);
+                    Boolean isMe = cafeImage.getMember().equals(member);
                     return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
 
         return new CafeImagesResponse(cafeImages.getNumber(), responses);
+    }
+
+    private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
+        return cafe.getCafeImages()
+                .stream()
+                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
+                .map(cafeImage -> {
+                    Boolean isMe = cafeImage.getMember().equals(member);
+                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
+                })
+                .collect(Collectors.toList());
     }
 }

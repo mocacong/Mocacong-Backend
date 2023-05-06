@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CafeImageResponse {
     private String imageUrl;
-    private boolean isMe;
+    private Boolean isMe;
 }
