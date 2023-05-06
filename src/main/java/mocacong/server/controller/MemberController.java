@@ -96,7 +96,7 @@ public class MemberController {
 
     @Operation(summary = "프로필 회원정보 수정")
     @SecurityRequirement(name = "JWT")
-    @PutMapping(value = "/mypage/info")
+    @PutMapping(value = "/info")
     public ResponseEntity<Void> updateProfileInfo(
             @LoginUserEmail String email,
             @RequestBody MemberProfileUpdateRequest request

@@ -306,7 +306,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
-                .when().put("/members/mypage/info")
+                .when().put("/members/info")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
