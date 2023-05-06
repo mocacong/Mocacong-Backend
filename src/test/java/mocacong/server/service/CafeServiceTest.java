@@ -138,7 +138,7 @@ class CafeServiceTest {
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
         cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
-                new CafeReviewRequest(2, "group", "느려요", "없어요",
+                new CafeReviewRequest(2, "both", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
         Comment comment1 = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
         commentRepository.save(comment1);
