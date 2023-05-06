@@ -209,7 +209,8 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         String imgUrl = awsS3Uploader.uploadImage(cafeImg);
-        cafe.saveCafeImgUrl(imgUrl, cafe, member);
+        CafeImage cafeImage = new CafeImage(imgUrl, cafe, member);
+        cafeImageRepository.save(cafeImage);
     }
 
     @Transactional(readOnly = true)
@@ -219,9 +220,11 @@ public class CafeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
-        Slice<CafeImage> cafeImages = cafeImageRepository.findByCafe(cafe, pageable);
+        Slice<CafeImage> cafeImages = cafeImageRepository.findAllByCafeId(cafe.getId(), pageable);
 
-        List<CafeImageResponse> responses = cafeImages.getContent().stream()
+        List<CafeImageResponse> responses = cafeImages
+                .getContent()
+                .stream()
                 .map(cafeImage -> {
                     boolean isMe = cafeImage.getMember().equals(member);
                     return new CafeImageResponse(cafeImage.getImgUrl(), isMe);

@@ -107,9 +107,4 @@ public class Cafe extends BaseTime {
     public void addReview(Review review) {
         this.reviews.add(review);
     }
-
-    public void saveCafeImgUrl(String imgUrl, Cafe cafe, Member member) {
-        CafeImage cafeImage = new CafeImage(imgUrl, cafe, member);
-        this.cafeImages.add(cafeImage);
-    }
 }

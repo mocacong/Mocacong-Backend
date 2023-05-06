@@ -7,16 +7,20 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "cafe_image")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CafeImage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cafe_image_id")
     private Long id;
 
+    @Column(name = "img_url")
     private String imgUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 
