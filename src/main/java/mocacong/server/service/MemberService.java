@@ -1,10 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
@@ -22,6 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -136,6 +137,11 @@ public class MemberService {
                 .orElseThrow(NotFoundMemberException::new);
         String profileImgUrl = profileImg == null ? null : awsS3Uploader.uploadImage(profileImg);
         member.updateProfileImgUrl(profileImgUrl);
+    }
+
+    public void updateProfileInfo(String email, String nickname, String password, String phone) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
     }
 }
 

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.EmailVerifyCodeRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
+import mocacong.server.dto.request.ProfileInfoUpdateRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
@@ -96,11 +97,11 @@ public class MemberController {
     @Operation(summary = "프로필 회원정보 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/mypage/info")
-    public ResponseEntity<String> updateProfileInfo(
+    public ResponseEntity<Void> updateProfileInfo(
             @LoginUserEmail String email,
             @RequestBody ProfileInfoUpdateRequest request
     ) {
-        memberService.updateProfileInfo(email, request);
+        memberService.updateProfileInfo(email, request.getNickname(), request.getPassword(), request.getPhone());
         return ResponseEntity.ok().build();
     }
 
