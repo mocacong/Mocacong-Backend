@@ -3,7 +3,6 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.EmailVerifyCodeRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
@@ -16,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -89,6 +90,17 @@ public class MemberController {
             @RequestParam(value = "file", required = false) MultipartFile multipartFile
     ) {
         memberService.updateProfileImage(email, multipartFile);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "프로필 회원정보 수정")
+    @SecurityRequirement(name = "JWT")
+    @PutMapping(value = "/mypage/info")
+    public ResponseEntity<String> updateProfileInfo(
+            @LoginUserEmail String email,
+            @RequestBody ProfileInfoUpdateRequest request
+    ) {
+        memberService.updateProfileInfo(email, request);
         return ResponseEntity.ok().build();
     }
 
