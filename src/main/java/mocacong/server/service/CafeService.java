@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class CafeService {
 
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
-    private static final int CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS = 3;
+    private static final int CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS = 5;
 
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;

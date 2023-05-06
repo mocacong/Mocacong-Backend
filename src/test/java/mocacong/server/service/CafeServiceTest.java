@@ -259,7 +259,7 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("카페를 조회할 때 이미지는 3개까지만 보여준다")
+    @DisplayName("카페를 조회할 때 이미지는 5개까지만 보여준다")
     void findCafeAndShowLimitImages() throws IOException {
         String expected = "test_img.jpg";
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
@@ -274,13 +274,15 @@ class CafeServiceTest {
         cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
         cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
         cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
 
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), mapId);
         CafeImagesResponse actual2 = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
 
         assertAll(
-                () -> assertThat(actual.getCafeImages()).hasSize(3),
-                () -> assertThat(actual2.getCafeImages()).hasSize(4)
+                () -> assertThat(actual.getCafeImages()).hasSize(5),
+                () -> assertThat(actual2.getCafeImages()).hasSize(6)
         );
     }
 
