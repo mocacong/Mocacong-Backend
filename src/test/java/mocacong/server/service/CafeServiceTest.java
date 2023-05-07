@@ -675,7 +675,7 @@ class CafeServiceTest {
         MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
-        assertThatThrownBy(() ->    cafeService.updateCafeImage(member.getEmail(), mapId, 0L,
+        assertThatThrownBy(() ->    cafeService.updateCafeImage(member.getEmail(), mapId, 1L,
                 newMockMultipartFile)).isInstanceOf(NotFoundCafeImageException.class);
     }
 }

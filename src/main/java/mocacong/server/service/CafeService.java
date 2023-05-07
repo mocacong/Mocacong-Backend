@@ -269,12 +269,12 @@ public class CafeService {
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
-        CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
-        cafeImageRepository.save(cafeImage);
-
         CafeImage notUsedImage = cafeImageRepository.findById(cafeImageId)
                         .orElseThrow(NotFoundCafeImageException::new);
         notUsedImage.setIsUsed(false);
+
+        String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
+        CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
+        cafeImageRepository.save(cafeImage);
     }
 }
