@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CommentResponse {
 
+    private Long id;
     private String imgUrl;
     private String nickname;
     private String content;
