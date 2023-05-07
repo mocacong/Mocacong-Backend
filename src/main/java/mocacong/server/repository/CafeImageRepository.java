@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface CafeImageRepository extends JpaRepository<CafeImage, Long> {
-    Slice<CafeImage> findAllByCafeId(Long cafeId, Pageable pageRequest);
+    Slice<CafeImage> findAllByCafeIdAndIsUsedTrue(Long id, Pageable pageable);
 }
