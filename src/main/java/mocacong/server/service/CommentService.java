@@ -1,7 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
@@ -22,6 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,9 +70,9 @@ public class CommentService {
         return comments.stream()
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
-                        return new CommentResponse(member.getImgUrl(), member.getNickname(), comment.getContent(), true);
+                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), true);
                     } else {
-                        return new CommentResponse(comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getId(),comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
                     }
                 })
                 .collect(Collectors.toList());
