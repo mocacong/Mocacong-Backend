@@ -1,20 +1,12 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
-import mocacong.server.exception.badrequest.DuplicateMemberException;
-import mocacong.server.exception.badrequest.InvalidEmailException;
-import mocacong.server.exception.badrequest.InvalidNicknameException;
-import mocacong.server.exception.badrequest.InvalidPasswordException;
+import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.MemberEvent;
@@ -25,6 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +56,17 @@ public class MemberService {
         memberRepository.findByEmail(memberSignUpRequest.getEmail())
                 .ifPresent(member -> {
                     throw new DuplicateMemberException();
+                });
+        memberRepository.findByNickname(memberSignUpRequest.getNickname())
+                .ifPresent(member -> {
+                    throw new DuplicateNicknameException();
+                });
+    }
+
+    private void validateDuplicateNickname(String nickname) {
+        memberRepository.findByNickname(nickname)
+                .ifPresent(member -> {
+                    throw new DuplicateNicknameException();
                 });
     }
 
@@ -136,5 +145,14 @@ public class MemberService {
         String profileImgUrl = profileImg == null ? null : awsS3Uploader.uploadImage(profileImg);
         member.updateProfileImgUrl(profileImgUrl);
     }
-}
 
+    @Transactional
+    public void updateProfileInfo(String email, String nickname, String password, String phone) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        validateDuplicateNickname(nickname);
+        validatePassword(password);
+        String encryptedPassword = passwordEncoder.encode(password);
+        member.updateProfileInfo(nickname, encryptedPassword, phone);
+    }
+}

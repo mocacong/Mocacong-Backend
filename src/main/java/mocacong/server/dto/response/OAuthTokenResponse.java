@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class AppleTokenResponse {
+public class OAuthTokenResponse {
 
     private String token;
     private String email;
