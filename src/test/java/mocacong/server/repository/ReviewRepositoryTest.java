@@ -6,6 +6,7 @@ import mocacong.server.domain.Member;
 import mocacong.server.domain.Review;
 import mocacong.server.domain.cafedetail.*;
 import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

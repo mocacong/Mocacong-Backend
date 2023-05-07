@@ -1,24 +1,40 @@
 package mocacong.server.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 
-@Embeddable
-@NoArgsConstructor
+@Entity
+@Table(name = "cafe_image")
 @Getter
-public class CafeImage {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class CafeImage extends BaseTime {
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cafe_image_id")
+    private Long id;
 
     @Column(name = "img_url")
     private String imgUrl;
 
-    public CafeImage(Long memberId, String imgUrl) {
-        this.memberId = memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cafe_id")
+    private Cafe cafe;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    public CafeImage(String imgUrl, Cafe cafe, Member member) {
         this.imgUrl = imgUrl;
+        this.cafe = cafe;
+        this.member = member;
+    }
+
+    public boolean isOwned(Member member) {
+        return this.member.equals(member);
     }
 }
