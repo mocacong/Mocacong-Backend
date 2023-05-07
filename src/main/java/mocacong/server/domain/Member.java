@@ -17,7 +17,6 @@ public class Member extends BaseTime {
 
     private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]{2,6}$");
     private static final Pattern PHONE_REGEX = Pattern.compile("^01[\\d\\-]{8,12}$");
-    private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,20}$");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,17 +81,12 @@ public class Member extends BaseTime {
         }
     }
 
-    public void validateUpdateInfo(String nickname, String password, String phone) {
-        validateNickname(nickname);
-        validatePhone(phone);
-    }
-
     public void updateProfileImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
     }
 
     public void updateProfileInfo(String nickname, String password, String phone) {
-        validateUpdateInfo(nickname, password, phone);
+        validateMemberInfo(nickname, phone);
         this.nickname = nickname;
         this.password = password;
         this.phone = phone;
