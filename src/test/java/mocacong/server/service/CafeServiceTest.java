@@ -1,5 +1,8 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -11,21 +14,16 @@ import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.support.AwsS3Uploader;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -138,7 +136,7 @@ class CafeServiceTest {
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
         cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
-                new CafeReviewRequest(2, "group", "느려요", "없어요",
+                new CafeReviewRequest(2, "both", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
         Comment comment1 = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
         commentRepository.save(comment1);
@@ -331,6 +329,36 @@ class CafeServiceTest {
                         "깨끗해요", "충분해요", "적당해요", "편해요"));
 
         assertThat(actual.getStudyType()).isEqualTo("both");
+    }
+
+    @Test
+    @DisplayName("특정 카페에 내가 작성한 리뷰를 볼 수 있다")
+    void findMyCafeReview() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "적당해요", "협소해요",
+                        "불편해요", "없어요", "적당해요", "불편해요"));
+
+        CafeMyReviewResponse actual = cafeService.findMyCafeReview(member1.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getMyScore()).isEqualTo(4),
+                () -> assertThat(actual.getMyStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getMyWifi()).isEqualTo("빵빵해요"),
+                () -> assertThat(actual.getMyParking()).isEqualTo("여유로워요"),
+                () -> assertThat(actual.getMyToilet()).isEqualTo("깨끗해요"),
+                () -> assertThat(actual.getMyPower()).isEqualTo("충분해요"),
+                () -> assertThat(actual.getMySound()).isEqualTo("조용해요"),
+                () -> assertThat(actual.getMyDesk()).isEqualTo("편해요")
+        );
     }
 
     @Test

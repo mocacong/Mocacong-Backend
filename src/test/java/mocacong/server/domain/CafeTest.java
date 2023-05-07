@@ -63,6 +63,40 @@ class CafeTest {
     }
 
     @Test
+    @DisplayName("카페 세부정보 리뷰로 both가 작성될 경우 solo, group 포인트가 모두 1씩 증가한다")
+    void updateCafeDetailsWhenStudyTypesAddBoth() {
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        Cafe cafe = new Cafe("1", "케이카페");
+
+        // BOTH 리뷰 추가 -> SOLO, GROUP 모두 1포인트
+        CafeDetail cafeDetail1 = new CafeDetail(StudyType.BOTH, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.NORMAL, Desk.UNCOMFORTABLE, Power.FEW, Sound.NOISY);
+        Review review1 = new Review(member, cafe, cafeDetail1);
+        cafe.addReview(review1);
+        cafe.updateCafeDetails();
+        CafeDetail actualWhenBothAdd = cafe.getCafeDetail();
+
+        // SOLO 리뷰 추가 -> SOLO 2포인트, GROUP 1포인트
+        CafeDetail cafeDetail2 = new CafeDetail(StudyType.SOLO, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
+        Review review2 = new Review(member, cafe, cafeDetail2);
+        cafe.addReview(review2);
+        cafe.updateCafeDetails();
+        CafeDetail actualWhenSoloAdd = cafe.getCafeDetail();
+
+        // GROUP 리뷰 추가 -> SOLO, GROUP 모두 2포인트
+        CafeDetail cafeDetail3 = new CafeDetail(StudyType.GROUP, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
+        Review review3 = new Review(member, cafe, cafeDetail3);
+        cafe.addReview(review3);
+        cafe.updateCafeDetails();
+        CafeDetail actualWhenGroupAdd = cafe.getCafeDetail();
+
+        assertAll(
+                () -> assertThat(actualWhenBothAdd.getStudyType()).isEqualTo(StudyType.BOTH),
+                () -> assertThat(actualWhenSoloAdd.getStudyType()).isEqualTo(StudyType.SOLO),
+                () -> assertThat(actualWhenGroupAdd.getStudyType()).isEqualTo(StudyType.BOTH)
+        );
+    }
+
+    @Test
     @DisplayName("카페 세부정보 중 study type은 같은 개수일 경우 solo나 group이 아닌 both를 반환한다")
     void updateCafeDetailsWhenStudyTypesEqual() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");

@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -21,11 +25,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -142,6 +141,20 @@ public class CafeService {
         );
         Review review = new Review(member, cafe, cafeDetail);
         reviewRepository.save(review);
+    }
+
+    @Transactional(readOnly = true)
+    public CafeMyReviewResponse findMyCafeReview(String email, String mapId) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+
+        Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElseThrow(NotFoundReviewException::new);
+        Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElse(null);
+        return CafeMyReviewResponse.of(score, review);
     }
 
     @Transactional
