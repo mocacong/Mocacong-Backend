@@ -270,8 +270,8 @@ public class CafeService {
         CafeImage notUsedImage = cafeImageRepository.getReferenceById(cafeImageId);
         notUsedImage.setIsUsed(false);
 
-        String imgUrl = awsS3Uploader.uploadImage(cafeImg);
-        CafeImage cafeImage = new CafeImage(imgUrl, true, cafe, member);
+        String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
+        CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
     }
 }
