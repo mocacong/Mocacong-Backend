@@ -1,24 +1,29 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
-import mocacong.server.dto.response.CafeFilterResponse;
-import mocacong.server.dto.response.CafeReviewResponse;
-import mocacong.server.dto.response.CafeReviewUpdateResponse;
-import mocacong.server.dto.response.FindCafeResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
+import mocacong.server.support.AwsS3Uploader;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -39,6 +44,9 @@ class CafeServiceTest {
     private FavoriteRepository favoriteRepository;
     @Autowired
     private MemberService memberService;
+
+    @MockBean
+    private AwsS3Uploader awsS3Uploader;
 
     @Test
     @DisplayName("등록되지 않은 카페를 성공적으로 등록한다")
@@ -128,7 +136,7 @@ class CafeServiceTest {
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
         cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
-                new CafeReviewRequest(2, "group", "느려요", "없어요",
+                new CafeReviewRequest(2, "both", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
         Comment comment1 = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
         commentRepository.save(comment1);
@@ -150,6 +158,30 @@ class CafeServiceTest {
                 () -> assertThat(actual.getComments())
                         .extracting("nickname")
                         .containsExactlyInAnyOrder("케이", "메리", "케이")
+        );
+    }
+
+    @Test
+    @DisplayName("카페를 조회할 때 댓글은 3개까지만 보여준다")
+    void findCafeAndShowLimitComments() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Comment comment1 = new Comment(cafe, member, "댓글1");
+        commentRepository.save(comment1);
+        Comment comment2 = new Comment(cafe, member, "댓글2");
+        commentRepository.save(comment2);
+        Comment comment3 = new Comment(cafe, member, "댓글3");
+        commentRepository.save(comment3);
+        Comment comment4 = new Comment(cafe, member, "댓글4");
+        commentRepository.save(comment4);
+
+        FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getCommentsCount()).isEqualTo(4),
+                () -> assertThat(actual.getComments()).hasSize(3)
         );
     }
 
@@ -224,6 +256,32 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("회원이 즐겨찾기한 카페 목록들을 보여준다")
+    void findMyFavoriteCafes() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(1, "group", "느려요", "없어요",
+                        "불편해요", "없어요", "북적북적해요", "불편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "느려요", "없어요",
+                        "깨끗해요", "없어요", null, "보통이에요"));
+        Favorite favorite = new Favorite(member1, cafe);
+        favoriteRepository.save(favorite);
+
+        MyFavoriteCafesResponse actual = cafeService.findMyFavoriteCafes(member1.getEmail(), 0, 3);
+
+        assertAll(
+                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getCafes().get(0).getScore()).isEqualTo(1.5)
+        );
+    }
+
+    @Test
     @DisplayName("카페에 대한 리뷰를 작성하면 해당 카페 평점과 세부정보가 갱신된다")
     void saveCafeReview() {
         Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
@@ -271,6 +329,36 @@ class CafeServiceTest {
                         "깨끗해요", "충분해요", "적당해요", "편해요"));
 
         assertThat(actual.getStudyType()).isEqualTo("both");
+    }
+
+    @Test
+    @DisplayName("특정 카페에 내가 작성한 리뷰를 볼 수 있다")
+    void findMyCafeReview() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "적당해요", "협소해요",
+                        "불편해요", "없어요", "적당해요", "불편해요"));
+
+        CafeMyReviewResponse actual = cafeService.findMyCafeReview(member1.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getMyScore()).isEqualTo(4),
+                () -> assertThat(actual.getMyStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getMyWifi()).isEqualTo("빵빵해요"),
+                () -> assertThat(actual.getMyParking()).isEqualTo("여유로워요"),
+                () -> assertThat(actual.getMyToilet()).isEqualTo("깨끗해요"),
+                () -> assertThat(actual.getMyPower()).isEqualTo("충분해요"),
+                () -> assertThat(actual.getMySound()).isEqualTo("조용해요"),
+                () -> assertThat(actual.getMyDesk()).isEqualTo("편해요")
+        );
     }
 
     @Test
@@ -385,5 +473,51 @@ class CafeServiceTest {
         CafeFilterResponse filteredCafes = cafeService.filterCafesByStudyType("group", requestBody);
 
         assertThat(filteredCafes.getMapIds()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("카페 이미지를 성공적으로 저장한다")
+    void saveCafeImage() throws IOException {
+        String expected = "test_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+
+        Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        assertAll(
+                () -> assertThat(actual.getCafeImages()).hasSize(1),
+                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected)
+        );
+    }
+
+    @Test
+    @DisplayName("사용자가 카페 이미지를 여러번 저장한다")
+    void saveCafeImages() throws IOException {
+        String expected = "test_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+
+        Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        assertAll(
+                () -> assertDoesNotThrow(() -> cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile)),
+                () -> assertThat(actual.getCafeImages()).hasSize(2),
+                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected),
+                () -> assertThat(actual.getCafeImages().get(1).getImgUrl()).isEqualTo(expected)
+        );
     }
 }

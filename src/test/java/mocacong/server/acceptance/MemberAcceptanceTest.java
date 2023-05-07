@@ -1,26 +1,27 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.dto.response.MyPageResponse;
+import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
-import mocacong.server.security.auth.apple.ApplePlatformMemberResponse;
 import mocacong.server.support.AwsSESSender;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
@@ -48,7 +49,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void signUpOauthMember() {
         String platformId = "1234321";
         String email = "kth@apple.com";
-        ApplePlatformMemberResponse oauthResponse = new ApplePlatformMemberResponse(platformId, email);
+        OAuthPlatformMemberResponse oauthResponse = new OAuthPlatformMemberResponse(platformId, email);
         when(appleOAuthUserProvider.getApplePlatformMember(any())).thenReturn(oauthResponse);
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -104,18 +105,22 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("모든 회원을 전체 삭제한다")
-    void deleteAll() {
-        MemberSignUpRequest request1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
-        회원_가입(request1);
-        MemberSignUpRequest request2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
-        회원_가입(request2);
+    @DisplayName("즐겨찾기를 등록한 회원이 정상적으로 탈퇴한다")
+    void deleteWhenSaveFavorites() {
+        String mapId = "1234";
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        즐겨찾기_등록(token, mapId);
 
         RestAssured.given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().delete("/members/all")
+                .auth().oauth2(token)
+                .when().delete("/members")
                 .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.OK.value())
+                .extract();
     }
 
     @Test
@@ -264,6 +269,52 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(actual.getNickname()).isEqualTo("케이"),
                 () -> assertThat(actual.getImgUrl()).isNull()
+        );
+    }
+
+    @Test
+    @DisplayName("마이페이지에서 즐겨찾기 등록한 카페 목록을 조회한다")
+    void findMyFavoriteCafes() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        즐겨찾기_등록(token, mapId);
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/members/mypage/stars?page=0&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
+
+    @Test
+    @DisplayName("회원이 정상적으로 회원정보를 수정한다")
+    void updateProfileInfo() {
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+        String newNickname = "메리";
+        String newPassword = "jisu1234";
+        String newPhone = "010-1234-5678";
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPassword, newPhone);
+
+        RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().put("/members/info")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+
+        MyPageResponse actual = 회원정보_조회(token).as(MyPageResponse.class);
+        assertAll(
+                () -> assertThat(actual.getNickname()).isEqualTo("메리"),
+                () -> assertThat(로그인_토큰_발급(memberSignUpRequest.getEmail(), newPassword)).isNotNull()
         );
     }
 }

@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.security.*;
 import java.util.Date;
 import mocacong.server.exception.unauthorized.InvalidTokenException;
+import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -53,7 +54,7 @@ class AppleOAuthUserProviderTest {
         when(publicKeyGenerator.generatePublicKey(any(), any())).thenReturn(publicKey);
         when(appleClaimsValidator.isValid(any())).thenReturn(true);
 
-        ApplePlatformMemberResponse actual = appleOAuthUserProvider.getApplePlatformMember(identityToken);
+        OAuthPlatformMemberResponse actual = appleOAuthUserProvider.getApplePlatformMember(identityToken);
 
         assertAll(
                 () -> assertThat(actual.getPlatformId()).isEqualTo(expected),

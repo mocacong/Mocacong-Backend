@@ -6,7 +6,8 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
-import mocacong.server.dto.response.AppleTokenResponse;
+import mocacong.server.dto.request.KakaoLoginRequest;
+import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,15 @@ public class AuthController {
 
     @Operation(summary = "애플 OAuth 로그인")
     @PostMapping("/apple")
-    public ResponseEntity<AppleTokenResponse> loginApple(@RequestBody @Valid AppleLoginRequest request) {
-        AppleTokenResponse response = authService.appleOAuthLogin(request);
+    public ResponseEntity<OAuthTokenResponse> loginApple(@RequestBody @Valid AppleLoginRequest request) {
+        OAuthTokenResponse response = authService.appleOAuthLogin(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "카카오 OAuth 로그인")
+    @PostMapping("/kakao")
+    public ResponseEntity<OAuthTokenResponse> loginKakao(@RequestBody @Valid KakaoLoginRequest request) {
+        OAuthTokenResponse response = authService.kakaoOAuthLogin(request);
         return ResponseEntity.ok(response);
     }
 }

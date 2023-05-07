@@ -36,6 +36,10 @@ public class Cafe extends BaseTime {
     @Embedded
     private CafeDetail cafeDetail;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "cafe_image")
+    private List<CafeImage> cafeImages;
+
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Review> reviews;
 
@@ -46,6 +50,7 @@ public class Cafe extends BaseTime {
         this.mapId = mapId;
         this.name = name;
         this.cafeDetail = new CafeDetail();
+        this.cafeImages = new ArrayList<>();
         this.score = new ArrayList<>();
         this.reviews = new ArrayList<>();
         this.comments = new ArrayList<>();
@@ -69,6 +74,10 @@ public class Cafe extends BaseTime {
             StudyType studyType = review.getStudyType();
             if (studyType == StudyType.SOLO) solo++;
             else if (studyType == StudyType.GROUP) group++;
+            else {
+                solo++;
+                group++;
+            }
         }
 
         if (solo == 0 && group == 0) return null;
@@ -101,5 +110,10 @@ public class Cafe extends BaseTime {
 
     public void addReview(Review review) {
         this.reviews.add(review);
+    }
+
+    public void saveCafeImgUrl(Long memberId, String imgUrl) {
+        CafeImage cafeImage = new CafeImage(memberId, imgUrl);
+        this.cafeImages.add(cafeImage);
     }
 }

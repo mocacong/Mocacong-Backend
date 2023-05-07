@@ -1,5 +1,6 @@
-package mocacong.server.security.auth.apple;
+package mocacong.server.dto.response;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ApplePlatformMemberResponse {
+public class MyFavoriteCafesResponse {
 
-    private String platformId;
-    private String email;
+    private int currentPage;
+    private List<MyFavoriteCafeResponse> cafes;
 }

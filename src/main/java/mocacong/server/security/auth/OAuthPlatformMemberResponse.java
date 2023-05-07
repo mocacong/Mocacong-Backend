@@ -1,4 +1,4 @@
-package mocacong.server.dto.response;
+package mocacong.server.security.auth;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -8,10 +8,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class AppleTokenResponse {
+public class OAuthPlatformMemberResponse {
 
-    private String token;
-    private String email;
-    private Boolean isRegistered;
     private String platformId;
+    private String email;
 }

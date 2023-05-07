@@ -3,18 +3,21 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.EmailVerifyCodeRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
+import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
+import mocacong.server.service.CafeService;
 import mocacong.server.service.MemberService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
 
     private final MemberService memberService;
+    private final CafeService cafeService;
 
     @Operation(summary = "회원가입")
     @PostMapping
@@ -67,14 +71,37 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "마이페이지 - 즐겨찾기 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/mypage/stars")
+    public ResponseEntity<MyFavoriteCafesResponse> findMyInfo(
+            @LoginUserEmail String email,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        MyFavoriteCafesResponse response = cafeService.findMyFavoriteCafes(email, page, count);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "프로필 이미지 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/mypage/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateProfileImage(
+    public ResponseEntity<Void> updateProfileImage(
             @LoginUserEmail String email,
             @RequestParam(value = "file", required = false) MultipartFile multipartFile
     ) {
         memberService.updateProfileImage(email, multipartFile);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "프로필 회원정보 수정")
+    @SecurityRequirement(name = "JWT")
+    @PutMapping(value = "/info")
+    public ResponseEntity<Void> updateProfileInfo(
+            @LoginUserEmail String email,
+            @RequestBody @Valid MemberProfileUpdateRequest request
+    ) {
+        memberService.updateProfileInfo(email, request.getNickname(), request.getPassword(), request.getPhone());
         return ResponseEntity.ok().build();
     }
 
@@ -83,13 +110,6 @@ public class MemberController {
     @DeleteMapping
     public ResponseEntity<Void> delete(@LoginUserEmail String email) {
         memberService.delete(email);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "회원전체탈퇴")
-    @DeleteMapping("/all")
-    public ResponseEntity<Void> deleteAllMembers() {
-        memberService.deleteAll();
         return ResponseEntity.ok().build();
     }
 

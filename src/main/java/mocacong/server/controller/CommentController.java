@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.CommentSaveRequest;
 import mocacong.server.dto.request.CommentUpdateRequest;
 import mocacong.server.dto.response.CommentSaveResponse;
+import mocacong.server.dto.response.CommentsResponse;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CommentService;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,32 @@ public class CommentController {
             @RequestBody CommentSaveRequest request
     ) {
         CommentSaveResponse response = commentService.save(email, mapId, request.getContent());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "카페 코멘트 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping
+    public ResponseEntity<CommentsResponse> findComments(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        CommentsResponse response = commentService.findAll(email, mapId, page, count);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "카페 코멘트 중 나의 코멘트만 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/me")
+    public ResponseEntity<CommentsResponse> findCommentsByMe(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        CommentsResponse response = commentService.findCafeCommentsOnlyMyComments(email, mapId, page, count);
         return ResponseEntity.ok(response);
     }
 
