@@ -20,6 +20,9 @@ public class CafeImage extends BaseTime {
     @Column(name = "img_url")
     private String imgUrl;
 
+    @Column(name = "is_used")
+    private Boolean isUsed;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
@@ -28,13 +31,18 @@ public class CafeImage extends BaseTime {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public CafeImage(String imgUrl, Cafe cafe, Member member) {
+    public CafeImage(String imgUrl, Boolean isUsed, Cafe cafe, Member member) {
         this.imgUrl = imgUrl;
+        this.isUsed = isUsed;
         this.cafe = cafe;
         this.member = member;
     }
 
     public boolean isOwned(Member member) {
         return this.member.equals(member);
+    }
+
+    public void setIsUsed(Boolean isUsed) {
+        this.isUsed = isUsed;
     }
 }

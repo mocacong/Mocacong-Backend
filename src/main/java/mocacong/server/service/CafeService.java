@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -26,6 +22,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -236,7 +237,7 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         String imgUrl = awsS3Uploader.uploadImage(cafeImg);
-        CafeImage cafeImage = new CafeImage(imgUrl, cafe, member);
+        CafeImage cafeImage = new CafeImage(imgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
     }
 
@@ -259,5 +260,18 @@ public class CafeService {
                 .collect(Collectors.toList());
 
         return new CafeImagesResponse(cafeImages.getNumber(), responses);
+    }
+
+    public void updateCafeImage(String email, String mapId, Long cafeImageId, MultipartFile cafeImg) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        CafeImage notUsedImage = cafeImageRepository.getReferenceById(cafeImageId);
+        notUsedImage.setIsUsed(false);
+
+        String imgUrl = awsS3Uploader.uploadImage(cafeImg);
+        CafeImage cafeImage = new CafeImage(imgUrl, true, cafe, member);
+        cafeImageRepository.save(cafeImage);
     }
 }

@@ -3,7 +3,6 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -16,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @Tag(name = "Cafes", description = "카페")
 @RestController
@@ -110,5 +111,18 @@ public class CafeController {
     ) {
         CafeImagesResponse response = cafeService.findCafeImages(email, mapId, page, count);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "카페 이미지 수정")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/{mapId}/img/{cafeImageId}")
+    public ResponseEntity<Void> updateCafeImage(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @PathVariable Long cafeImageId,
+            @RequestParam(value = "file", required = false) MultipartFile multipartFile
+    ) {
+        cafeService.updateCafeImage(email, mapId, cafeImageId, multipartFile);
+        return ResponseEntity.ok().build();
     }
 }
