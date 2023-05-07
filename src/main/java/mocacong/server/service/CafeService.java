@@ -10,6 +10,7 @@ import mocacong.server.dto.request.CafeReviewUpdateRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
+import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
@@ -264,16 +265,18 @@ public class CafeService {
         return new CafeImagesResponse(cafeImages.getNumber(), responses);
     }
 
+    @Transactional
     public void updateCafeImage(String email, String mapId, Long cafeImageId, MultipartFile cafeImg) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        CafeImage notUsedImage = cafeImageRepository.getReferenceById(cafeImageId);
-        notUsedImage.setIsUsed(false);
-
         String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
         CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
+
+        CafeImage notUsedImage = cafeImageRepository.findById(cafeImageId)
+                        .orElseThrow(NotFoundCafeImageException::new);
+        notUsedImage.setIsUsed(false);
     }
 }
