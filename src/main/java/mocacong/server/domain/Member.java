@@ -3,11 +3,8 @@ package mocacong.server.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mocacong.server.exception.badrequest.InvalidArgumentException;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
-import mocacong.server.exception.badrequest.InvalidPasswordException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.util.regex.Pattern;
@@ -85,6 +82,22 @@ public class Member extends BaseTime {
         }
     }
 
+    public void validateUpdateInfo(String nickname, String password, String phone) {
+        validateNickname(nickname);
+        validatePhone(phone);
+    }
+
+    public void updateProfileImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public void updateProfileInfo(String nickname, String password, String phone) {
+        validateUpdateInfo(nickname, password, phone);
+        this.nickname = nickname;
+        this.password = password;
+        this.phone = phone;
+    }
+
     public boolean isRegisteredOAuthMember() {
         return nickname != null;
     }
@@ -104,30 +117,5 @@ public class Member extends BaseTime {
         if (!PHONE_REGEX.matcher(phone).matches()) {
             throw new InvalidPhoneException();
         }
-    }
-
-    private void validatePassword(String password) {
-        if (!PASSWORD_REGEX.matcher(password).matches()) {
-            throw new InvalidPasswordException();
-        }
-    }
-
-    public void validateUpdateInfo(String nickname, String password, String phone) {
-        if (StringUtils.isBlank(nickname) || StringUtils.isBlank(password) || StringUtils.isBlank(phone)) {
-            throw new InvalidArgumentException();
-        }
-        validateNickname(nickname);
-        validatePassword(password);
-        validatePhone(phone);
-    }
-
-    public void updateProfileImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
-    public void updateProfileInfo(String nickname, String password, String phone) {
-        this.nickname = nickname;
-        this.password = password;
-        this.phone = phone;
     }
 }

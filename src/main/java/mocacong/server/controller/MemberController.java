@@ -99,7 +99,7 @@ public class MemberController {
     @PutMapping(value = "/info")
     public ResponseEntity<Void> updateProfileInfo(
             @LoginUserEmail String email,
-            @RequestBody MemberProfileUpdateRequest request
+            @RequestBody @Valid MemberProfileUpdateRequest request
     ) {
         memberService.updateProfileInfo(email, request.getNickname(), request.getPassword(), request.getPhone());
         return ResponseEntity.ok().build();

@@ -63,6 +63,13 @@ public class MemberService {
                 });
     }
 
+    private void validateDuplicateNickname(String nickname) {
+        memberRepository.findByNickname(nickname)
+                .ifPresent(member -> {
+                    throw new DuplicateNicknameException();
+                });
+    }
+
     @Transactional
     public OAuthMemberSignUpResponse signUpByOAuthMember(OAuthMemberSignUpRequest request) {
         Platform platform = Platform.from(request.getPlatform());
@@ -143,9 +150,9 @@ public class MemberService {
     public void updateProfileInfo(String email, String nickname, String password, String phone) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        member.validateUpdateInfo(nickname, password, phone);
+        validateDuplicateNickname(nickname);
+        validatePassword(password);
         String encryptedPassword = passwordEncoder.encode(password);
         member.updateProfileInfo(nickname, encryptedPassword, phone);
     }
 }
-
