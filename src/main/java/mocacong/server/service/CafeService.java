@@ -103,6 +103,7 @@ public class CafeService {
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
         return cafe.getCafeImages()
                 .stream()
+                .filter(CafeImage::getIsUsed)
                 .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
@@ -253,6 +254,7 @@ public class CafeService {
         List<CafeImageResponse> responses = cafeImages
                 .getContent()
                 .stream()
+                .filter(CafeImage::getIsUsed)
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
