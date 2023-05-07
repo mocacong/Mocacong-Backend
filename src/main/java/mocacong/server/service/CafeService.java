@@ -221,7 +221,7 @@ public class CafeService {
                 .stream()
                 .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
                 .map(cafeImage -> {
-                    Boolean isMe = cafeImage.getMember().equals(member);
+                    Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
@@ -240,7 +240,7 @@ public class CafeService {
                 .getContent()
                 .stream()
                 .map(cafeImage -> {
-                    Boolean isMe = cafeImage.getMember().equals(member);
+                    Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());

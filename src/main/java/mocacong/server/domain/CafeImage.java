@@ -33,4 +33,8 @@ public class CafeImage extends BaseTime {
         this.cafe = cafe;
         this.member = member;
     }
+
+    public boolean isOwned(Member member) {
+        return this.member.equals(member);
+    }
 }
