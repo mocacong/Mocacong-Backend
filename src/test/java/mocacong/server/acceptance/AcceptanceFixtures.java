@@ -104,4 +104,14 @@ public class AcceptanceFixtures {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
     }
+
+    public static ExtractableResponse<Response> 회원정보_조회(String token) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/members/mypage")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+    }
 }
