@@ -288,9 +288,11 @@ class MemberServiceTest {
         Member updatedMember = memberRepository.findByEmail(member.getEmail())
                 .orElseThrow();
 
-        assertThat(updatedMember.getNickname()).isEqualTo(newNickname);
-        assertThat(passwordEncoder.matches(newPassword, updatedMember.getPassword())).isTrue();
-        assertThat(updatedMember.getPhone()).isEqualTo(newPhone);
+        assertAll(
+                () -> assertThat(updatedMember.getNickname()).isEqualTo(newNickname),
+                () -> assertThat(passwordEncoder.matches(newPassword, updatedMember.getPassword())).isTrue(),
+                () -> assertThat(updatedMember.getPhone()).isEqualTo(newPhone)
+        );
     }
 
     @Test
@@ -342,5 +344,20 @@ class MemberServiceTest {
 
         assertThatThrownBy(() -> memberService.updateProfileInfo(email, newNickname, newPassword, newPhone))
                 .isInstanceOf(InvalidPhoneException.class);
+    }
+
+    @Test
+    @DisplayName("회원이 중복된 닉네임으로 회원정보 수정을 시도하면 예외를 반환한다")
+    void updateDuplicateNicknameWithValidateException() {
+        String email = "dlawotn3@naver.com";
+        String password = "jisu0708";
+        String originalNickname = "mery";
+        String newNickname = "케이";
+        String phone = "010-1111-1111";
+        memberRepository.save(new Member(email, password, originalNickname, phone));
+        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
+
+        assertThatThrownBy(() -> memberService.updateProfileInfo(email, newNickname, password, phone))
+                .isInstanceOf(DuplicateNicknameException.class);
     }
 }
