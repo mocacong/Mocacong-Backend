@@ -100,6 +100,17 @@ public class CafeService {
                 .collect(Collectors.toList());
     }
 
+    private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
+        return cafe.getCafeImages()
+                .stream()
+                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
+                .map(cafeImage -> {
+                    Boolean isMe = cafeImage.isOwned(member);
+                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
+                })
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public MyFavoriteCafesResponse findMyFavoriteCafes(String email, Integer page, int count) {
         Slice<Cafe> myFavoriteCafes = cafeRepository.findByMyFavoriteCafes(email, PageRequest.of(page, count));
@@ -214,17 +225,6 @@ public class CafeService {
         String imgUrl = awsS3Uploader.uploadImage(cafeImg);
         CafeImage cafeImage = new CafeImage(imgUrl, cafe, member);
         cafeImageRepository.save(cafeImage);
-    }
-
-    private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        return cafe.getCafeImages()
-                .stream()
-                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
-                .map(cafeImage -> {
-                    Boolean isMe = cafeImage.isOwned(member);
-                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
-                })
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
