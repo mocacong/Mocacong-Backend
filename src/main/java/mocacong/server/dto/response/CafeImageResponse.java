@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class CafeImageResponse {
+    private Long id;
     private String imageUrl;
     private Boolean isMe;
 }
