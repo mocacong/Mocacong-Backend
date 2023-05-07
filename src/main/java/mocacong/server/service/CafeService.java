@@ -216,6 +216,17 @@ public class CafeService {
         cafeImageRepository.save(cafeImage);
     }
 
+    private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
+        return cafe.getCafeImages()
+                .stream()
+                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
+                .map(cafeImage -> {
+                    Boolean isMe = cafeImage.getMember().equals(member);
+                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
+                })
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public CafeImagesResponse findCafeImages(String email, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -235,16 +246,5 @@ public class CafeService {
                 .collect(Collectors.toList());
 
         return new CafeImagesResponse(cafeImages.getNumber(), responses);
-    }
-
-    private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        return cafe.getCafeImages()
-                .stream()
-                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
-                .map(cafeImage -> {
-                    Boolean isMe = cafeImage.getMember().equals(member);
-                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
-                })
-                .collect(Collectors.toList());
     }
 }

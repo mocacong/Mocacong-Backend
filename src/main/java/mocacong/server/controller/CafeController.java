@@ -91,7 +91,7 @@ public class CafeController {
 
     @Operation(summary = "카페 이미지 조회")
     @SecurityRequirement(name = "JWT")
-    @GetMapping(value = "/{mapId}/img", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{mapId}/img")
     public ResponseEntity<CafeImagesResponse> getCafeImages(
             @LoginUserEmail String email,
             @PathVariable String mapId,

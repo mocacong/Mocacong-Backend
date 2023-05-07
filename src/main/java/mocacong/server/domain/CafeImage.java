@@ -20,7 +20,7 @@ public class CafeImage extends BaseTime {
     @Column(name = "img_url")
     private String imgUrl;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 

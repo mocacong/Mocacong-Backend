@@ -40,13 +40,9 @@ class CafeServiceTest {
     @Autowired
     private ScoreRepository scoreRepository;
     @Autowired
-    private ReviewRepository reviewRepository;
-    @Autowired
     private CommentRepository commentRepository;
     @Autowired
     private FavoriteRepository favoriteRepository;
-    @Autowired
-    private CafeImageRepository cafeImageRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
