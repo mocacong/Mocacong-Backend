@@ -98,4 +98,17 @@ public class CafeController {
         cafeService.saveCafeImage(email, mapId, multipartFile);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "카페 이미지 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/{mapId}/img")
+    public ResponseEntity<CafeImagesResponse> getCafeImages(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        CafeImagesResponse response = cafeService.findCafeImages(email, mapId, page, count);
+        return ResponseEntity.ok(response);
+    }
 }

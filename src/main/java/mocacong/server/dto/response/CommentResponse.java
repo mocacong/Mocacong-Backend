@@ -8,6 +8,7 @@ import lombok.*;
 @ToString
 public class CommentResponse {
 
+    private Long id;
     private String imgUrl;
     private String nickname;
     private String content;

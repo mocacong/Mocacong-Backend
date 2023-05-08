@@ -3,11 +3,11 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.EmailVerifyCodeRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
+import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -84,11 +86,22 @@ public class MemberController {
     @Operation(summary = "프로필 이미지 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/mypage/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> updateProfileImage(
+    public ResponseEntity<Void> updateProfileImage(
             @LoginUserEmail String email,
             @RequestParam(value = "file", required = false) MultipartFile multipartFile
     ) {
         memberService.updateProfileImage(email, multipartFile);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "프로필 회원정보 수정")
+    @SecurityRequirement(name = "JWT")
+    @PutMapping(value = "/info")
+    public ResponseEntity<Void> updateProfileInfo(
+            @LoginUserEmail String email,
+            @RequestBody @Valid MemberProfileUpdateRequest request
+    ) {
+        memberService.updateProfileInfo(email, request.getNickname(), request.getPassword(), request.getPhone());
         return ResponseEntity.ok().build();
     }
 

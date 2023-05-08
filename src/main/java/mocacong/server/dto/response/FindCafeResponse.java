@@ -23,4 +23,5 @@ public class FindCafeResponse {
     private int reviewsCount;
     private int commentsCount;
     private List<CommentResponse> comments;
+    private List<CafeImageResponse> cafeImages;
 }
