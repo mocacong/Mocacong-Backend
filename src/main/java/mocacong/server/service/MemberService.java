@@ -1,8 +1,14 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
+import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
@@ -17,12 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -147,12 +147,15 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateProfileInfo(String email, String nickname, String password, String phone) {
+    public void updateProfileInfo(String email, MemberProfileUpdateRequest request) {
+        String updateNickname = request.getNickname();
+        String updatePassword = request.getPassword();
+        String updatePhone = request.getPhone();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        validateDuplicateNickname(nickname);
-        validatePassword(password);
-        String encryptedPassword = passwordEncoder.encode(password);
-        member.updateProfileInfo(nickname, encryptedPassword, phone);
+        validateDuplicateNickname(updateNickname);
+        validatePassword(updatePassword);
+        String encryptedPassword = passwordEncoder.encode(updatePassword);
+        member.updateProfileInfo(updateNickname, encryptedPassword, updatePhone);
     }
 }
