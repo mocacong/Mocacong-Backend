@@ -10,5 +10,6 @@ import java.util.List;
 
 public interface CafeImageRepository extends JpaRepository<CafeImage, Long> {
     Slice<CafeImage> findAllByCafeIdAndIsUsedTrue(Long cafeId, Pageable pageRequest);
+
     List<CafeImage> findAllByCafeIdAndIsUsedTrue(Long cafeId);
 }
