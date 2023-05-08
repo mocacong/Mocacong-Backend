@@ -44,7 +44,7 @@
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!-- rolling(백업) 파일 저장 위치 -->
-                <fileNamePattern>${ARCHIVE_PATH}/mocacong-%d${BY_DATE}-%i.log</fileNamePattern>
+                <fileNamePattern>${ARCHIVE_PATH}/mocacong-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
                 <!-- 로그 파일이 10MB 넘으면 백업하고 새로운 파일 생성 -->
                 <maxFileSize>10MB</maxFileSize>
                 <!-- 백업 로그 파일은 7일 이후 삭제 -->
@@ -76,7 +76,7 @@
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!-- 에러 rolling(백업) 파일 저장 위치 -->
-                <fileNamePattern>${ARCHIVE_PATH}/error/mocacong-error-%d${BY_DATE}-%i.log</fileNamePattern>
+                <fileNamePattern>${ARCHIVE_PATH}/error/mocacong-error-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
                 <!-- 에러 로그 파일이 10MB 넘으면 백업하고 새로운 파일 생성 -->
                 <maxFileSize>10MB</maxFileSize>
                 <!-- 에러 백업 로그 파일은 20일 이후 삭제 -->
