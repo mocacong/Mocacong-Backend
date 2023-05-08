@@ -8,8 +8,16 @@
 
     <springProfile name="!prod">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="mocacong.server.support.logging.MaskingPatternLayout">
+                    <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
+                    <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
+                    <maskPattern>phone\s*=\s*([^,)\s]+)</maskPattern> <!-- Phone Arg pattern -->
+                    <maskPattern>platformId\s*=\s*([^,)\s]+)</maskPattern> <!-- PlatformId Arg pattern -->
+                    <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
+                    <maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
+                    <pattern>${LOG_PATTERN}</pattern>
+                </layout>
             </encoder>
         </appender>
 
@@ -23,8 +31,16 @@
         <!-- 운영 환경에서는 로그를 파일로 저장 -->
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_PATH}/mocacong-${BY_DATE}.log</file>
-            <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="mocacong.server.support.logging.MaskingPatternLayout">
+                    <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
+                    <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
+                    <maskPattern>phone\s*=\s*([^,)\s]+)</maskPattern> <!-- Phone Arg pattern -->
+                    <maskPattern>platformId\s*=\s*([^,)\s]+)</maskPattern> <!-- PlatformId Arg pattern -->
+                    <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
+                    <maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
+                    <pattern>${LOG_PATTERN}</pattern>
+                </layout>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!-- rolling(백업) 파일 저장 위치 -->
@@ -42,13 +58,21 @@
         <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_PATH}/error/mocacong-error-${BY_DATE}.log</file>
             <!-- ERROR 로깅 레벨만 필터링 -->
-            <filter class = "ch.qos.logback.classic.filter.LevelFilter">
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>ERROR</level>
                 <onMatch>ACCEPT</onMatch>
                 <onMismatch>DENY</onMismatch>
             </filter>
-            <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
+            <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                <layout class="mocacong.server.support.logging.MaskingPatternLayout">
+                    <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
+                    <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
+                    <maskPattern>phone\s*=\s*([^,)\s]+)</maskPattern> <!-- Phone Arg pattern -->
+                    <maskPattern>platformId\s*=\s*([^,)\s]+)</maskPattern> <!-- PlatformId Arg pattern -->
+                    <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
+                    <maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
+                    <pattern>${LOG_PATTERN}</pattern>
+                </layout>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <!-- 에러 rolling(백업) 파일 저장 위치 -->
