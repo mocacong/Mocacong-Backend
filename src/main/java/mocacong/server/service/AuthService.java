@@ -40,17 +40,25 @@ public class AuthService {
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
         OAuthPlatformMemberResponse applePlatformMember =
                 appleOAuthUserProvider.getApplePlatformMember(request.getToken());
-        return generateOAuthTokenResponse(applePlatformMember.getEmail(), applePlatformMember.getPlatformId());
+        return generateOAuthTokenResponse(
+                Platform.APPLE,
+                applePlatformMember.getEmail(),
+                applePlatformMember.getPlatformId()
+        );
     }
 
     public OAuthTokenResponse kakaoOAuthLogin(KakaoLoginRequest request) {
-        OAuthPlatformMemberResponse applePlatformMember =
+        OAuthPlatformMemberResponse kakaoPlatformMember =
                 kakaoOAuthUserProvider.getKakaoPlatformMember(request.getCode());
-        return generateOAuthTokenResponse(applePlatformMember.getEmail(), applePlatformMember.getPlatformId());
+        return generateOAuthTokenResponse(
+                Platform.KAKAO,
+                kakaoPlatformMember.getEmail(),
+                kakaoPlatformMember.getPlatformId()
+        );
     }
 
-    private OAuthTokenResponse generateOAuthTokenResponse(String email, String platformId) {
-        return memberRepository.findIdByPlatformAndPlatformId(Platform.APPLE, platformId)
+    private OAuthTokenResponse generateOAuthTokenResponse(Platform platform, String email, String platformId) {
+        return memberRepository.findIdByPlatformAndPlatformId(platform, platformId)
                 .map(memberId -> {
                     Member findMember = memberRepository.findById(memberId)
                             .orElseThrow(NotFoundMemberException::new);
@@ -62,7 +70,7 @@ public class AuthService {
                     return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId);
                 })
                 .orElseGet(() -> {
-                    Member oauthMember = new Member(email, Platform.APPLE, platformId);
+                    Member oauthMember = new Member(email, platform, platformId);
                     Member savedMember = memberRepository.save(oauthMember);
                     String token = issueToken(savedMember);
                     return new OAuthTokenResponse(token, email, false, platformId);

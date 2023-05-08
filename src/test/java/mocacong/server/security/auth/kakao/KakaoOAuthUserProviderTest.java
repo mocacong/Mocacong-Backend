@@ -1,7 +1,10 @@
 package mocacong.server.security.auth.kakao;
 
+import feign.FeignException;
+import mocacong.server.exception.unauthorized.InvalidTokenException;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,5 +44,13 @@ class KakaoOAuthUserProviderTest {
                 () -> assertThat(actual.getEmail()).isEqualTo(email),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
         );
+    }
+
+    @Test
+    @DisplayName("Kakao OAuth 서버와 통신할 때 인가코드가 올바르지 않으면 예외를 반환한다")
+    void getKakaoPlatformMemberWhenInvalidAuthorizationCode() {
+        when(kakaoAccessTokenClient.getToken(any())).thenThrow(FeignException.class);
+        assertThatThrownBy(() -> kakaoOAuthUserProvider.getKakaoPlatformMember("invalid_token"))
+                .isInstanceOf(InvalidTokenException.class);
     }
 }
