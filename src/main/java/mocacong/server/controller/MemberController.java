@@ -3,11 +3,12 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.EmailVerifyCodeRequest;
+import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
-import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
@@ -16,8 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -101,7 +100,7 @@ public class MemberController {
             @LoginUserEmail String email,
             @RequestBody @Valid MemberProfileUpdateRequest request
     ) {
-        memberService.updateProfileInfo(email, request.getNickname(), request.getPassword(), request.getPhone());
+        memberService.updateProfileInfo(email, request);
         return ResponseEntity.ok().build();
     }
 

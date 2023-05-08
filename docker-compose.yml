@@ -7,3 +7,25 @@ services:
       - "8080"
     ports:  # host - container 포트 매핑
       - "8080:8080"
+  pinpoint:
+    container_name: pinpoint
+    depends_on:
+      - zoo1
+    expose:
+      - "60000" # HBase Master API port
+      - "16010" # HBase Master Web UI
+      - "60020" # Regionserver API port
+      - "16030" # HBase Regionserver web UI
+    hostname: pinpoint
+    image: "pinpointdocker/pinpoint-hbase:${PINPOINT_VERSION}"
+    networks:
+      - pinpoint
+    ports:
+      - "60000:60000"
+      - "16010:16010"
+      - "60020:60020"
+      - "16030:16030"
+    restart: always
+    volumes:
+      - /home/pinpoint/hbase
+      - /home/pinpoint/zookeeper

@@ -1,15 +1,13 @@
 package mocacong.server.dto.response;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import mocacong.server.domain.Review;
 import mocacong.server.domain.cafedetail.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@ToString
 public class ReviewResponse {
 
     private Wifi wifi;

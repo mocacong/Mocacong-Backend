@@ -82,8 +82,8 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @GetMapping
     public ResponseEntity<CafeFilterResponse> getCafesByStudyType(@RequestParam(required = false) String studytype,
-                                                                  @RequestBody CafeFilterRequest requestBody) {
-        CafeFilterResponse responseBody = cafeService.filterCafesByStudyType(studytype, requestBody);
+                                                                  @RequestBody CafeFilterRequest request) {
+        CafeFilterResponse responseBody = cafeService.filterCafesByStudyType(studytype, request);
         return ResponseEntity.ok(responseBody);
     }
 
