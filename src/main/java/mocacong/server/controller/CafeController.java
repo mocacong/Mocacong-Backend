@@ -3,7 +3,6 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -16,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @Tag(name = "Cafes", description = "카페")
 @RestController
@@ -90,7 +91,7 @@ public class CafeController {
     @Operation(summary = "카페 이미지 업로드")
     @SecurityRequirement(name = "JWT")
     @PostMapping(value = "/{mapId}/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateCafeImage(
+    public ResponseEntity<Void> saveCafeImage(
             @LoginUserEmail String email,
             @PathVariable String mapId,
             @RequestParam(value = "file") MultipartFile multipartFile
@@ -110,5 +111,18 @@ public class CafeController {
     ) {
         CafeImagesResponse response = cafeService.findCafeImages(email, mapId, page, count);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "카페 이미지 수정")
+    @SecurityRequirement(name = "JWT")
+    @PutMapping(value = "/{mapId}/img/{cafeImageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateCafeImage(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @PathVariable Long cafeImageId,
+            @RequestParam(value = "file") MultipartFile multipartFile
+    ) {
+        cafeService.updateCafeImage(email, mapId, cafeImageId, multipartFile);
+        return ResponseEntity.ok().build();
     }
 }

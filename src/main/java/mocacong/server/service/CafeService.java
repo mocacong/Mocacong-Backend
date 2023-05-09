@@ -10,6 +10,7 @@ import mocacong.server.dto.request.CafeReviewUpdateRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
+import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
@@ -101,12 +102,13 @@ public class CafeService {
     }
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        return cafe.getCafeImages()
+        List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
+        return cafeImages
                 .stream()
                 .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
-                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
+                    return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
     }
@@ -237,7 +239,7 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         String imgUrl = awsS3Uploader.uploadImage(cafeImg);
-        CafeImage cafeImage = new CafeImage(imgUrl, cafe, member);
+        CafeImage cafeImage = new CafeImage(imgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
     }
 
@@ -248,17 +250,32 @@ public class CafeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
-        Slice<CafeImage> cafeImages = cafeImageRepository.findAllByCafeId(cafe.getId(), pageable);
+        Slice<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId(), pageable);
 
         List<CafeImageResponse> responses = cafeImages
                 .getContent()
                 .stream()
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
-                    return new CafeImageResponse(cafeImage.getImgUrl(), isMe);
+                    return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
 
         return new CafeImagesResponse(cafeImages.getNumber(), responses);
+    }
+
+    @Transactional
+    public void updateCafeImage(String email, String mapId, Long cafeImageId, MultipartFile cafeImg) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        CafeImage notUsedImage = cafeImageRepository.findById(cafeImageId)
+                        .orElseThrow(NotFoundCafeImageException::new);
+        notUsedImage.setIsUsed(false);
+
+        String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
+        CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
+        cafeImageRepository.save(cafeImage);
     }
 }
