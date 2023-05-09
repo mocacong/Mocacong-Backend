@@ -12,11 +12,12 @@ import mocacong.server.exception.badrequest.InvalidPowerException;
 @Getter
 public enum Power {
 
-    MANY("충분해요"),
-    FEW("적당해요"),
-    NONE("없어요");
+    MANY("충분해요", 3),
+    FEW("적당해요", 2),
+    NONE("없어요", 1);
 
     private String value;
+    private int score;
 
     public static Power from(String value) {
         if (value == null) return null;
@@ -24,5 +25,12 @@ public enum Power {
                 .filter(it -> Objects.equals(it.value, value))
                 .findFirst()
                 .orElseThrow(InvalidPowerException::new);
+    }
+
+    public static Power averageFrom(double score) {
+        return Arrays.stream(values())
+                .filter(it -> it.score == (int) (score + 0.5))
+                .findFirst()
+                .orElse(null);
     }
 }

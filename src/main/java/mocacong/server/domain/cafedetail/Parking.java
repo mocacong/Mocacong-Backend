@@ -12,11 +12,12 @@ import mocacong.server.exception.badrequest.InvalidParkingException;
 @Getter
 public enum Parking {
 
-    COMFORTABLE("여유로워요"),
-    UNCOMFORTABLE("협소해요"),
-    NONE("없어요");
+    COMFORTABLE("여유로워요", 3),
+    UNCOMFORTABLE("협소해요", 2),
+    NONE("없어요", 1);
 
     private String value;
+    private int score;
 
     public static Parking from(String value) {
         if (value == null) return null;
@@ -24,5 +25,12 @@ public enum Parking {
                 .filter(it -> Objects.equals(it.value, value))
                 .findFirst()
                 .orElseThrow(InvalidParkingException::new);
+    }
+
+    public static Parking averageFrom(double score) {
+        return Arrays.stream(values())
+                .filter(it -> it.score == (int) (score + 0.5))
+                .findFirst()
+                .orElse(null);
     }
 }

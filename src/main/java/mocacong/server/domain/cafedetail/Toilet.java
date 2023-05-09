@@ -12,11 +12,12 @@ import mocacong.server.exception.badrequest.InvalidToiletException;
 @Getter
 public enum Toilet {
 
-    CLEAN("깨끗해요"),
-    NORMAL("평범해요"),
-    UNCOMFORTABLE("불편해요");
+    CLEAN("깨끗해요", 3),
+    NORMAL("평범해요", 2),
+    UNCOMFORTABLE("불편해요", 1);
 
     private String value;
+    private int score;
 
     public static Toilet from(String value) {
         if (value == null) return null;
@@ -24,5 +25,12 @@ public enum Toilet {
                 .filter(it -> Objects.equals(it.value, value))
                 .findFirst()
                 .orElseThrow(InvalidToiletException::new);
+    }
+
+    public static Toilet averageFrom(double score) {
+        return Arrays.stream(values())
+                .filter(it -> it.score == (int) (score + 0.5))
+                .findFirst()
+                .orElse(null);
     }
 }
