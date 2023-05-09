@@ -705,7 +705,7 @@ class CafeServiceTest {
         cafeService.updateCafeImage(member.getEmail(), mapId, oldFindImage.getCafeImages().get(0).getId(), newMockMultipartFile);
         cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), mapId);
-        CafeImagesResponse actual2 = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
+        CafeImagesResponse given = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
 
         assertAll(
                 () -> assertThat(actual.getCafeImages()).hasSize(5),
@@ -715,7 +715,7 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(3).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
-                () -> assertThat(actual2.getCafeImages()).hasSize(6)
+                () -> assertThat(given.getCafeImages()).hasSize(6)
         );
     }
 }
