@@ -29,7 +29,7 @@ public enum Toilet {
 
     public static Toilet averageFrom(double score) {
         return Arrays.stream(values())
-                .filter(it -> it.score == (int) (score + 0.5))
+                .filter(it -> it.score == Math.round(score))
                 .findFirst()
                 .orElse(null);
     }
