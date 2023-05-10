@@ -7,6 +7,7 @@ import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
+import mocacong.server.exception.badrequest.InvalidCommentDeleteException;
 import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
@@ -105,10 +106,13 @@ public class CommentService {
                 .filter(c -> c.getId().equals(commentId))
                 .findFirst()
                 .orElseThrow(NotFoundCommentException::new);
+
         if (!comment.isWrittenByMember(member)) {
-            throw new InvalidCommentUpdateException();
+            throw new InvalidCommentDeleteException();
         }
+        commentRepository.delete(comment);
     }
+
     @EventListener
     public void updateCommentWhenMemberDelete(MemberEvent event) {
         Member member = event.getMember();
