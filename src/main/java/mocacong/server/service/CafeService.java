@@ -39,6 +39,7 @@ public class CafeService {
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
     private final ScoreRepository scoreRepository;
+    private final CommentRepository commentRepository;
     private final ReviewRepository reviewRepository;
     private final FavoriteRepository favoriteRepository;
     private final CafeImageRepository cafeImageRepository;
@@ -122,6 +123,22 @@ public class CafeService {
                 .map(cafe -> new MyFavoriteCafeResponse(cafe.getName(), cafe.findAverageScore()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.getNumber(), responses);
+    }
+
+    @Transactional(readOnly = true)
+    public MyCommentCafesResponse findMyCommentCafes(String email, int page, int count) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        Slice<Comment> comments = commentRepository.findByMemberId(member.getId(), PageRequest.of(page, count));
+
+        List<MyCommentCafeResponse> responses = comments.stream()
+                .map(comment -> new MyCommentCafeResponse(
+                        comment.getCafe().getName(),
+                        comment.getContent()
+                ))
+                .collect(Collectors.toList());
+
+        return new MyCommentCafesResponse(comments.getNumber(), responses);
     }
 
     @Transactional
