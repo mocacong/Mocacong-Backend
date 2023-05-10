@@ -1,5 +1,8 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -11,21 +14,18 @@ import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -44,6 +44,8 @@ class CafeServiceTest {
     private CommentRepository commentRepository;
     @Autowired
     private FavoriteRepository favoriteRepository;
+    @Autowired
+    private CafeImageRepository cafeImageRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
@@ -675,7 +677,7 @@ class CafeServiceTest {
         MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
-        assertThatThrownBy(() ->    cafeService.updateCafeImage(member.getEmail(), mapId, 9999L,
+        assertThatThrownBy(() -> cafeService.updateCafeImage(member.getEmail(), mapId, 9999L,
                 newMockMultipartFile)).isInstanceOf(NotFoundCafeImageException.class);
     }
 
@@ -716,6 +718,32 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
+        );
+    }
+
+    @Test
+    @DisplayName("사용하지 않는 카페 이미지들을 삭제한다")
+    void deleteNotUsedCafeImages() {
+        List<String> notUsedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member);
+        cafeImageRepository.save(cafeImage1);
+        CafeImage cafeImage2 = new CafeImage("test_img2.jpg", false, cafe, member);
+        cafeImageRepository.save(cafeImage2);
+        CafeImage cafeImage3 = new CafeImage("test_img3.jpg", false, cafe, member);
+        cafeImageRepository.save(cafeImage3);
+
+        doNothing().when(awsS3Uploader).deleteImages(new DeleteNotUsedImagesEvent(notUsedImgUrls));
+        cafeService.deleteNotUsedCafeImages();
+
+        List<CafeImage> actual = cafeImageRepository.findAll();
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual).extracting("imgUrl")
+                        .containsExactlyInAnyOrder("test_img.jpg")
         );
     }
 }

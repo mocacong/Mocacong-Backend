@@ -17,6 +17,7 @@ import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
@@ -166,5 +167,19 @@ public class MemberService {
         validatePassword(updatePassword);
         String encryptedPassword = passwordEncoder.encode(updatePassword);
         member.updateProfileInfo(updateNickname, encryptedPassword, updatePhone);
+    }
+
+    @Transactional
+    public void deleteNotUsedProfileImages() {
+        List<MemberProfileImage> memberProfileImages = memberProfileImageRepository.findAllByIsUsedFalse();
+        List<String> imgUrls = memberProfileImages.stream()
+                .map(MemberProfileImage::getImgUrl)
+                .collect(Collectors.toList());
+        applicationEventPublisher.publishEvent(new DeleteNotUsedImagesEvent(imgUrls));
+
+        List<Long> ids = memberProfileImages.stream()
+                .map(MemberProfileImage::getId)
+                .collect(Collectors.toList());
+        memberProfileImageRepository.deleteAllByIdInBatch(ids);
     }
 }

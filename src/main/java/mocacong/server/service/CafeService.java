@@ -14,8 +14,10 @@ import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +46,7 @@ public class CafeService {
     private final CafeImageRepository cafeImageRepository;
     private final EntityManager em;
     private final AwsS3Uploader awsS3Uploader;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
@@ -277,5 +280,19 @@ public class CafeService {
         String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
         CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
+    }
+
+    @Transactional
+    public void deleteNotUsedCafeImages() {
+        List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalse();
+        List<String> imgUrls = cafeImages.stream()
+                .map(CafeImage::getImgUrl)
+                .collect(Collectors.toList());
+        applicationEventPublisher.publishEvent(new DeleteNotUsedImagesEvent(imgUrls));
+
+        List<Long> ids = cafeImages.stream()
+                .map(CafeImage::getId)
+                .collect(Collectors.toList());
+        cafeImageRepository.deleteAllByIdInBatch(ids);
     }
 }

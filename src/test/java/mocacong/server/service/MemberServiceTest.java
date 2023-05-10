@@ -15,6 +15,7 @@ import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -380,5 +381,27 @@ class MemberServiceTest {
         MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, password, phone);
         assertThatThrownBy(() -> memberService.updateProfileInfo(email, request))
                 .isInstanceOf(DuplicateNicknameException.class);
+    }
+
+    @Test
+    @DisplayName("사용하지 않는 회원 프로필 이미지를 삭제한다")
+    void deleteMemberProfileImages() {
+        List<String> notUsedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
+        MemberProfileImage memberProfileImage1 = new MemberProfileImage("test_img.jpg");
+        memberProfileImageRepository.save(memberProfileImage1);
+        MemberProfileImage memberProfileImage2 = new MemberProfileImage(notUsedImgUrls.get(0), false);
+        memberProfileImageRepository.save(memberProfileImage2);
+        MemberProfileImage memberProfileImage3 = new MemberProfileImage(notUsedImgUrls.get(1), false);
+        memberProfileImageRepository.save(memberProfileImage3);
+
+        doNothing().when(awsS3Uploader).deleteImages(new DeleteNotUsedImagesEvent(notUsedImgUrls));
+        memberService.deleteNotUsedProfileImages();
+
+        List<MemberProfileImage> actual = memberProfileImageRepository.findAll();
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual).extracting("imgUrl")
+                        .containsExactlyInAnyOrder("test_img.jpg")
+        );
     }
 }
