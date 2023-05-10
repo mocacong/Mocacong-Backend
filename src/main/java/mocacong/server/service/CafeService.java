@@ -137,7 +137,6 @@ public class CafeService {
                         comment.getContent()
                 ))
                 .collect(Collectors.toList());
-
         return new MyCommentCafesResponse(comments.getNumber(), responses);
     }
 
