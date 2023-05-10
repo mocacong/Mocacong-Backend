@@ -40,7 +40,7 @@ class CafeTest {
 
         CafeDetail cafeDetail1 = new CafeDetail(StudyType.SOLO, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
         Review review1 = new Review(member, cafe, cafeDetail1);
-        CafeDetail cafeDetail2 = new CafeDetail(StudyType.GROUP, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.NORMAL, Desk.UNCOMFORTABLE, Power.FEW, Sound.NOISY);
+        CafeDetail cafeDetail2 = new CafeDetail(StudyType.GROUP, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.UNCOMFORTABLE, Desk.UNCOMFORTABLE, Power.FEW, Sound.LOUD);
         Review review2 = new Review(member, cafe, cafeDetail2);
         CafeDetail cafeDetail3 = new CafeDetail(StudyType.SOLO, Wifi.NORMAL, Parking.UNCOMFORTABLE, Toilet.NORMAL, Desk.COMFORTABLE, Power.FEW, Sound.LOUD);
         Review review3 = new Review(member, cafe, cafeDetail3);
@@ -56,7 +56,7 @@ class CafeTest {
                 () -> assertThat(actual.getWifi()).isEqualTo(Wifi.NORMAL),
                 () -> assertThat(actual.getParking()).isEqualTo(Parking.COMFORTABLE),
                 () -> assertThat(actual.getToilet()).isEqualTo(Toilet.NORMAL),
-                () -> assertThat(actual.getDesk()).isEqualTo(Desk.COMFORTABLE),
+                () -> assertThat(actual.getDesk()).isEqualTo(Desk.NORMAL),
                 () -> assertThat(actual.getPower()).isEqualTo(Power.FEW),
                 () -> assertThat(actual.getSound()).isEqualTo(Sound.LOUD)
         );

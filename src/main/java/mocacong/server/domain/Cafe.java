@@ -2,11 +2,7 @@ package mocacong.server.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,6 +14,8 @@ import mocacong.server.domain.cafedetail.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cafe extends BaseTime {
+
+    private static final int NONE_REVIEW_SCORE = -1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,13 +55,18 @@ public class Cafe extends BaseTime {
 
     public void updateCafeDetails() {
         StudyType studyType = getMostFrequentStudyType();
-        Wifi wifi = (Wifi) getMostFrequentType(reviews.stream().map(Review::getWifi));
-        Parking parking = (Parking) getMostFrequentType(reviews.stream().map(Review::getParking));
-        Toilet toilet = (Toilet) getMostFrequentType(reviews.stream().map(Review::getToilet));
-        Desk desk = (Desk) getMostFrequentType(reviews.stream().map(Review::getDesk));
-        Power power = (Power) getMostFrequentType(reviews.stream().map(Review::getPower));
-        Sound sound = (Sound) getMostFrequentType(reviews.stream().map(Review::getSound));
-
+        Wifi wifi = Wifi.averageFrom(reviews.stream().map(Review::getWifi)
+                .filter(Objects::nonNull).mapToDouble(Wifi::getScore).average().orElse(NONE_REVIEW_SCORE));
+        Parking parking = Parking.averageFrom(reviews.stream().map(Review::getParking)
+                .filter(Objects::nonNull).mapToDouble(Parking::getScore).average().orElse(NONE_REVIEW_SCORE));
+        Toilet toilet = Toilet.averageFrom(reviews.stream().map(Review::getToilet)
+                .filter(Objects::nonNull).mapToDouble(Toilet::getScore).average().orElse(NONE_REVIEW_SCORE));
+        Desk desk = Desk.averageFrom(reviews.stream().map(Review::getDesk)
+                .filter(Objects::nonNull).mapToDouble(Desk::getScore).average().orElse(NONE_REVIEW_SCORE));
+        Power power = Power.averageFrom(reviews.stream().map(Review::getPower)
+                .filter(Objects::nonNull).mapToDouble(Power::getScore).average().orElse(NONE_REVIEW_SCORE));
+        Sound sound = Sound.averageFrom(reviews.stream().map(Review::getSound)
+                .filter(Objects::nonNull).mapToDouble(Sound::getScore).average().orElse(NONE_REVIEW_SCORE));
         this.cafeDetail = new CafeDetail(studyType, wifi, parking, toilet, desk, power, sound);
     }
 
@@ -83,17 +86,6 @@ public class Cafe extends BaseTime {
         else if (solo == group) return StudyType.BOTH;
         else if (solo > group) return StudyType.SOLO;
         else return StudyType.GROUP;
-    }
-
-    private Object getMostFrequentType(Stream<Object> stream) {
-        Map.Entry<Object, Long> frequentTypeInfo = stream
-                .filter(Objects::nonNull)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
-                .orElse(null);
-        return frequentTypeInfo != null ? frequentTypeInfo.getKey() : null;
     }
 
     public double findAverageScore() {
