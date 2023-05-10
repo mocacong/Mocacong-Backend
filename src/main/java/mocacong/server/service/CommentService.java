@@ -95,6 +95,20 @@ public class CommentService {
         comment.updateComment(content);
     }
 
+    @Transactional
+    public void delete(String email, String mapId, Long commentId) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        Comment comment = cafe.getComments().stream()
+                .filter(c -> c.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(NotFoundCommentException::new);
+        if (!comment.isWrittenByMember(member)) {
+            throw new InvalidCommentUpdateException();
+        }
+    }
     @EventListener
     public void updateCommentWhenMemberDelete(MemberEvent event) {
         Member member = event.getMember();
