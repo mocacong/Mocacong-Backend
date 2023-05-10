@@ -3,7 +3,6 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.EmailVerifyCodeRequest;
 import mocacong.server.dto.request.MemberProfileUpdateRequest;
@@ -17,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -79,6 +80,18 @@ public class MemberController {
             @RequestParam("count") final int count
     ) {
         MyFavoriteCafesResponse response = cafeService.findMyFavoriteCafes(email, page, count);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "마이페이지 - 리뷰 남긴 카페 목록 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/mypage/reviews")
+    public ResponseEntity<MyReviewCafesResponse> findMyReviewCafes(
+            @LoginUserEmail String email,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        MyReviewCafesResponse response = cafeService.findMyReivewCafes(email, page, count);
         return ResponseEntity.ok(response);
     }
 

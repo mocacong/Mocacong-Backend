@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -122,6 +123,23 @@ public class CafeService {
                 .map(cafe -> new MyFavoriteCafeResponse(cafe.getName(), cafe.findAverageScore()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.getNumber(), responses);
+    }
+
+    @Transactional(readOnly = true)
+    public MyReviewCafesResponse findMyReivewCafes(String email, Integer page, int count) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(email, PageRequest.of(page, count));
+        List<MyReviewCafeResponse> responses = myReviewCafes
+                .getContent()
+                .stream()
+                .map(cafe -> {
+                    Optional<Score> score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId());
+                    double scoreValue = score.map(Score::getScore).orElse(0);
+                    return new MyReviewCafeResponse(cafe.getName(), scoreValue);
+                })
+                .collect(Collectors.toList());
+        return new MyReviewCafesResponse(myReviewCafes.getNumber(), responses);
     }
 
     @Transactional
