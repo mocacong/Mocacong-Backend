@@ -1,10 +1,7 @@
 package mocacong.server.support;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -54,10 +51,11 @@ public class AwsS3Uploader {
         List<String> imgUrls = event.getImgUrls();
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
         for (String imgUrl : imgUrls) {
-            String fileName = imgUrl.substring(imgUrl.lastIndexOf(".") + 1);
+            String fileName = S3_BUCKET_DIRECTORY_NAME + imgUrl.substring(imgUrl.lastIndexOf("/"));
             keys.add(new DeleteObjectsRequest.KeyVersion(fileName));
         }
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucket).withKeys(keys);
-        amazonS3Client.deleteObjects(deleteObjectsRequest);
+        DeleteObjectsResult result = amazonS3Client.deleteObjects(deleteObjectsRequest);
+        log.info("Failed Delete Object Counts = {}", imgUrls.size() - result.getDeletedObjects().size());
     }
 }
