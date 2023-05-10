@@ -316,12 +316,17 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
-        cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
+        Cafe cafe2 = new Cafe("2154122541112", "메리카페");
+        cafeRepository.save(cafe1);
+        cafeRepository.save(cafe2);
+        cafeService.saveCafeReview(member1.getEmail(), cafe1.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getEmail(), cafe2.getMapId(),
+                new CafeReviewRequest(5, "group", "느려요", "없어요",
+                        "불편해요", "없어요", "북적북적해요", "불편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe1.getMapId(),
                 new CafeReviewRequest(2, "group", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
 
@@ -329,7 +334,10 @@ class CafeServiceTest {
 
         assertAll(
                 () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
-                () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(1)
+                () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(1),
+                () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("케이카페"),
+                () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(5),
+                () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("메리카페")
         );
     }
 
