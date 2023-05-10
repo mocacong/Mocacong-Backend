@@ -198,8 +198,8 @@ class CommentServiceTest {
         CommentSaveResponse response = commentService.save(email, mapId, "공부하기 좋아요~🥰");
 
         commentService.delete(email, mapId, response.getId());
-
         CommentsResponse actual = commentService.findAll(email, mapId, 0, 3);
+
         assertThat(actual.getComments()).hasSize(0);
     }
 
