@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.ErrorResponse;
+import mocacong.server.dto.response.MyCommentCafesResponse;
 import mocacong.server.dto.response.MyPageResponse;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
@@ -289,6 +290,36 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
+    }
+
+    @Test
+    @DisplayName("마이페이지에서 댓글을 작성한 카페 목록을 조회한다")
+    void findMyCommentCafes() {
+        String mapId1 = "12332312";
+        String mapId2 = "12121212";
+        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페"));
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("mery@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        회원_가입(signUpRequest2);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest.getPassword());
+        카페_코멘트_작성(token, mapId1, new CommentSaveRequest("댓글"));
+        카페_코멘트_작성(token, mapId1, new CommentSaveRequest("댓글2"));
+        카페_코멘트_작성(token, mapId2, new CommentSaveRequest("댓글3"));
+        카페_코멘트_작성(token2, mapId1, new CommentSaveRequest("댓글4"));
+
+        MyCommentCafesResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/members/mypage/comments?page=0&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(MyCommentCafesResponse.class);
+
+        assertThat(response.getCafes()).hasSize(3);
     }
 
     @Test
