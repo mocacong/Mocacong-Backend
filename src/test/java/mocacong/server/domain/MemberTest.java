@@ -87,4 +87,41 @@ class MemberTest {
         assertThatThrownBy(() -> new Member("kth990303@naver.com", "a1b2c3d4", "케이", phone))
                 .isInstanceOf(InvalidPhoneException.class);
     }
+
+    @Test
+    @DisplayName("회원의 프로필 이미지가 존재하면 해당 이미지 url을 올바르게 반환한다")
+    void getImgUrlWhenHasImage() {
+        String expected = "test_img.jpg";
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678", new MemberProfileImage(expected));
+
+        String actual = member.getImgUrl();
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("회원의 프로필 이미지가 존재하지 않으면 해당 이미지 url 반환은 null을 반환한다")
+    void getImgUrlWhenHasNotImage() {
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+
+        String actual = member.getImgUrl();
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    @DisplayName("회원 프로필 이미지를 변경하면 변경 전 이미지 사용여부는 false, 프로필 이미지는 올바르게 변경된다")
+    void updateProfileImgUrl() {
+        String expected = "test_img.jpg";
+        MemberProfileImage memberProfileImage = new MemberProfileImage("before.jpg");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678",
+                memberProfileImage, Platform.MOCACONG, "1234");
+
+        member.updateProfileImgUrl(new MemberProfileImage(expected));
+
+        assertAll(
+                () -> assertThat(member.getImgUrl()).isEqualTo(expected),
+                () -> assertThat(memberProfileImage.getIsUsed()).isFalse()
+        );
+    }
 }
