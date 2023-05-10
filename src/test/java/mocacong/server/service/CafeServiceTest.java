@@ -310,6 +310,30 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("회원이 리뷰를 남긴 카페 목록들을 보여준다")
+    void findMyReviewCafes() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(1, "group", "느려요", "없어요",
+                        "불편해요", "없어요", "북적북적해요", "불편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "group", "느려요", "없어요",
+                        "깨끗해요", "없어요", null, "보통이에요"));
+
+        MyReviewCafesResponse actual = cafeService.findMyReivewCafes(member1.getEmail(), 0, 3);
+
+        assertAll(
+                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(1)
+        );
+    }
+
+    @Test
     @DisplayName("카페에 대한 리뷰를 작성하면 해당 카페 평점과 세부정보가 갱신된다")
     void saveCafeReview() {
         Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
