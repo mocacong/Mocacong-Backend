@@ -310,6 +310,33 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("회원이 댓글을 작성한 카페 목록들을 보여준다")
+    void findMyCommentCafes() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
+        Cafe cafe2 = new Cafe("1212121212121", "메리카페");
+        cafeRepository.save(cafe1);
+        cafeRepository.save(cafe2);
+        commentRepository.save(new Comment(cafe1, member1, "댓글1"));
+        commentRepository.save(new Comment(cafe1, member1, "댓글2"));
+        commentRepository.save(new Comment(cafe2, member1, "댓글3"));
+        commentRepository.save(new Comment(cafe2, member2, "댓글4"));
+
+        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getEmail(), 0, 5);
+
+        assertAll(
+                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getCafes()).hasSize(3),
+                () -> assertThat(actual.getCafes().get(0).getComment()).isEqualTo("댓글1"),
+                () -> assertThat(actual.getCafes().get(1).getComment()).isEqualTo("댓글2"),
+                () -> assertThat(actual.getCafes().get(2).getComment()).isEqualTo("댓글3")
+        );
+    }
+
+    @Test
     @DisplayName("카페에 대한 리뷰를 작성하면 해당 카페 평점과 세부정보가 갱신된다")
     void saveCafeReview() {
         Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");

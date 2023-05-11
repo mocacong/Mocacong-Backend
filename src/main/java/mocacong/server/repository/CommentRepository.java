@@ -11,6 +11,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findAllByMemberId(Long memberId);
 
+    Slice<Comment> findByMemberId(Long memberId, Pageable pageRequest);
+
     Slice<Comment> findAllByCafeId(Long cafeId, Pageable pageRequest);
 
     Slice<Comment> findAllByCafeIdAndMemberId(Long cafeId, Long memberId, Pageable pageRequest);
