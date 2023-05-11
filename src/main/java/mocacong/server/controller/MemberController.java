@@ -83,7 +83,19 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "마이페이지 - 코멘트 목록 조회")
+    @Operation(summary = "마이페이지 - 리뷰 남긴 카페 목록 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/mypage/reviews")
+    public ResponseEntity<MyReviewCafesResponse> findMyReviewCafes(
+            @LoginUserEmail String email,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        MyReviewCafesResponse response = cafeService.findMyReviewCafes(email, page, count);
+        return ResponseEntity.ok(response);
+    }
+    
+  @Operation(summary = "마이페이지 - 코멘트 목록 조회")
     @SecurityRequirement(name = "JWT")
     @GetMapping("/mypage/comments")
     public ResponseEntity<MyCommentCafesResponse> findMyComments(

@@ -6,6 +6,7 @@ import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.dto.response.MyCommentCafesResponse;
 import mocacong.server.dto.response.MyPageResponse;
+import mocacong.server.dto.response.MyReviewCafesResponse;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.support.AwsSESSender;
@@ -292,6 +293,46 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .extract();
     }
 
+    @Test
+    @DisplayName("마이페이지에서 리뷰를 등록한 카페 목록을 조회한다")
+    void findMyReviewCafes() {
+        String mapId1 = "12332312";
+        String mapId2 = "12121212";
+        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페"));
+        MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1111-1111");
+        회원_가입(signUpRequest1);
+        회원_가입(signUpRequest2);
+        String token1 = 로그인_토큰_발급(signUpRequest1.getEmail(), signUpRequest1.getPassword());
+        String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest2.getPassword());
+        CafeReviewRequest request1 = new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                "깨끗해요", "충분해요", "조용해요", "편해요");
+        CafeReviewRequest request2 = new CafeReviewRequest(2, "solo", "빵빵해요", "여유로워요",
+                "깨끗해요", "충분해요", "조용해요", "편해요");
+        CafeReviewRequest request3 = new CafeReviewRequest(1, "group", "빵빵해요", "여유로워요",
+                "깨끗해요", "충분해요", "조용해요", "편해요");
+        카페_리뷰_작성(token1, mapId1, request1);
+        카페_리뷰_작성(token1, mapId2, request2);
+        카페_리뷰_작성(token2, mapId1, request3);
+
+        MyReviewCafesResponse actual = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token1)
+                .when().get("/members/mypage/reviews?page=0&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(MyReviewCafesResponse.class);
+
+        assertAll(
+                () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(4),
+                () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("메리네 카페"),
+                () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(2),
+                () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("케이네 카페")
+        );
+    }
+  
     @Test
     @DisplayName("마이페이지에서 댓글을 작성한 카페 목록을 조회한다")
     void findMyCommentCafes() {

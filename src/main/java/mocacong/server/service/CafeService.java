@@ -129,6 +129,22 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
+    public MyReviewCafesResponse findMyReviewCafes(String email, Integer page, int count) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(email, PageRequest.of(page, count));
+        List<MyReviewCafeResponse> responses = myReviewCafes
+                .getContent()
+                .stream()
+                .map(cafe -> {
+                    int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
+                    return new MyReviewCafeResponse(cafe.getName(), score);
+                })
+                .collect(Collectors.toList());
+        return new MyReviewCafesResponse(myReviewCafes.getNumber(), responses);
+    }
+
+    @Transactional(readOnly = true)
     public MyCommentCafesResponse findMyCommentCafes(String email, int page, int count) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
