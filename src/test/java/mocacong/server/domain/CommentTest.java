@@ -39,7 +39,7 @@ class CommentTest {
     @Test
     @DisplayName("댓글 작성자 프로필 이미지 url을 반환한다")
     void getWriterImgUrl() {
-        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678", "test_img.jpg");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678", new MemberProfileImage("test_img.jpg"));
         Cafe cafe = new Cafe("1", "케이카페");
         Comment comment = new Comment(cafe, member, "안녕하세요");
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import java.util.List;
 import mocacong.server.domain.Member;
+import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
@@ -12,7 +13,9 @@ import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +35,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @ServiceTest
 class MemberServiceTest {
 
+    @Autowired
+    private MemberProfileImageRepository memberProfileImageRepository;
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -229,7 +234,10 @@ class MemberServiceTest {
     void findMyInfo() {
         String imgUrl = "test_img.jpg";
         String nickname = "케이";
-        Member member = new Member("kth990303@naver.com", "a1b2c3d4", nickname, "010-1234-5678", imgUrl);
+        MemberProfileImage memberProfileImage = new MemberProfileImage(imgUrl);
+        memberProfileImageRepository.save(memberProfileImage);
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678",
+                memberProfileImage, Platform.MOCACONG, "1234");
         memberRepository.save(member);
 
         MyPageResponse actual = memberService.findMyInfo(member.getEmail());
@@ -253,21 +261,32 @@ class MemberServiceTest {
 
         Member actual = memberRepository.findByEmail(member.getEmail())
                 .orElseThrow();
-        assertThat(actual.getImgUrl()).isEqualTo(expected);
+
+        assertAll(
+                () -> assertThat(actual.getImgUrl()).isEqualTo(expected),
+                () -> assertThat(actual.getMemberProfileImage().getIsUsed()).isTrue()
+        );
     }
 
     @Test
     @DisplayName("회원이 프로필 이미지를 삭제하거나 null로 설정하면 프로필 이미지는 null로 설정된다")
     void updateProfileImgWithNull() {
+        MemberProfileImage memberProfileImage = new MemberProfileImage("test.me.jpg");
+        memberProfileImageRepository.save(memberProfileImage);
         Member member = memberRepository.save(
-                new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", "test.me.jpg")
+                new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678",
+                        memberProfileImage, Platform.MOCACONG, "1234")
         );
 
         memberService.updateProfileImage(member.getEmail(), null);
 
         Member actual = memberRepository.findByEmail(member.getEmail())
                 .orElseThrow();
-        assertThat(actual.getImgUrl()).isNull();
+
+        assertAll(
+                () -> assertThat(actual.getImgUrl()).isNull(),
+                () -> assertThat(actual.getMemberProfileImage()).isNull()
+        );
     }
 
     @Test
@@ -362,5 +381,27 @@ class MemberServiceTest {
         MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, password, phone);
         assertThatThrownBy(() -> memberService.updateProfileInfo(email, request))
                 .isInstanceOf(DuplicateNicknameException.class);
+    }
+
+    @Test
+    @DisplayName("사용하지 않는 회원 프로필 이미지를 삭제한다")
+    void deleteMemberProfileImages() {
+        List<String> notUsedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
+        MemberProfileImage memberProfileImage1 = new MemberProfileImage("test_img.jpg");
+        memberProfileImageRepository.save(memberProfileImage1);
+        MemberProfileImage memberProfileImage2 = new MemberProfileImage(notUsedImgUrls.get(0), false);
+        memberProfileImageRepository.save(memberProfileImage2);
+        MemberProfileImage memberProfileImage3 = new MemberProfileImage(notUsedImgUrls.get(1), false);
+        memberProfileImageRepository.save(memberProfileImage3);
+
+        doNothing().when(awsS3Uploader).deleteImages(new DeleteNotUsedImagesEvent(notUsedImgUrls));
+        memberService.deleteNotUsedProfileImages();
+
+        List<MemberProfileImage> actual = memberProfileImageRepository.findAll();
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual).extracting("imgUrl")
+                        .containsExactlyInAnyOrder("test_img.jpg")
+        );
     }
 }

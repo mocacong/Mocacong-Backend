@@ -3,8 +3,6 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CommentSaveRequest;
 import mocacong.server.dto.request.CommentUpdateRequest;
@@ -13,13 +11,17 @@ import mocacong.server.dto.response.CommentResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
 import mocacong.server.dto.response.FindCafeResponse;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommentAcceptanceTest extends AcceptanceTest {
 
@@ -130,5 +132,33 @@ public class CommentAcceptanceTest extends AcceptanceTest {
                 () -> assertEquals(1, comments.size()),
                 () -> assertEquals(expected, comments.get(0).getContent())
         );
+    }
+
+    @Test
+    @DisplayName("카페에 작성한 코멘트를 삭제한다")
+    void deleteComment() {
+        String content = "공부하기 좋아요~🥰";
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        CommentSaveRequest saveRequest = new CommentSaveRequest(content);
+        ExtractableResponse<Response> response = 카페_코멘트_작성(token, mapId, saveRequest);
+        Long commentId = response.as(CommentSaveResponse.class).getId();
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().delete("/cafes/" + mapId + "/comments/" + commentId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract();
+        List<CommentResponse> comments = 카페_조회(token, mapId)
+                .as(FindCafeResponse.class)
+                .getComments();
+
+        assertThat(comments.size()).isEqualTo(0);
     }
 }

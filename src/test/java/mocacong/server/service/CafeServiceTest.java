@@ -1,5 +1,8 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -11,21 +14,18 @@ import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -44,6 +44,8 @@ class CafeServiceTest {
     private CommentRepository commentRepository;
     @Autowired
     private FavoriteRepository favoriteRepository;
+    @Autowired
+    private CafeImageRepository cafeImageRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
@@ -339,6 +341,33 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(5),
                 () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("메리카페"),
                 () -> assertThat(actual.getCafes()).hasSize(2)
+        );
+    }
+  
+    @Test
+    @DisplayName("회원이 댓글을 작성한 카페 목록들을 보여준다")
+    void findMyCommentCafes() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
+        Cafe cafe2 = new Cafe("1212121212121", "메리카페");
+        cafeRepository.save(cafe1);
+        cafeRepository.save(cafe2);
+        commentRepository.save(new Comment(cafe1, member1, "댓글1"));
+        commentRepository.save(new Comment(cafe1, member1, "댓글2"));
+        commentRepository.save(new Comment(cafe2, member1, "댓글3"));
+        commentRepository.save(new Comment(cafe2, member2, "댓글4"));
+
+        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getEmail(), 0, 5);
+
+        assertAll(
+                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getCafes()).hasSize(3),
+                () -> assertThat(actual.getCafes().get(0).getComment()).isEqualTo("댓글1"),
+                () -> assertThat(actual.getCafes().get(1).getComment()).isEqualTo("댓글2"),
+                () -> assertThat(actual.getCafes().get(2).getComment()).isEqualTo("댓글3")
         );
     }
 
@@ -708,7 +737,7 @@ class CafeServiceTest {
         MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
-        assertThatThrownBy(() ->    cafeService.updateCafeImage(member.getEmail(), mapId, 9999L,
+        assertThatThrownBy(() -> cafeService.updateCafeImage(member.getEmail(), mapId, 9999L,
                 newMockMultipartFile)).isInstanceOf(NotFoundCafeImageException.class);
     }
 
@@ -749,6 +778,32 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
+        );
+    }
+
+    @Test
+    @DisplayName("사용하지 않는 카페 이미지들을 삭제한다")
+    void deleteNotUsedCafeImages() {
+        List<String> notUsedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member);
+        cafeImageRepository.save(cafeImage1);
+        CafeImage cafeImage2 = new CafeImage("test_img2.jpg", false, cafe, member);
+        cafeImageRepository.save(cafeImage2);
+        CafeImage cafeImage3 = new CafeImage("test_img3.jpg", false, cafe, member);
+        cafeImageRepository.save(cafeImage3);
+
+        doNothing().when(awsS3Uploader).deleteImages(new DeleteNotUsedImagesEvent(notUsedImgUrls));
+        cafeService.deleteNotUsedCafeImages();
+
+        List<CafeImage> actual = cafeImageRepository.findAll();
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual).extracting("imgUrl")
+                        .containsExactlyInAnyOrder("test_img.jpg")
         );
     }
 }

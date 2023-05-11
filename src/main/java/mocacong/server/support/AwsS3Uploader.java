@@ -1,15 +1,18 @@
 package mocacong.server.support;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,5 +43,19 @@ public class AwsS3Uploader {
             throw new IllegalStateException("S3 파일 업로드에 실패했습니다.");
         }
         return amazonS3Client.getUrl(bucket, fileName).toString();
+    }
+
+    @Async
+    @EventListener
+    public void deleteImages(DeleteNotUsedImagesEvent event) {
+        List<String> imgUrls = event.getImgUrls();
+        List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
+        for (String imgUrl : imgUrls) {
+            String fileName = S3_BUCKET_DIRECTORY_NAME + imgUrl.substring(imgUrl.lastIndexOf("/"));
+            keys.add(new DeleteObjectsRequest.KeyVersion(fileName));
+        }
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucket).withKeys(keys);
+        DeleteObjectsResult result = amazonS3Client.deleteObjects(deleteObjectsRequest);
+        log.info("Failed Delete Object Counts = {}", imgUrls.size() - result.getDeletedObjects().size());
     }
 }

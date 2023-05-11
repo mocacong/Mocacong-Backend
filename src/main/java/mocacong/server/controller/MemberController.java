@@ -94,6 +94,18 @@ public class MemberController {
         MyReviewCafesResponse response = cafeService.findMyReviewCafes(email, page, count);
         return ResponseEntity.ok(response);
     }
+    
+  @Operation(summary = "마이페이지 - 코멘트 목록 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/mypage/comments")
+    public ResponseEntity<MyCommentCafesResponse> findMyComments(
+            @LoginUserEmail String email,
+            @RequestParam("page") final Integer page,
+            @RequestParam("count") final int count
+    ) {
+        MyCommentCafesResponse response = cafeService.findMyCommentCafes(email, page, count);
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(summary = "프로필 이미지 수정")
     @SecurityRequirement(name = "JWT")

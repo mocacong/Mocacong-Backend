@@ -1,13 +1,12 @@
 package mocacong.server.domain;
 
+import java.util.regex.Pattern;
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
-
-import javax.persistence.*;
-import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "member")
@@ -35,8 +34,9 @@ public class Member extends BaseTime {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "img_url")
-    private String imgUrl;
+    @OneToOne
+    @JoinColumn(name = "member_profile_image_id")
+    private MemberProfileImage memberProfileImage;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "platform")
@@ -46,7 +46,7 @@ public class Member extends BaseTime {
     private String platformId;
 
     public Member(
-            String email, String password, String nickname, String phone, String imgUrl,
+            String email, String password, String nickname, String phone, MemberProfileImage memberProfileImage,
             Platform platform, String platformId
     ) {
         validateMemberInfo(nickname, phone);
@@ -54,13 +54,21 @@ public class Member extends BaseTime {
         this.password = password;
         this.nickname = nickname;
         this.phone = phone;
-        this.imgUrl = imgUrl;
+        this.memberProfileImage = memberProfileImage;
         this.platform = platform;
         this.platformId = platformId;
     }
 
-    public Member(String email, String password, String nickname, String phone, String imgUrl) {
-        this(email, password, nickname, phone, imgUrl, Platform.MOCACONG, null);
+    public Member(String email, String password, String nickname, String phone, MemberProfileImage memberProfileImage) {
+        this(
+                email,
+                password,
+                nickname,
+                phone,
+                memberProfileImage,
+                Platform.MOCACONG,
+                null
+        );
     }
 
     public Member(String email, String password, String nickname, String phone) {
@@ -81,8 +89,19 @@ public class Member extends BaseTime {
         }
     }
 
-    public void updateProfileImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public String getImgUrl() {
+        return this.memberProfileImage != null ? this.memberProfileImage.getImgUrl() : null;
+    }
+
+    public void updateProfileImgUrl(MemberProfileImage memberProfileImage) {
+        updateBeforeProfileImageNotUsedStatus();
+        this.memberProfileImage = memberProfileImage;
+    }
+
+    private void updateBeforeProfileImageNotUsedStatus() {
+        if (this.memberProfileImage != null) {
+            this.memberProfileImage.updateNotUsedStatus();
+        }
     }
 
     public void updateProfileInfo(String nickname, String password, String phone) {
