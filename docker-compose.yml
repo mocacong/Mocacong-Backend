@@ -7,3 +7,5 @@ services:
       - "8080"
     ports:  # host - container 포트 매핑
       - "8080:8080"
+    volumes: # host 로그 디렉토리 - container 로그 디렉토리 볼륨 마운트
+      - ./logs:/logs
