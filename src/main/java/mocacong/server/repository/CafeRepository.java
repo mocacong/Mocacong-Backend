@@ -2,7 +2,6 @@ package mocacong.server.repository;
 
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.cafedetail.StudyType;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,5 +26,5 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
             "join r.cafe c " +
             "join r.member m " +
             "where m.email = :email")
-    Slice<Cafe> findByMyReviewCafes(String email, PageRequest of);
+    Slice<Cafe> findByMyReviewCafes(String email, Pageable pageRequest);
 }
