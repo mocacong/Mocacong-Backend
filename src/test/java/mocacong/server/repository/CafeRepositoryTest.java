@@ -1,16 +1,15 @@
 package mocacong.server.repository;
 
-import mocacong.server.domain.Cafe;
-import mocacong.server.domain.Favorite;
-import mocacong.server.domain.Member;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
+import mocacong.server.domain.*;
+import mocacong.server.domain.cafedetail.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @RepositoryTest
 class CafeRepositoryTest {
@@ -21,6 +20,8 @@ class CafeRepositoryTest {
     private MemberRepository memberRepository;
     @Autowired
     private FavoriteRepository favoriteRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Test
     @DisplayName("내가 즐겨찾기에 등록한 카페 목록을 조회한다")
@@ -35,6 +36,32 @@ class CafeRepositoryTest {
         favoriteRepository.save(new Favorite(member, savedCafe3));
 
         Slice<Cafe> actual = cafeRepository.findByMyFavoriteCafes(member.getEmail(), PageRequest.of(1, 2));
+
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual.getNumber()).isEqualTo(1),
+                () -> assertThat(actual.isLast()).isTrue(),
+                () -> assertThat(actual)
+                        .extracting("name")
+                        .containsExactly("케이카페3")
+        );
+    }
+
+    @Test
+    @DisplayName("내가 리뷰를 등록한 카페 목록을 조회한다")
+    void findByMyReviewCafes() {
+        Cafe savedCafe1 = cafeRepository.save(new Cafe("1", "케이카페1"));
+        Cafe savedCafe2 = cafeRepository.save(new Cafe("2", "케이카페2"));
+        Cafe savedCafe3 = cafeRepository.save(new Cafe("3", "케이카페3"));
+        Cafe savedCafe4 = cafeRepository.save(new Cafe("4", "케이카페4"));
+        CafeDetail cafeDetail = new CafeDetail(StudyType.BOTH, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.NORMAL,
+                Power.NONE, Sound.LOUD);
+        Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이", "010-1234-5678"));
+        reviewRepository.save(new Review(member, savedCafe1, cafeDetail));
+        reviewRepository.save(new Review(member, savedCafe2, cafeDetail));
+        reviewRepository.save(new Review(member, savedCafe3, cafeDetail));
+
+        Slice<Cafe> actual = cafeRepository.findByMyReviewCafes(member.getEmail(), PageRequest.of(1, 2));
 
         assertAll(
                 () -> assertThat(actual).hasSize(1),
