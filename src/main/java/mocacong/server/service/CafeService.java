@@ -126,7 +126,7 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public MyReviewCafesResponse findMyReivewCafes(String email, Integer page, int count) {
+    public MyReviewCafesResponse findMyReviewCafes(String email, Integer page, int count) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(email, PageRequest.of(page, count));

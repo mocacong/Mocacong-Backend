@@ -330,7 +330,7 @@ class CafeServiceTest {
                 new CafeReviewRequest(2, "group", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
 
-        MyReviewCafesResponse actual = cafeService.findMyReivewCafes(member1.getEmail(), 0, 3);
+        MyReviewCafesResponse actual = cafeService.findMyReviewCafes(member1.getEmail(), 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getCurrentPage()).isEqualTo(0),

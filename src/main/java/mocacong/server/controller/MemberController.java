@@ -91,7 +91,7 @@ public class MemberController {
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count
     ) {
-        MyReviewCafesResponse response = cafeService.findMyReivewCafes(email, page, count);
+        MyReviewCafesResponse response = cafeService.findMyReviewCafes(email, page, count);
         return ResponseEntity.ok(response);
     }
 
