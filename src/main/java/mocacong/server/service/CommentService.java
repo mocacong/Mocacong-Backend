@@ -7,6 +7,7 @@ import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
+import mocacong.server.exception.badrequest.InvalidCommentDeleteException;
 import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
@@ -93,6 +94,23 @@ public class CommentService {
             throw new InvalidCommentUpdateException();
         }
         comment.updateComment(content);
+    }
+
+    @Transactional
+    public void delete(String email, String mapId, Long commentId) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+        Comment comment = cafe.getComments().stream()
+                .filter(c -> c.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(NotFoundCommentException::new);
+
+        if (!comment.isWrittenByMember(member)) {
+            throw new InvalidCommentDeleteException();
+        }
+        commentRepository.delete(comment);
     }
 
     @EventListener

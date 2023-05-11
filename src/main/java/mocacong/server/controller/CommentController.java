@@ -71,4 +71,16 @@ public class CommentController {
         commentService.update(email, mapId, request.getContent(), commentId);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "카페 코멘트 삭제")
+    @SecurityRequirement(name = "JWT")
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @LoginUserEmail String email,
+            @PathVariable String mapId,
+            @PathVariable Long commentId
+    ) {
+        commentService.delete(email, mapId, commentId);
+        return ResponseEntity.ok().build();
+    }
 }
