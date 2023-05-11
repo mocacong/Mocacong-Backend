@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
+import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
@@ -14,7 +15,9 @@ import mocacong.server.dto.request.OAuthMemberSignUpRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
@@ -32,6 +35,7 @@ public class MemberService {
     private static final int EMAIL_VERIFY_CODE_MAXIMUM_NUMBER = 9999;
 
     private final MemberRepository memberRepository;
+    private final MemberProfileImageRepository memberProfileImageRepository;
     private final PasswordEncoder passwordEncoder;
     private final AwsS3Uploader awsS3Uploader;
     private final AwsSESSender awsSESSender;
@@ -142,8 +146,14 @@ public class MemberService {
     public void updateProfileImage(String email, MultipartFile profileImg) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        String profileImgUrl = profileImg == null ? null : awsS3Uploader.uploadImage(profileImg);
-        member.updateProfileImgUrl(profileImgUrl);
+        if (profileImg == null) {
+            member.updateProfileImgUrl(null);
+            return;
+        }
+        String profileImgUrl = awsS3Uploader.uploadImage(profileImg);
+        MemberProfileImage memberProfileImage = new MemberProfileImage(profileImgUrl, true);
+        memberProfileImageRepository.save(memberProfileImage);
+        member.updateProfileImgUrl(memberProfileImage);
     }
 
     @Transactional
@@ -157,5 +167,19 @@ public class MemberService {
         validatePassword(updatePassword);
         String encryptedPassword = passwordEncoder.encode(updatePassword);
         member.updateProfileInfo(updateNickname, encryptedPassword, updatePhone);
+    }
+
+    @Transactional
+    public void deleteNotUsedProfileImages() {
+        List<MemberProfileImage> memberProfileImages = memberProfileImageRepository.findAllByIsUsedFalse();
+        List<String> imgUrls = memberProfileImages.stream()
+                .map(MemberProfileImage::getImgUrl)
+                .collect(Collectors.toList());
+        applicationEventPublisher.publishEvent(new DeleteNotUsedImagesEvent(imgUrls));
+
+        List<Long> ids = memberProfileImages.stream()
+                .map(MemberProfileImage::getId)
+                .collect(Collectors.toList());
+        memberProfileImageRepository.deleteAllByIdInBatch(ids);
     }
 }
