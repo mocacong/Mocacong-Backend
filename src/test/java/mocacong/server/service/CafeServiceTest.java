@@ -337,7 +337,8 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(1),
                 () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("케이카페"),
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(5),
-                () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("메리카페")
+                () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("메리카페"),
+                () -> assertThat(actual.getCafes()).hasSize(2)
         );
     }
 

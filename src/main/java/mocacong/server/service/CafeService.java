@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -134,9 +133,8 @@ public class CafeService {
                 .getContent()
                 .stream()
                 .map(cafe -> {
-                    Optional<Score> score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId());
-                    double scoreValue = score.map(Score::getScore).orElse(0);
-                    return new MyReviewCafeResponse(cafe.getName(), scoreValue);
+                    int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
+                    return new MyReviewCafeResponse(cafe.getName(), score);
                 })
                 .collect(Collectors.toList());
         return new MyReviewCafesResponse(myReviewCafes.getNumber(), responses);

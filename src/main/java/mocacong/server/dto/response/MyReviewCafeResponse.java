@@ -9,5 +9,5 @@ import lombok.*;
 public class MyReviewCafeResponse {
 
     private String name;
-    private double myScore;
+    private int myScore;
 }
