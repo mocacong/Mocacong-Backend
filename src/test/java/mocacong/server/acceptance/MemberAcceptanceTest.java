@@ -409,7 +409,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("회원이 잘못된 비밀번호로 비밀번호 인증한다")
+    @DisplayName("회원이 틀린 비밀번호로 비밀번호 인증한다")
     void verifyPasswordWithFalse() {
         MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         회원_가입(memberSignUpRequest);

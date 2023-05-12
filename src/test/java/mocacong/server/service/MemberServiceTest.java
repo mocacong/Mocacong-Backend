@@ -408,7 +408,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원이 정상 비밀번호로 비밀번호 확인 인증을 성공한다")
+    @DisplayName("회원이 옳은 비밀번호로 비밀번호 확인 인증을 성공한다")
     void verifyPasswordReturnTrue() {
         String email = "dlawotn3@naver.com";
         String password = "jisu1234";
