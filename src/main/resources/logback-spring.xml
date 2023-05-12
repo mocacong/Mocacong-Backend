@@ -6,7 +6,7 @@
     <property name="LOG_PATTERN"
               value="[%d{yyyy-MM-dd HH:mm:ss}:%-4relative] %green([%thread]) %highlight(%-5level) [%C.%M:%line] - %msg%n"/>
 
-    <springProfile name="!prod">
+    <springProfile name="default">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                 <layout class="mocacong.server.support.logging.MaskingPatternLayout">
@@ -27,8 +27,8 @@
         </root>
     </springProfile>
 
-    <springProfile name="prod">
-        <!-- 운영 환경에서는 로그를 파일로 저장 -->
+    <springProfile name="!default">
+        <!-- 개발 환경과 운영 환경에서는 로그를 파일로 저장 -->
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_PATH}/mocacong-${BY_DATE}.log</file>
             <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
