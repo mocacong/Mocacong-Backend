@@ -19,11 +19,9 @@ public class AuthConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs", "/error")
+                .addPathPatterns("/members/**", "/cafes/**")
                 .excludePathPatterns("/members", "/members/oauth", "/members/all",
                         "/members/check-duplicate/**", "/members/email-verification")
-                .excludePathPatterns("/login/**")
                 .excludePathPatterns("/cafes");
     }
 
