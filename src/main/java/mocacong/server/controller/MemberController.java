@@ -42,7 +42,7 @@ public class MemberController {
     @Operation(summary = "이메일 인증코드 발송")
     @PostMapping("/email-verification")
     public ResponseEntity<EmailVerifyCodeResponse> emailVerify(@RequestBody @Valid EmailVerifyCodeRequest request) {
-        EmailVerifyCodeResponse response = memberService.sendEmailVerifyCode(request.getEmail());
+        EmailVerifyCodeResponse response = memberService.sendEmailVerifyCode(request);
         return ResponseEntity.ok(response);
     }
 

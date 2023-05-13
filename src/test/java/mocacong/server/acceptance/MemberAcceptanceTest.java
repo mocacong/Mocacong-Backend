@@ -1,28 +1,29 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.support.AwsSESSender;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
+
+    private static final String NONCE = "test";
 
     @MockBean
     private AppleOAuthUserProvider appleOAuthUserProvider;
@@ -133,10 +134,13 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("회원은 이메일 인증을 요청할 수 있다")
+    @DisplayName("회원가입이 된 이메일로 이메일 인증을 요청할 수 있다")
     void verifyEmail() {
+        String email = "kth990303@naver.com";
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
         doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
-        EmailVerifyCodeRequest request = new EmailVerifyCodeRequest("kth990303@naver.com");
+        EmailVerifyCodeRequest request = new EmailVerifyCodeRequest(NONCE, email);
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -144,6 +148,20 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .when().post("/members/email-verification")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    @DisplayName("회원가입이 돼있지 않은 이메일로는 비밀번호 찾기 요청 시에 이메일 인증을 요청할 수 없다")
+    void verifyEmailWhenNotRegisteredMember() {
+        doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
+        EmailVerifyCodeRequest request = new EmailVerifyCodeRequest(NONCE, "kth990303@naver.com");
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/members/email-verification")
+                .then().log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
@@ -329,7 +347,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("케이네 카페")
         );
     }
-  
+
     @Test
     @DisplayName("마이페이지에서 댓글을 작성한 카페 목록을 조회한다")
     void findMyCommentCafes() {

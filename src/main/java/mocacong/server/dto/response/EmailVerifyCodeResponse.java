@@ -8,5 +8,6 @@ import lombok.*;
 @ToString
 public class EmailVerifyCodeResponse {
 
+    private Long id;
     private String code;
 }
