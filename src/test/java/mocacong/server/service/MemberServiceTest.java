@@ -6,6 +6,7 @@ import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
+import mocacong.server.dto.request.PasswordVerifyRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -416,8 +417,9 @@ class MemberServiceTest {
         String phone = "010-1111-1111";
         Member member = new Member(email, passwordEncoder.encode(password), nickname, phone);
         memberRepository.save(member);
+        PasswordVerifyRequest request = new PasswordVerifyRequest("jisu1234");
 
-        PasswordVerifyResponse actual = memberService.verifyPassword(email, password);
+        PasswordVerifyResponse actual = memberService.verifyPassword(email, request);
 
         assertThat(actual.getIsSuccess()).isTrue();
     }
@@ -431,8 +433,9 @@ class MemberServiceTest {
         String phone = "010-1111-1111";
         Member member = new Member(email, passwordEncoder.encode(password), nickname, phone);
         memberRepository.save(member);
+        PasswordVerifyRequest request = new PasswordVerifyRequest("wrongpwd123");
 
-        PasswordVerifyResponse actual = memberService.verifyPassword(email, "wrongpwd123");
+        PasswordVerifyResponse actual = memberService.verifyPassword(email, request);
 
         assertThat(actual.getIsSuccess()).isFalse();
     }

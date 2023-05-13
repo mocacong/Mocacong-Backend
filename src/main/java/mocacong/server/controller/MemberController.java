@@ -104,7 +104,7 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "프로필 이미지 수정")
+    @Operation(summary = "마이페이지 - 프로필 이미지 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/mypage/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateProfileImage(
@@ -133,7 +133,7 @@ public class MemberController {
             @LoginUserEmail String email,
             @RequestBody @Valid PasswordVerifyRequest request
     ) {
-        PasswordVerifyResponse response = memberService.verifyPassword(email, request.getPassword());
+        PasswordVerifyResponse response = memberService.verifyPassword(email, request);
         return ResponseEntity.ok(response);
     }
 

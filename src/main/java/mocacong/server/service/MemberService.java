@@ -7,6 +7,7 @@ import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.MemberProfileUpdateRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.request.OAuthMemberSignUpRequest;
+import mocacong.server.dto.request.PasswordVerifyRequest;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -184,11 +185,11 @@ public class MemberService {
         memberProfileImageRepository.deleteAllByIdInBatch(ids);
     }
 
-    public PasswordVerifyResponse verifyPassword(String email, String password) {
+    public PasswordVerifyResponse verifyPassword(String email, PasswordVerifyRequest request) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         String storedPassword = member.getPassword();
-        String encodedPassword = passwordEncoder.encode(password);
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
         Boolean isSuccess = storedPassword.equals(encodedPassword);
 
         return new PasswordVerifyResponse(isSuccess);
