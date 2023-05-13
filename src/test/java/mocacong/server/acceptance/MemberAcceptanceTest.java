@@ -3,10 +3,7 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.*;
-import mocacong.server.dto.response.ErrorResponse;
-import mocacong.server.dto.response.MyCommentCafesResponse;
-import mocacong.server.dto.response.MyPageResponse;
-import mocacong.server.dto.response.MyReviewCafesResponse;
+import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.support.AwsSESSender;
@@ -388,5 +385,47 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(actual.getNickname()).isEqualTo("메리"),
                 () -> assertThat(로그인_토큰_발급(memberSignUpRequest.getEmail(), newPassword)).isNotNull()
         );
+    }
+
+    @Test
+    @DisplayName("회원이 옳은 비밀번호로 비밀번호 인증한다")
+    void verifyPasswordWithTrue() {
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+        PasswordVerifyRequest request = new PasswordVerifyRequest("a1b2c3d4");
+
+        PasswordVerifyResponse actual = RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/members/info/password")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(PasswordVerifyResponse.class);
+
+        assertThat(actual.getIsSuccess()).isTrue();
+    }
+
+    @Test
+    @DisplayName("회원이 틀린 비밀번호로 비밀번호 인증한다")
+    void verifyPasswordWithFalse() {
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+        PasswordVerifyRequest request = new PasswordVerifyRequest("wrongpwd123");
+
+        PasswordVerifyResponse actual = RestAssured.given().log().all()
+                .auth().oauth2(token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().post("/members/info/password")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(PasswordVerifyResponse.class);
+
+        assertThat(actual.getIsSuccess()).isFalse();
     }
 }

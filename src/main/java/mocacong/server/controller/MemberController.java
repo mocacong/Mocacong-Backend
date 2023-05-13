@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.dto.request.EmailVerifyCodeRequest;
-import mocacong.server.dto.request.MemberProfileUpdateRequest;
-import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.request.OAuthMemberSignUpRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
@@ -107,7 +104,7 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "프로필 이미지 수정")
+    @Operation(summary = "마이페이지 - 프로필 이미지 수정")
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/mypage/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateProfileImage(
@@ -127,6 +124,17 @@ public class MemberController {
     ) {
         memberService.updateProfileInfo(email, request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "비밀번호 확인 인증")
+    @SecurityRequirement(name = "JWT")
+    @PostMapping("/info/password")
+    public ResponseEntity<PasswordVerifyResponse> passwordVerify(
+            @LoginUserEmail String email,
+            @RequestBody @Valid PasswordVerifyRequest request
+    ) {
+        PasswordVerifyResponse response = memberService.verifyPassword(email, request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "회원탈퇴")
