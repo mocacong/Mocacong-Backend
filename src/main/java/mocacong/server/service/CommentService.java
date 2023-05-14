@@ -1,5 +1,7 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
@@ -21,9 +23,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class CommentService {
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Comment> comments = commentRepository.findAllByCafeId(cafe.getId(), PageRequest.of(page, count));
         List<CommentResponse> responses = findCommentResponses(member, comments);
-        return new CommentsResponse(comments.getNumber(), responses);
+        return new CommentsResponse(comments.isLast(), responses);
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +63,7 @@ public class CommentService {
         Slice<Comment> comments =
                 commentRepository.findAllByCafeIdAndMemberId(cafe.getId(), member.getId(), PageRequest.of(page, count));
         List<CommentResponse> responses = findCommentResponses(member, comments);
-        return new CommentsResponse(comments.getNumber(), responses);
+        return new CommentsResponse(comments.isLast(), responses);
     }
 
     private List<CommentResponse> findCommentResponses(Member member, Slice<Comment> comments) {
@@ -73,7 +72,7 @@ public class CommentService {
                     if (comment.isWrittenByMember(member)) {
                         return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), true);
                     } else {
-                        return new CommentResponse(comment.getId(),comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
                     }
                 })
                 .collect(Collectors.toList());

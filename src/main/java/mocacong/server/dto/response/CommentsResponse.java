@@ -9,6 +9,6 @@ import lombok.*;
 @ToString
 public class CommentsResponse {
 
-    private int currentPage;
+    private Boolean isEnd;
     private List<CommentResponse> comments;
 }

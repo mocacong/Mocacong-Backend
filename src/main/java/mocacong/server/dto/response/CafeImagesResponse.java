@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class CafeImagesResponse {
-    private int currentPage;
+
+    private Boolean isEnd;
     private List<CafeImageResponse> cafeImages;
 }
