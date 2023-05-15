@@ -61,8 +61,8 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
-        log.warn("Max Upload Size Exception ErrMessage={}\n", e.getMessage());
+    public ResponseEntity<ErrorResponse> handleFileSizeLimitExceeded(MaxUploadSizeExceededException e) {
+        log.warn("File Size Limit Exception ErrMessage={}\n", e.getMessage());
 
         return ResponseEntity.badRequest().body(new ErrorResponse(9003, "이미지 용량이 10MB를 초과합니다."));
     }
