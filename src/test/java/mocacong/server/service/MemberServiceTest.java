@@ -1,12 +1,13 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import static java.lang.Integer.parseInt;
+import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
-import mocacong.server.dto.request.MemberProfileUpdateRequest;
-import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.request.OAuthMemberSignUpRequest;
-import mocacong.server.dto.request.PasswordVerifyRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -15,28 +16,24 @@ import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import static java.lang.Integer.parseInt;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
 @ServiceTest
 class MemberServiceTest {
+
+    private static final String NONCE = "test";
 
     @Autowired
     private MemberProfileImageRepository memberProfileImageRepository;
@@ -142,14 +139,36 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원의 이메일 인증을 위한 인증코드를 이메일로 전송한다")
     void sendEmailVerifyCode() {
+        String email = "kth990303@naver.com";
+        memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
         doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
 
-        EmailVerifyCodeResponse actual = memberService.sendEmailVerifyCode("kth990303@naver.com");
+        EmailVerifyCodeRequest request = new EmailVerifyCodeRequest(NONCE, email);
+        EmailVerifyCodeResponse actual = memberService.sendEmailVerifyCode(request);
 
         assertAll(
                 () -> verify(awsSESSender, times(1)).sendToVerifyEmail(anyString(), anyString()),
                 () -> assertThat(parseInt(actual.getCode())).isLessThanOrEqualTo(9999)
         );
+    }
+
+    @Test
+    @DisplayName("회원가입이 돼있지 않은 이메일로 인증 시 예외를 반환한다")
+    void sendEmailVerifyCodeWhenNotRegisteredEmail() {
+        String email = "kth990303@naver.com";
+        doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
+        EmailVerifyCodeRequest request = new EmailVerifyCodeRequest(NONCE, email);
+        assertThatThrownBy(() -> memberService.sendEmailVerifyCode(request))
+                .isInstanceOf(NotFoundMemberException.class);
+    }
+
+    @Test
+    @DisplayName("nonce 값이 올바르지 않은, 유효한 요청이 아닌 경우 이메일 인증 시 예외를 반환한다")
+    void sendEmailVerifyCodeWhenInvalidNonce() {
+        doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
+        EmailVerifyCodeRequest request = new EmailVerifyCodeRequest("invalid_nonce", "kth990303@naver.com");
+        assertThatThrownBy(() -> memberService.sendEmailVerifyCode(request))
+                .isInstanceOf(InvalidNonceException.class);
     }
 
     @Test

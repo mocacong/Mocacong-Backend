@@ -70,6 +70,9 @@ oauth:
     client-secret: ${OAUTH_KAKAO_CLIENT_SECRET}
     redirect-uri: ${OAUTH_KAKAO_REDIRECT_URI}
 
+mocacong:
+  nonce: ${MOCACONG_NONCE}
+
 feign:
   client:
     config:

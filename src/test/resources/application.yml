@@ -44,6 +44,9 @@ slack:
   webhook:
     url: test
 
+mocacong:
+  nonce: test
+
 oauth:
   apple:
     iss: https://appleid.apple.com

@@ -1,13 +1,15 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
-import mocacong.server.dto.request.MemberProfileUpdateRequest;
-import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.request.OAuthMemberSignUpRequest;
-import mocacong.server.dto.request.PasswordVerifyRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -17,17 +19,12 @@ import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +39,9 @@ public class MemberService {
     private final AwsS3Uploader awsS3Uploader;
     private final AwsSESSender awsSESSender;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    @Value("${mocacong.nonce}")
+    private String nonce;
 
     public MemberSignUpResponse signUp(MemberSignUpRequest request) {
         validatePassword(request.getPassword());
@@ -117,12 +117,18 @@ public class MemberService {
         }
     }
 
-    public EmailVerifyCodeResponse sendEmailVerifyCode(String to) {
+    public EmailVerifyCodeResponse sendEmailVerifyCode(EmailVerifyCodeRequest request) {
+        if (!nonce.equals(request.getNonce())) {
+            throw new InvalidNonceException();
+        }
+        String emailOwner = request.getEmail();
+        Member member = memberRepository.findByEmail(emailOwner)
+                .orElseThrow(NotFoundMemberException::new);
         Random random = new Random();
         int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
         String code = String.format("%04d", randomNumber);
-        awsSESSender.sendToVerifyEmail(to, code);
-        return new EmailVerifyCodeResponse(code);
+        awsSESSender.sendToVerifyEmail(emailOwner, code);
+        return new EmailVerifyCodeResponse(member.getId(), code);
     }
 
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
