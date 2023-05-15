@@ -1,7 +1,5 @@
 package mocacong.server.controller;
 
-import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mocacong.server.dto.response.ErrorResponse;
@@ -15,6 +13,10 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,6 +58,13 @@ public class ControllerAdvice {
         log.warn("Http Method not supported Exception ErrMessage={}\n", e.getMessage());
 
         return ResponseEntity.badRequest().body(new ErrorResponse(9002, "해당 Http Method에 맞는 API가 존재하지 않습니다."));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.warn("Max Upload Size Exception ErrMessage={}\n", e.getMessage());
+
+        return ResponseEntity.badRequest().body(new ErrorResponse(9003, "이미지 용량이 10MB를 초과합니다."));
     }
 
     @ExceptionHandler(MocacongException.class)
