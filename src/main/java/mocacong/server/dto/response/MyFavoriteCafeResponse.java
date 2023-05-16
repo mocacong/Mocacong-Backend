@@ -8,6 +8,7 @@ import lombok.*;
 @ToString
 public class MyFavoriteCafeResponse {
 
+    private String mapId;
     private String name;
     private double score;
 }
