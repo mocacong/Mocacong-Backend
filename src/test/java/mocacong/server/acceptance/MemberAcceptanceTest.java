@@ -175,7 +175,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
-                .when().post("/members/info/reset-password")
+                .when().put("/members/info/reset-password")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
     }

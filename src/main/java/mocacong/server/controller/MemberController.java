@@ -137,7 +137,7 @@ public class MemberController {
     }
 
     @Operation(summary = "비밀번호 찾기 및 변경")
-    @PostMapping("/info/reset-password")
+    @PutMapping("/info/reset-password")
     public ResponseEntity<Void> findAndResetPassword(
             @RequestBody @Valid ResetPasswordRequest request
     ) {
