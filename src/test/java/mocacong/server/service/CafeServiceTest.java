@@ -1,8 +1,5 @@
 package mocacong.server.service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.CafeFilterRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
@@ -16,16 +13,23 @@ import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @ServiceTest
 class CafeServiceTest {
@@ -609,6 +613,24 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected),
                 () -> assertThat(actual.getCafeImages().get(1).getImgUrl()).isEqualTo(expected)
         );
+    }
+
+    @Test
+    @DisplayName("10MB를 초과하는 카페 이미지를 저장할 시 예외를 반환한다")
+    void saveOverSizedCafeImage() throws IOException {
+        String expected = "oversized_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("oversized_img", expected, "jpg", fileInputStream);
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("oversized_img.jpg");
+
+        assertThrows(MaxUploadSizeExceededException.class, () -> {
+            cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        });
     }
 
     @Test
