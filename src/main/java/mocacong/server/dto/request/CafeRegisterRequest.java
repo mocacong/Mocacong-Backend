@@ -9,9 +9,9 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @ToString
 public class CafeRegisterRequest {
-    @NotBlank
+    @NotBlank(message = "1012:공백일 수 없습니다.")
     private String id;
 
-    @NotBlank
+    @NotBlank(message = "1012:공백일 수 없습니다.")
     private String name;
 }

@@ -172,6 +172,44 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("비밀번호 찾기 요청을 받을 경우, 새로운 비밀번호로 변경한다")
+    void findAndResetPassword() {
+        String email = "kth990303@naver.com";
+        String updatePassword = "password123";
+        Member member = memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
+        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, member.getId(), updatePassword);
+
+        memberService.resetPassword(request);
+
+        Member actual = memberRepository.findById(member.getId())
+                .orElseThrow();
+        assertAll(
+                () -> assertThat(actual.getPassword()).isEqualTo(passwordEncoder.encode(updatePassword)),
+                // 비밀번호 외의 정보는 변경되지 않는다
+                () -> assertThat(actual.getNickname()).isNull()
+        );
+    }
+
+    @Test
+    @DisplayName("올바르지 않은 member id로 비밀번호 찾기 요청을 받을 경우 예외를 반환한다")
+    void findAndResetPasswordWhenInvalidMemberId() {
+        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, 9999L, "password123");
+
+        assertThatThrownBy(() -> memberService.resetPassword(request))
+                .isInstanceOf(NotFoundMemberException.class);
+    }
+
+    @Test
+    @DisplayName("nonce 값이 올바르지 않은, 유효한 비밀번호 찾기 요청이 아닌 경우 비밀번호 변경이 안되고 예외를 반환한다")
+    void findAndResetPasswordWhenInvalidNonce() {
+        Member member = memberRepository.save(new Member("test@naver.com", Platform.MOCACONG, "1234"));
+        ResetPasswordRequest request = new ResetPasswordRequest("invalid_nonce", member.getId(), "password123");
+
+        assertThatThrownBy(() -> memberService.resetPassword(request))
+                .isInstanceOf(InvalidNonceException.class);
+    }
+
+    @Test
     @DisplayName("이미 존재하는 이메일인 경우 True를 반환한다")
     void isDuplicateEmailReturnTrue() {
         String email = "dlawotn3@naver.com";

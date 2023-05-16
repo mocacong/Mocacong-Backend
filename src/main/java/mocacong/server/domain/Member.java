@@ -111,10 +111,6 @@ public class Member extends BaseTime {
         this.phone = phone;
     }
 
-    public boolean isRegisteredOAuthMember() {
-        return nickname != null;
-    }
-
     private void validateMemberInfo(String nickname, String phone) {
         validateNickname(nickname);
         validatePhone(phone);
@@ -130,5 +126,13 @@ public class Member extends BaseTime {
         if (!PHONE_REGEX.matcher(phone).matches()) {
             throw new InvalidPhoneException();
         }
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isRegisteredOAuthMember() {
+        return nickname != null;
     }
 }
