@@ -200,6 +200,17 @@ class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("올바르지 않은 비밀번호로 비밀번호 찾기 요청을 받을 경우 예외를 반환한다")
+    void findAndResetPasswordWhenInvalidPassword() {
+        String email = "kth990303@naver.com";
+        Member member = memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
+        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, member.getId(), "123");
+
+        assertThatThrownBy(() -> memberService.resetPassword(request))
+                .isInstanceOf(InvalidPasswordException.class);
+    }
+
+    @Test
     @DisplayName("nonce 값이 올바르지 않은, 유효한 비밀번호 찾기 요청이 아닌 경우 비밀번호 변경이 안되고 예외를 반환한다")
     void findAndResetPasswordWhenInvalidNonce() {
         Member member = memberRepository.save(new Member("test@naver.com", Platform.MOCACONG, "1234"));
