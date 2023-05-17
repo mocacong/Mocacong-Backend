@@ -62,7 +62,7 @@ public class ControllerAdvice {
 
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<ErrorResponse> handleFileSizeLimitExceeded(MultipartException e) {
-        log.warn("File Size Limit Exception ErrMessage={}\n", e.getMessage());
+        log.error("File Size Limit Exception ErrMessage={}\n", e.getMessage());
 
         return ResponseEntity.badRequest().body(new ErrorResponse(9003, "이미지 용량이 10MB를 초과합니다."));
     }

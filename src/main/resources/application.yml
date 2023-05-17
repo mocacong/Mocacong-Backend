@@ -81,7 +81,3 @@ feign:
       apple-public-key-client:
         connectTimeout: 5000
         readTimeout: 3000
-
-server:
-  tomcat:
-    max-swallow-size: -1
