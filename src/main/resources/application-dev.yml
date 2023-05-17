@@ -18,6 +18,7 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
+      resolve-lazily: true
   task:
     execution:
       pool:

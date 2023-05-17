@@ -12,6 +12,7 @@ spring:
           enabled: true
         show_sql: true
         format_sql: true
+
   h2:
     console:
       enabled: true
