@@ -52,12 +52,6 @@ public class MemberService {
         return new MemberSignUpResponse(memberRepository.save(member).getId());
     }
 
-    private void validatePassword(String password) {
-        if (!PASSWORD_REGEX.matcher(password).matches()) {
-            throw new InvalidPasswordException();
-        }
-    }
-
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
         memberRepository.findByEmail(memberSignUpRequest.getEmail())
                 .ifPresent(member -> {
@@ -143,6 +137,12 @@ public class MemberService {
     private void validateNonce(String requestNonce) {
         if (!nonce.equals(requestNonce)) {
             throw new InvalidNonceException();
+        }
+    }
+
+    private void validatePassword(String password) {
+        if (!PASSWORD_REGEX.matcher(password).matches()) {
+            throw new InvalidPasswordException();
         }
     }
 
