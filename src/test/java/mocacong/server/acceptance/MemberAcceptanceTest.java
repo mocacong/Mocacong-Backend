@@ -165,6 +165,22 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @DisplayName("비밀번호 찾기 요청으로 새로운 비밀번호로 변경한다")
+    void findAndResetPassword() {
+        String email = "kth990303@naver.com";
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+        Long memberId = 회원_가입(memberSignUpRequest).as(MemberSignUpResponse.class).getId();
+        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, memberId, "password123");
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(request)
+                .when().put("/members/info/reset-password")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
     @DisplayName("가입되어 있지 않은 이메일은 이메일 중복검사에서 걸리지 않는다")
     void isDuplicateWithNonExistingEmail() {
         MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");

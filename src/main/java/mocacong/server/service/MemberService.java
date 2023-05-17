@@ -52,12 +52,6 @@ public class MemberService {
         return new MemberSignUpResponse(memberRepository.save(member).getId());
     }
 
-    private void validatePassword(String password) {
-        if (!PASSWORD_REGEX.matcher(password).matches()) {
-            throw new InvalidPasswordException();
-        }
-    }
-
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
         memberRepository.findByEmail(memberSignUpRequest.getEmail())
                 .ifPresent(member -> {
@@ -118,9 +112,7 @@ public class MemberService {
     }
 
     public EmailVerifyCodeResponse sendEmailVerifyCode(EmailVerifyCodeRequest request) {
-        if (!nonce.equals(request.getNonce())) {
-            throw new InvalidNonceException();
-        }
+        validateNonce(request.getNonce());
         String emailOwner = request.getEmail();
         Member member = memberRepository.findByEmail(emailOwner)
                 .orElseThrow(NotFoundMemberException::new);
@@ -129,6 +121,29 @@ public class MemberService {
         String code = String.format("%04d", randomNumber);
         awsSESSender.sendToVerifyEmail(emailOwner, code);
         return new EmailVerifyCodeResponse(member.getId(), code);
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        validateNonce(request.getNonce());
+        Member member = memberRepository.findById(request.getMemberId())
+                .orElseThrow(NotFoundMemberException::new);
+        String updatePassword = request.getPassword();
+        validatePassword(updatePassword);
+        String encryptedPassword = passwordEncoder.encode(updatePassword);
+        member.updatePassword(encryptedPassword);
+    }
+
+    private void validateNonce(String requestNonce) {
+        if (!nonce.equals(requestNonce)) {
+            throw new InvalidNonceException();
+        }
+    }
+
+    private void validatePassword(String password) {
+        if (!PASSWORD_REGEX.matcher(password).matches()) {
+            throw new InvalidPasswordException();
+        }
     }
 
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {

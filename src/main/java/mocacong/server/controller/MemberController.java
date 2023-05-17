@@ -3,6 +3,7 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
@@ -13,8 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -91,8 +90,8 @@ public class MemberController {
         MyReviewCafesResponse response = cafeService.findMyReviewCafes(email, page, count);
         return ResponseEntity.ok(response);
     }
-    
-  @Operation(summary = "마이페이지 - 코멘트 목록 조회")
+
+    @Operation(summary = "마이페이지 - 코멘트 목록 조회")
     @SecurityRequirement(name = "JWT")
     @GetMapping("/mypage/comments")
     public ResponseEntity<MyCommentCafesResponse> findMyComments(
@@ -135,6 +134,15 @@ public class MemberController {
     ) {
         PasswordVerifyResponse response = memberService.verifyPassword(email, request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "비밀번호 찾기 및 변경")
+    @PutMapping("/info/reset-password")
+    public ResponseEntity<Void> findAndResetPassword(
+            @RequestBody @Valid ResetPasswordRequest request
+    ) {
+        memberService.resetPassword(request);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원탈퇴")
