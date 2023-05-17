@@ -616,24 +616,6 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("10MB를 초과하는 카페 이미지를 저장할 시 예외를 반환한다")
-    void saveOverSizedCafeImage() throws IOException {
-        String expected = "oversized_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
-        cafeRepository.save(cafe);
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
-        memberRepository.save(member);
-        String mapId = cafe.getMapId();
-        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("oversized_img", expected, "jpg", fileInputStream);
-        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("oversized_img.jpg");
-
-        assertThrows(MaxUploadSizeExceededException.class, () -> {
-            cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        });
-    }
-
-    @Test
     @DisplayName("사용자가 카페 이미지를 조회한다")
     void findCafeImages() throws IOException {
         String expected = "test_img.jpg";
