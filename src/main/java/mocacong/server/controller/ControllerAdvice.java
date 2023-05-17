@@ -13,7 +13,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
@@ -60,8 +60,8 @@ public class ControllerAdvice {
         return ResponseEntity.badRequest().body(new ErrorResponse(9002, "해당 Http Method에 맞는 API가 존재하지 않습니다."));
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ErrorResponse> handleFileSizeLimitExceeded(MaxUploadSizeExceededException e) {
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ErrorResponse> handleFileSizeLimitExceeded(MultipartException e) {
         log.warn("File Size Limit Exception ErrMessage={}\n", e.getMessage());
 
         return ResponseEntity.badRequest().body(new ErrorResponse(9003, "이미지 용량이 10MB를 초과합니다."));
