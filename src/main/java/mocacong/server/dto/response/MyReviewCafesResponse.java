@@ -10,6 +10,6 @@ import java.util.List;
 @ToString
 public class MyReviewCafesResponse {
 
-    private int currentPage;
+    private Boolean isEnd;
     private List<MyReviewCafeResponse> cafes;
 }

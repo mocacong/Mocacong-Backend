@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -25,11 +29,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -125,7 +124,7 @@ public class CafeService {
                 .stream()
                 .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.findAverageScore()))
                 .collect(Collectors.toList());
-        return new MyFavoriteCafesResponse(myFavoriteCafes.getNumber(), responses);
+        return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
 
     @Transactional(readOnly = true)
@@ -141,7 +140,7 @@ public class CafeService {
                     return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), score);
                 })
                 .collect(Collectors.toList());
-        return new MyReviewCafesResponse(myReviewCafes.getNumber(), responses);
+        return new MyReviewCafesResponse(myReviewCafes.isLast(), responses);
     }
 
     @Transactional(readOnly = true)
@@ -157,7 +156,7 @@ public class CafeService {
                         comment.getContent()
                 ))
                 .collect(Collectors.toList());
-        return new MyCommentCafesResponse(comments.getNumber(), responses);
+        return new MyCommentCafesResponse(comments.isLast(), responses);
     }
 
     @Transactional
@@ -297,7 +296,7 @@ public class CafeService {
                 })
                 .collect(Collectors.toList());
 
-        return new CafeImagesResponse(cafeImages.getNumber(), responses);
+        return new CafeImagesResponse(cafeImages.isLast(), responses);
     }
 
     @Transactional
@@ -307,7 +306,7 @@ public class CafeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         CafeImage notUsedImage = cafeImageRepository.findById(cafeImageId)
-                        .orElseThrow(NotFoundCafeImageException::new);
+                .orElseThrow(NotFoundCafeImageException::new);
         notUsedImage.setIsUsed(false);
 
         String newImgUrl = awsS3Uploader.uploadImage(cafeImg);

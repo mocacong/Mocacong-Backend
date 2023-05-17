@@ -9,6 +9,6 @@ import lombok.*;
 @ToString
 public class MyFavoriteCafesResponse {
 
-    private int currentPage;
+    private Boolean isEnd;
     private List<MyFavoriteCafeResponse> cafes;
 }

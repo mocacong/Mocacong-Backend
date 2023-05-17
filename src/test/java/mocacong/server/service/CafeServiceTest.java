@@ -306,7 +306,7 @@ class CafeServiceTest {
         MyFavoriteCafesResponse actual = cafeService.findMyFavoriteCafes(member1.getEmail(), 0, 3);
 
         assertAll(
-                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getCafes().get(0).getScore()).isEqualTo(1.5)
         );
     }
@@ -335,7 +335,7 @@ class CafeServiceTest {
         MyReviewCafesResponse actual = cafeService.findMyReviewCafes(member1.getEmail(), 0, 3);
 
         assertAll(
-                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(1),
                 () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("케이카페"),
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(5),
@@ -343,7 +343,7 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafes()).hasSize(2)
         );
     }
-  
+
     @Test
     @DisplayName("회원이 댓글을 작성한 카페 목록들을 보여준다")
     void findMyCommentCafes() {
@@ -363,7 +363,7 @@ class CafeServiceTest {
         MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getEmail(), 0, 5);
 
         assertAll(
-                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getCafes()).hasSize(3),
                 () -> assertThat(actual.getCafes().get(0).getComment()).isEqualTo("댓글1"),
                 () -> assertThat(actual.getCafes().get(1).getComment()).isEqualTo("댓글2"),
@@ -632,7 +632,7 @@ class CafeServiceTest {
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
         assertAll(
-                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(cafeImages).hasSize(3)
         );
     }
@@ -656,7 +656,7 @@ class CafeServiceTest {
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
         assertAll(
-                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(cafeImages).hasSize(2),
                 () -> assertThat(cafeImages.get(0).getIsMe()).isTrue(),
                 () -> assertThat(cafeImages.get(1).getIsMe()).isTrue()
@@ -686,7 +686,7 @@ class CafeServiceTest {
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
         assertAll(
-                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(cafeImages).hasSize(4),
                 () -> assertThat(cafeImages.get(0).getIsMe()).isFalse(),
                 () -> assertThat(cafeImages.get(1).getIsMe()).isFalse()
@@ -717,7 +717,7 @@ class CafeServiceTest {
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
         assertAll(
-                () -> assertThat(actual.getCurrentPage()).isEqualTo(0),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getCafeImages().get(0).getId()).isNotEqualTo(oldFindImage.getCafeImages().get(0).getId()),
                 () -> assertThat(cafeImages.get(0).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(cafeImages).hasSize(1)
