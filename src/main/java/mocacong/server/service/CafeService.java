@@ -123,7 +123,7 @@ public class CafeService {
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getName(), cafe.findAverageScore()))
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.findAverageScore()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.getNumber(), responses);
     }
@@ -138,7 +138,7 @@ public class CafeService {
                 .stream()
                 .map(cafe -> {
                     int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
-                    return new MyReviewCafeResponse(cafe.getName(), score);
+                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), score);
                 })
                 .collect(Collectors.toList());
         return new MyReviewCafesResponse(myReviewCafes.getNumber(), responses);
@@ -152,6 +152,7 @@ public class CafeService {
 
         List<MyCommentCafeResponse> responses = comments.stream()
                 .map(comment -> new MyCommentCafeResponse(
+                        comment.getCafe().getMapId(),
                         comment.getCafe().getName(),
                         comment.getContent()
                 ))

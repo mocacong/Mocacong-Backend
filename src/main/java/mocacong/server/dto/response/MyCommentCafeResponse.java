@@ -8,6 +8,7 @@ import lombok.*;
 @ToString
 public class MyCommentCafeResponse {
 
+    private String mapId;
     private String name;
     private String comment;
 }
