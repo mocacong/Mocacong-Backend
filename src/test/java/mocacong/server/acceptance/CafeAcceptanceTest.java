@@ -1,19 +1,21 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import java.util.List;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.dto.request.*;
-import mocacong.server.dto.response.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
+import mocacong.server.dto.response.CafeFilterResponse;
+import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class CafeAcceptanceTest extends AcceptanceTest {
 
@@ -73,7 +75,8 @@ public class CafeAcceptanceTest extends AcceptanceTest {
                 .as(CafeReviewResponse.class);
         assertAll(
                 () -> assertThat(actual.getScore()).isEqualTo(4),
-                () -> assertThat(actual.getStudyType()).isEqualTo("solo")
+                () -> assertThat(actual.getStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(1)
         );
     }
 
@@ -146,7 +149,8 @@ public class CafeAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 () -> assertThat(actual.getScore()).isEqualTo(3),
-                () -> assertThat(actual.getDesk()).isEqualTo("불편해요")
+                () -> assertThat(actual.getDesk()).isEqualTo("불편해요"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(1)
         );
     }
 
