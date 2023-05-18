@@ -166,6 +166,78 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("평점, 리뷰가 존재하지 않는 카페 정보를 미리보기한다")
+    void previewCafe() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getFavorite()).isFalse(),
+                () -> assertThat(actual.getScore()).isEqualTo(0),
+                () -> assertThat(actual.getStudyType()).isNull(),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(0)
+        );
+    }
+
+    @Test
+    @DisplayName("평점이 존재하고 리뷰가 존재하지 않는 카페 정보를 미리보기한다")
+    void previewCafeWithScore() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        scoreRepository.save(new Score(4, member1, cafe));
+        scoreRepository.save(new Score(5, member2, cafe));
+        favoriteRepository.save(new Favorite(member1, cafe));
+
+        PreviewCafeResponse actual1 = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual2 = cafeService.previewCafeByMapId(member2.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual1.getFavorite()).isTrue(),
+                () -> assertThat(actual2.getFavorite()).isFalse(),
+                () -> assertThat(actual1.getScore()).isEqualTo(4.5),
+                () -> assertThat(actual1.getStudyType()).isNull(),
+                () -> assertThat(actual1.getReviewsCount()).isEqualTo(0)
+        );
+    }
+
+    @Test
+    @DisplayName("평점과 리뷰가 모두 존재하는 카페 정보를 미리보기한다")
+    void previewCafeWithScoreAndReview() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(3, "group", "느려요", "없어요",
+                        "불편해요", "없어요", "북적북적해요", "불편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(2, "both", "느려요", "없어요",
+                        "깨끗해요", "없어요", null, "보통이에요"));
+        favoriteRepository.save(new Favorite(member1, cafe));
+
+        PreviewCafeResponse actual1 = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual2 = cafeService.previewCafeByMapId(member2.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual1.getFavorite()).isTrue(),
+                () -> assertThat(actual2.getFavorite()).isFalse(),
+                () -> assertThat(actual1.getScore()).isEqualTo(2.5),
+                () -> assertThat(actual1.getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual1.getReviewsCount()).isEqualTo(2)
+        );
+    }
+
+    @Test
     @DisplayName("카페를 조회할 때 댓글은 3개까지만 보여준다")
     void findCafeAndShowLimitComments() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
