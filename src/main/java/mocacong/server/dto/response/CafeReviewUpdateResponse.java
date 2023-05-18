@@ -23,6 +23,7 @@ public class CafeReviewUpdateResponse {
     public static CafeReviewUpdateResponse of(double score, Cafe cafe) {
         CafeDetail cafeDetail = cafe.getCafeDetail();
         int reviewsCount = cafe.getReviews().size();
+
         return new CafeReviewUpdateResponse(
                 score,
                 cafeDetail.getStudyTypeValue(),
