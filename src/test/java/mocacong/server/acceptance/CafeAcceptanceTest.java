@@ -1,19 +1,21 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import java.util.List;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.dto.request.*;
-import mocacong.server.dto.response.*;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
+import mocacong.server.dto.response.CafeFilterResponse;
+import mocacong.server.dto.response.CafeReviewResponse;
+import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class CafeAcceptanceTest extends AcceptanceTest {
 
@@ -169,6 +171,32 @@ public class CafeAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("code", equalTo(3008));
+    }
+
+    @Test
+    @DisplayName("카페 정보를 미리보기한다")
+    void previewCafe() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+
+        MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1111-1111");
+        회원_가입(signUpRequest1);
+        회원_가입(signUpRequest2);
+        String token1 = 로그인_토큰_발급(signUpRequest1.getEmail(), signUpRequest1.getPassword());
+        String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest2.getPassword());
+        카페_리뷰_작성(token1, mapId, new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                "깨끗해요", "충분해요", "조용해요", "편해요"));
+        카페_리뷰_작성(token2, mapId, new CafeReviewRequest(2, "group", "빵빵해요", "여유로워요",
+                "깨끗해요", "충분해요", "조용해요", "편해요"));
+        즐겨찾기_등록(token1, mapId);
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token1)
+                .when().get("/cafes/" + mapId + "/preview")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
