@@ -18,9 +18,11 @@ public class CafeReviewUpdateResponse {
     private String power;
     private String sound;
     private String desk;
+    private int reviewsCount;
 
     public static CafeReviewUpdateResponse of(double score, Cafe cafe) {
         CafeDetail cafeDetail = cafe.getCafeDetail();
+        int reviewsCount = cafe.getReviews().size();
         return new CafeReviewUpdateResponse(
                 score,
                 cafeDetail.getStudyTypeValue(),
@@ -29,7 +31,8 @@ public class CafeReviewUpdateResponse {
                 cafeDetail.getToilet().getValue(),
                 cafeDetail.getPower().getValue(),
                 cafeDetail.getSound().getValue(),
-                cafeDetail.getDesk().getValue()
+                cafeDetail.getDesk().getValue(),
+                reviewsCount
         );
     }
 }
