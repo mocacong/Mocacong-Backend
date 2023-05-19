@@ -44,6 +44,17 @@ public class CafeController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "특정 카페 미리보기 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping("/{mapId}/preview")
+    public ResponseEntity<PreviewCafeResponse> previewCafeByMapId(
+            @LoginUserEmail String email,
+            @PathVariable String mapId
+    ) {
+        PreviewCafeResponse response = cafeService.previewCafeByMapId(email, mapId);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "특정 카페 리뷰 작성")
     @SecurityRequirement(name = "JWT")
     @PostMapping("/{mapId}")
