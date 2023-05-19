@@ -471,7 +471,8 @@ class CafeServiceTest {
                 () -> assertThat(actual.getToilet()).isEqualTo("깨끗해요"),
                 () -> assertThat(actual.getPower()).isEqualTo("충분해요"),
                 () -> assertThat(actual.getSound()).isNotEqualTo("북적북적해요"),
-                () -> assertThat(actual.getDesk()).isEqualTo("편해요")
+                () -> assertThat(actual.getDesk()).isEqualTo("편해요"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(2)
         );
     }
 
@@ -567,7 +568,8 @@ class CafeServiceTest {
                 () -> assertThat(actual.getToilet()).isEqualTo("깨끗해요"),
                 () -> assertThat(actual.getPower()).isEqualTo("충분해요"),
                 () -> assertThat(actual.getSound()).isEqualTo("조용해요"),
-                () -> assertThat(actual.getDesk()).isEqualTo("불편해요")
+                () -> assertThat(actual.getDesk()).isEqualTo("불편해요"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(1)
         );
     }
 

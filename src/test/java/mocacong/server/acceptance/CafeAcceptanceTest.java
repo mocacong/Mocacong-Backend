@@ -75,7 +75,8 @@ public class CafeAcceptanceTest extends AcceptanceTest {
                 .as(CafeReviewResponse.class);
         assertAll(
                 () -> assertThat(actual.getScore()).isEqualTo(4),
-                () -> assertThat(actual.getStudyType()).isEqualTo("solo")
+                () -> assertThat(actual.getStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(1)
         );
     }
 
@@ -148,7 +149,8 @@ public class CafeAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 () -> assertThat(actual.getScore()).isEqualTo(3),
-                () -> assertThat(actual.getDesk()).isEqualTo("불편해요")
+                () -> assertThat(actual.getDesk()).isEqualTo("불편해요"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(1)
         );
     }
 
