@@ -128,7 +128,7 @@ public class MemberController {
 
     @Operation(summary = "프로필 회원정보 수정 페이지 조회")
     @SecurityRequirement(name = "JWT")
-    @PutMapping(value = "/info")
+    @GetMapping(value = "/info")
     public ResponseEntity<GetUpdateProfileInfoResponse> getUpdateProfileInfo(
             @LoginUserEmail String email
     ) {
