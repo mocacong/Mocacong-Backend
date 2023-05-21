@@ -401,10 +401,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
-        String newEmail = "mery@naver.com";
         String newNickname = "메리";
         String newPhone = "010-1234-5678";
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newEmail, newNickname, newPhone);
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPhone);
 
         RestAssured.given().log().all()
                 .auth().oauth2(token)
@@ -415,8 +414,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract();
 
-        String newToken = 로그인_토큰_발급(request.getEmail(), memberSignUpRequest.getPassword());
-        MyPageResponse actual = 회원정보_조회(newToken).as(MyPageResponse.class);
+        MyPageResponse actual = 회원정보_조회(token).as(MyPageResponse.class);
         assertAll(
                 () -> assertThat(actual.getNickname()).isEqualTo("메리")
         );
