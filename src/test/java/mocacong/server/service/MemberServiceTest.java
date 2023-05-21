@@ -177,9 +177,9 @@ class MemberServiceTest {
         String email = "kth990303@naver.com";
         String updatePassword = "password123";
         Member member = memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
-        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, member.getId(), updatePassword);
+        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, updatePassword);
 
-        memberService.resetPassword(request);
+        memberService.resetPassword(email, request);
 
         Member actual = memberRepository.findById(member.getId())
                 .orElseThrow();
@@ -191,32 +191,24 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("올바르지 않은 member id로 비밀번호 찾기 요청을 받을 경우 예외를 반환한다")
-    void findAndResetPasswordWhenInvalidMemberId() {
-        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, 9999L, "password123");
-
-        assertThatThrownBy(() -> memberService.resetPassword(request))
-                .isInstanceOf(NotFoundMemberException.class);
-    }
-
-    @Test
     @DisplayName("올바르지 않은 비밀번호로 비밀번호 찾기 요청을 받을 경우 예외를 반환한다")
     void findAndResetPasswordWhenInvalidPassword() {
         String email = "kth990303@naver.com";
-        Member member = memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
-        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, member.getId(), "123");
+        memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
+        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, "123");
 
-        assertThatThrownBy(() -> memberService.resetPassword(request))
+        assertThatThrownBy(() -> memberService.resetPassword(email, request))
                 .isInstanceOf(InvalidPasswordException.class);
     }
 
     @Test
     @DisplayName("nonce 값이 올바르지 않은, 유효한 비밀번호 찾기 요청이 아닌 경우 비밀번호 변경이 안되고 예외를 반환한다")
     void findAndResetPasswordWhenInvalidNonce() {
-        Member member = memberRepository.save(new Member("test@naver.com", Platform.MOCACONG, "1234"));
-        ResetPasswordRequest request = new ResetPasswordRequest("invalid_nonce", member.getId(), "password123");
+        String email = "kth990303@naver.com";
+        memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
+        ResetPasswordRequest request = new ResetPasswordRequest("invalid_nonce", "password123");
 
-        assertThatThrownBy(() -> memberService.resetPassword(request))
+        assertThatThrownBy(() -> memberService.resetPassword(email, request))
                 .isInstanceOf(InvalidNonceException.class);
     }
 

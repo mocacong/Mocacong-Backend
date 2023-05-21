@@ -15,6 +15,7 @@ import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
@@ -36,6 +37,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberProfileImageRepository memberProfileImageRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
     private final AwsS3Uploader awsS3Uploader;
     private final AwsSESSender awsSESSender;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -113,20 +115,21 @@ public class MemberService {
 
     public EmailVerifyCodeResponse sendEmailVerifyCode(EmailVerifyCodeRequest request) {
         validateNonce(request.getNonce());
-        String emailOwner = request.getEmail();
-        Member member = memberRepository.findByEmail(emailOwner)
+        String requestEmail = request.getEmail();
+        memberRepository.findByEmail(requestEmail)
                 .orElseThrow(NotFoundMemberException::new);
         Random random = new Random();
         int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
         String code = String.format("%04d", randomNumber);
-        awsSESSender.sendToVerifyEmail(emailOwner, code);
-        return new EmailVerifyCodeResponse(member.getId(), code);
+        awsSESSender.sendToVerifyEmail(requestEmail, code);
+        String token = jwtTokenProvider.createToken(requestEmail);
+        return new EmailVerifyCodeResponse(token, code);
     }
 
     @Transactional
-    public void resetPassword(ResetPasswordRequest request) {
+    public void resetPassword(String email, ResetPasswordRequest request) {
         validateNonce(request.getNonce());
-        Member member = memberRepository.findById(request.getMemberId())
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         String updatePassword = request.getPassword();
         validatePassword(updatePassword);
