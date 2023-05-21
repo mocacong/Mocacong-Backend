@@ -511,7 +511,7 @@ class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("프로필 수정 페이지에서 정보를 조회한다")
+    @DisplayName("프로필 수정 페이지에서 내 정보를 조회한다")
     void getUpdateProfileInfo() {
         String email = "dlawotn3@naver.com";
         String password = "jisu1234";
