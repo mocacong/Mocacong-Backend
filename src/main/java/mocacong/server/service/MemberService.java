@@ -216,4 +216,11 @@ public class MemberService {
 
         return new PasswordVerifyResponse(isSuccess);
     }
+
+    public GetUpdateProfileInfoResponse getUpdateProfileInfo(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
+
+        return new GetUpdateProfileInfoResponse(member.getEmail(), member.getNickname(), member.getPhone());
+    }
 }
