@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import static java.lang.Integer.parseInt;
-import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
@@ -16,19 +12,25 @@ import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+
+import static java.lang.Integer.parseInt;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @ServiceTest
 class MemberServiceTest {
@@ -363,78 +365,78 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원이 회원 정보를 수정하면 수정된 정보로 갱신된다")
     void updateProfileInfo() {
-        String email = "dlawotn3@naver.com";
-        String originalPassword = "jisu0708";
-        String newPassword = "jisu1234";
+        String originalEmail = "dlawotn3@naver.com";
+        String newEmail = "mery@naver.com";
+        String password = "a1b2c3d4";
         String originalNickname = "mery";
         String newNickname = "케이";
         String originalPhone = "010-1111-1111";
         String newPhone = "010-1234-1234";
-        Member member = new Member(email, passwordEncoder.encode(originalPassword), originalNickname, originalPhone);
+        Member member = new Member(originalEmail, passwordEncoder.encode(password), originalNickname, originalPhone);
         memberRepository.save(member);
 
-        memberService.updateProfileInfo(email, new MemberProfileUpdateRequest(newNickname, newPassword, newPhone));
-        Member updatedMember = memberRepository.findByEmail(member.getEmail())
+        memberService.updateProfileInfo(originalEmail, new MemberProfileUpdateRequest(newEmail, newNickname, newPhone));
+        Member updatedMember = memberRepository.findByEmail(newEmail)
                 .orElseThrow();
 
         assertAll(
+                () -> assertThat(updatedMember.getEmail()).isEqualTo(newEmail),
                 () -> assertThat(updatedMember.getNickname()).isEqualTo(newNickname),
-                () -> assertThat(passwordEncoder.matches(newPassword, updatedMember.getPassword())).isTrue(),
                 () -> assertThat(updatedMember.getPhone()).isEqualTo(newPhone)
         );
     }
 
     @Test
-    @DisplayName("회원이 잘못된 닉네임 형식으로 회원정보 수정을 시도하면 예외를 반환한다")
-    void updateBadNicknameWithValidateException() {
-        String email = "dlawotn3@naver.com";
-        String originalPassword = "jisu0708";
-        String newPassword = "jisu1234";
-        String originalNickname = "mery";
-        String newNickname = "케이123";
-        String originalPhone = "010-1111-1111";
-        String newPhone = "010-1234-1234";
-        Member member = new Member(email, passwordEncoder.encode(originalPassword), originalNickname, originalPhone);
-        memberRepository.save(member);
-
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPassword, newPhone);
-        assertThatThrownBy(() -> memberService.updateProfileInfo(email, request))
-                .isInstanceOf(InvalidNicknameException.class);
-    }
-
-    @Test
-    @DisplayName("회원이 잘못된 비밀번호 형식으로 회원정보 수정을 시도하면 예외를 반환한다")
-    void updateBadPasswordWithValidateException() {
-        String email = "dlawotn3@naver.com";
-        String originalPassword = "jisu0708";
-        String newPassword = "jisu";
+    @DisplayName("회원이 잘못된 이메일 형식으로 회원정보 수정을 시도하면 예외를 반환한다")
+    void updateBadEmailWithValidateException() {
+        String originalEmail = "dlawotn3@naver.com";
+        String newEmail = "";
+        String password = "jisu1234";
         String originalNickname = "mery";
         String newNickname = "케이";
         String originalPhone = "010-1111-1111";
         String newPhone = "010-1234-1234";
-        Member member = new Member(email, passwordEncoder.encode(originalPassword), originalNickname, originalPhone);
+        Member member = new Member(originalEmail, passwordEncoder.encode(password), originalNickname, originalPhone);
         memberRepository.save(member);
 
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPassword, newPhone);
-        assertThatThrownBy(() -> memberService.updateProfileInfo(email, request))
-                .isInstanceOf(InvalidPasswordException.class);
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newEmail, newNickname, newPhone);
+        assertThatThrownBy(() -> memberService.updateProfileInfo(originalEmail, request))
+                .isInstanceOf(InvalidEmailException.class);
+    }
+
+    @Test
+    @DisplayName("회원이 잘못된 닉네임 형식으로 회원정보 수정을 시도하면 예외를 반환한다")
+    void updateBadNicknameWithValidateException() {
+        String originalEmail = "dlawotn3@naver.com";
+        String newEmail = "mery@naver.com";
+        String password = "jisu1234";
+        String originalNickname = "mery";
+        String newNickname = "케이123";
+        String originalPhone = "010-1111-1111";
+        String newPhone = "010-1234-1234";
+        Member member = new Member(originalEmail, passwordEncoder.encode(password), originalNickname, originalPhone);
+        memberRepository.save(member);
+
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newEmail, newNickname, newPhone);
+        assertThatThrownBy(() -> memberService.updateProfileInfo(originalEmail, request))
+                .isInstanceOf(InvalidNicknameException.class);
     }
 
     @Test
     @DisplayName("회원이 잘못된 전화번호 형식으로 회원정보 수정을 시도하면 예외를 반환한다")
     void updateBadPhoneWithValidateException() {
-        String email = "dlawotn3@naver.com";
-        String originalPassword = "jisu0708";
-        String newPassword = "jisu1234";
+        String originalEmail = "dlawotn3@naver.com";
+        String newEmail = "mery@naver.com";
+        String password = "jisu1234";
         String originalNickname = "mery";
         String newNickname = "케이";
         String originalPhone = "010-1111-1111";
         String newPhone = "010-0000";
-        Member member = new Member(email, passwordEncoder.encode(originalPassword), originalNickname, originalPhone);
+        Member member = new Member(originalEmail, passwordEncoder.encode(password), originalNickname, originalPhone);
         memberRepository.save(member);
 
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPassword, newPhone);
-        assertThatThrownBy(() -> memberService.updateProfileInfo(email, request))
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newEmail, newNickname, newPhone);
+        assertThatThrownBy(() -> memberService.updateProfileInfo(originalEmail, request))
                 .isInstanceOf(InvalidPhoneException.class);
     }
 
