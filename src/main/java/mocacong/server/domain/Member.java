@@ -105,9 +105,8 @@ public class Member extends BaseTime {
         }
     }
 
-    public void updateProfileInfo(String email, String nickname, String phone) {
+    public void updateProfileInfo(String nickname, String phone) {
         validateMemberInfo(nickname, phone);
-        this.email = email;
         this.nickname = nickname;
         this.phone = phone;
     }
