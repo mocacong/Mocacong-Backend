@@ -1,12 +1,13 @@
 package mocacong.server.domain;
 
-import java.util.regex.Pattern;
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 import mocacong.server.exception.badrequest.InvalidPhoneException;
+
+import javax.persistence.*;
+import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "member")
@@ -104,10 +105,10 @@ public class Member extends BaseTime {
         }
     }
 
-    public void updateProfileInfo(String nickname, String password, String phone) {
+    public void updateProfileInfo(String email, String nickname, String phone) {
         validateMemberInfo(nickname, phone);
+        this.email = email;
         this.nickname = nickname;
-        this.password = password;
         this.phone = phone;
     }
 
