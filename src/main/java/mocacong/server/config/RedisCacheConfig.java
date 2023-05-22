@@ -1,10 +1,12 @@
 package mocacong.server.config;
 
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -16,22 +18,52 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisCacheConfig {
 
+    @Value("${security.jwt.token.expire-length}")
+    private long accessTokenValidityInMilliseconds;
+
     @Bean
-    public CacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        RedisCacheConfiguration redisCacheConfiguration =
-                RedisCacheConfiguration.defaultCacheConfig()
-                        .serializeKeysWith(
-                                RedisSerializationContext.SerializationPair.fromSerializer(
-                                        new StringRedisSerializer()))
-                        .serializeValuesWith(
-                                RedisSerializationContext.SerializationPair.fromSerializer(
-                                        new GenericJackson2JsonRedisSerializer()))
-                        /* 캐시 만료 기간은 1일 */
-                        .entryTtl(Duration.ofDays(1L));
+    public CacheManager oauthPublicKeyCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        /* public key 갱신은 1년에 몇 번 안되므로 ttl 1주일로 설정 */
+        RedisCacheConfiguration redisCacheConfiguration = generateCacheConfiguration()
+                .entryTtl(Duration.ofDays(7L));
+        return RedisCacheManager.RedisCacheManagerBuilder
+                .fromConnectionFactory(redisConnectionFactory)
+                .cacheDefaults(redisCacheConfiguration)
+                .build();
+    }
+
+    @Bean
+    public CacheManager accessTokenCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        /* accessToken 시간만큼 ttl 설정 */
+        RedisCacheConfiguration redisCacheConfiguration = generateCacheConfiguration()
+                .entryTtl(Duration.ofMillis(accessTokenValidityInMilliseconds));
 
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
+    }
+
+    @Bean
+    @Primary
+    public CacheManager cafeCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        /* 카페 관련 캐시는 충분히 많이 쌓일 수 있으므로 OOM 방지 차 ttl 12시간으로 설정 */
+        RedisCacheConfiguration redisCacheConfiguration = generateCacheConfiguration()
+                .entryTtl(Duration.ofHours(12L));
+
+        return RedisCacheManager.RedisCacheManagerBuilder
+                .fromConnectionFactory(redisConnectionFactory)
+                .cacheDefaults(redisCacheConfiguration)
+                .build();
+    }
+
+    private RedisCacheConfiguration generateCacheConfiguration() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .serializeKeysWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                new StringRedisSerializer()))
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                new GenericJackson2JsonRedisSerializer()));
     }
 }

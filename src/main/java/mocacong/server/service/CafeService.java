@@ -93,7 +93,7 @@ public class CafeService {
         );
     }
 
-    @Cacheable(key = "#mapId", value = "cafePreviewCache", cacheManager = "redisCacheManager")
+    @Cacheable(key = "#mapId", value = "cafePreviewCache", cacheManager = "cafeCacheManager")
     @Transactional(readOnly = true)
     public PreviewCafeResponse previewCafeByMapId(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
