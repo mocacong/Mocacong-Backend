@@ -186,14 +186,11 @@ public class MemberService {
     @Transactional
     public void updateProfileInfo(String email, MemberProfileUpdateRequest request) {
         String updateNickname = request.getNickname();
-        String updatePassword = request.getPassword();
         String updatePhone = request.getPhone();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         validateDuplicateNickname(updateNickname);
-        validatePassword(updatePassword);
-        String encryptedPassword = passwordEncoder.encode(updatePassword);
-        member.updateProfileInfo(updateNickname, encryptedPassword, updatePhone);
+        member.updateProfileInfo(updateNickname, updatePhone);
     }
 
     @Transactional

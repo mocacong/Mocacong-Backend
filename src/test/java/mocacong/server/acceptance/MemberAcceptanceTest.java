@@ -404,9 +404,8 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
         String newNickname = "메리";
-        String newPassword = "jisu1234";
         String newPhone = "010-1234-5678";
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPassword, newPhone);
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPhone);
 
         RestAssured.given().log().all()
                 .auth().oauth2(token)
@@ -419,8 +418,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
         MyPageResponse actual = 회원정보_조회(token).as(MyPageResponse.class);
         assertAll(
-                () -> assertThat(actual.getNickname()).isEqualTo("메리"),
-                () -> assertThat(로그인_토큰_발급(memberSignUpRequest.getEmail(), newPassword)).isNotNull()
+                () -> assertThat(actual.getNickname()).isEqualTo("메리")
         );
     }
 

@@ -16,8 +16,5 @@ public class MemberProfileUpdateRequest {
     private String nickname;
 
     @NotBlank(message = "1012:공백일 수 없습니다.")
-    private String password;
-
-    @NotBlank(message = "1012:공백일 수 없습니다.")
     private String phone;
 }
