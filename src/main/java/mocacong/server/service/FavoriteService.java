@@ -49,6 +49,7 @@ public class FavoriteService {
                 });
     }
 
+    @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public void delete(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
