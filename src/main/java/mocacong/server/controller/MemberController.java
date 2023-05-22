@@ -3,7 +3,6 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
@@ -14,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 
 @Tag(name = "Members", description = "회원")
 @RestController
@@ -123,6 +124,16 @@ public class MemberController {
     ) {
         memberService.updateProfileInfo(email, request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "프로필 회원정보 수정 페이지 조회")
+    @SecurityRequirement(name = "JWT")
+    @GetMapping(value = "/info")
+    public ResponseEntity<GetUpdateProfileInfoResponse> getUpdateProfileInfo(
+            @LoginUserEmail String email
+    ) {
+        GetUpdateProfileInfoResponse response = memberService.getUpdateProfileInfo(email);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "비밀번호 확인 인증")

@@ -1,25 +1,26 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.support.AwsSESSender;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
@@ -461,5 +462,28 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .as(PasswordVerifyResponse.class);
 
         assertThat(actual.getIsSuccess()).isFalse();
+    }
+
+    @Test
+    @DisplayName("프로필 수정 페이지에서 내 정보를 조회한다")
+    void getUpdateProfileInfo() {
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+
+        GetUpdateProfileInfoResponse actual = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/members/info")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(GetUpdateProfileInfoResponse.class);
+
+        assertAll(
+                () -> assertThat(actual.getEmail()).isEqualTo("kth990303@naver.com"),
+                () -> assertThat(actual.getNickname()).isEqualTo("케이"),
+                () -> assertThat(actual.getPhone()).isEqualTo("010-1234-5678")
+        );
     }
 }
