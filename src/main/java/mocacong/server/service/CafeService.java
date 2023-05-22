@@ -17,6 +17,7 @@ import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -179,6 +180,7 @@ public class CafeService {
         return new MyCommentCafesResponse(comments.isLast(), responses);
     }
 
+    @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public CafeReviewResponse saveCafeReview(String email, String mapId, CafeReviewRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
