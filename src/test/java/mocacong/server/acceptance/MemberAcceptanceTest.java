@@ -170,11 +170,13 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void findAndResetPassword() {
         String email = "kth990303@naver.com";
         MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
-        Long memberId = 회원_가입(memberSignUpRequest).as(MemberSignUpResponse.class).getId();
-        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, memberId, "password123");
+        회원_가입(memberSignUpRequest);
+        String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
+        ResetPasswordRequest request = new ResetPasswordRequest(NONCE, "password123");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
                 .body(request)
                 .when().put("/members/info/reset-password")
                 .then().log().all()

@@ -147,12 +147,14 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "비밀번호 찾기 및 변경")
+    @Operation(summary = "비밀번호 변경")
+    @SecurityRequirement(name = "JWT")
     @PutMapping("/info/reset-password")
     public ResponseEntity<Void> findAndResetPassword(
+            @LoginUserEmail String email,
             @RequestBody @Valid ResetPasswordRequest request
     ) {
-        memberService.resetPassword(request);
+        memberService.resetPassword(email, request);
         return ResponseEntity.ok().build();
     }
 
