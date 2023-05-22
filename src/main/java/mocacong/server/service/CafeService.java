@@ -17,6 +17,7 @@ import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
@@ -91,6 +92,7 @@ public class CafeService {
         );
     }
 
+    @Cacheable(key = "#mapId", value = "cafePreviewCache", cacheManager = "redisCacheManager")
     @Transactional(readOnly = true)
     public PreviewCafeResponse previewCafeByMapId(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
