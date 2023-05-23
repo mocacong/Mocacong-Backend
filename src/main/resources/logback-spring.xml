@@ -13,8 +13,6 @@
                     <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
                     <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
                     <maskPattern>phone\s*=\s*([^,)\s]+)</maskPattern> <!-- Phone Arg pattern -->
-                    <maskPattern>platformId\s*=\s*([^,)\s]+)</maskPattern> <!-- PlatformId Arg pattern -->
-                    <maskPattern>nonce\s*=\s*([^,)\s]+)</maskPattern> <!-- Nonce Arg pattern -->
                     <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
                     <maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
                     <pattern>${LOG_PATTERN}</pattern>

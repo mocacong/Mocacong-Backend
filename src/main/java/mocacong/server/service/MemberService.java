@@ -1,6 +1,7 @@
 package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
@@ -140,7 +141,7 @@ public class MemberService {
 
     private void validateNonce(String requestNonce) {
         if (!nonce.equals(requestNonce)) {
-            throw new InvalidNonceException();
+            throw new InvalidNonceException(requestNonce);
         }
     }
 
