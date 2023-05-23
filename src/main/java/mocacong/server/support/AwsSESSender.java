@@ -5,11 +5,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -20,7 +16,6 @@ public class AwsSESSender {
 
     private static final String FROM = "verify-email@mocacong.com";
     private static final String TITLE = "모카콩 이메일 인증";
-    private static final String VERIFY_EMAIL_FILE_PATH = "/verify-email.html";
     private static final String INITIAL_CODE = "9999";
 
     private final AmazonSimpleEmailService amazonSimpleEmailService;
@@ -38,19 +33,11 @@ public class AwsSESSender {
 
     @Async
     public void sendToVerifyEmail(String to, String code) {
-        try {
-            String path = System.getProperty("user.dir") + VERIFY_EMAIL_FILE_PATH;
-            log.info("email path 가리키는 위치 = {}", path);
-            File file = new File(path);
-            String contentHtml = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-            String updatedContent = contentHtml.replace(INITIAL_CODE, code);
+        String contentHtml = EmailHtmlContent.verifyEmailHtmlContent;
+        String updatedContent = contentHtml.replace(INITIAL_CODE, code);
 
-            SendEmailRequest request = generateSendEmailRequest(to, updatedContent);
-            amazonSimpleEmailService.sendEmail(request);
-        } catch (IOException e) {
-            log.error("이메일 생성 중 문제가 발생했습니다. error message = {}", e.getMessage());
-            throw new IllegalArgumentException(e.getMessage());
-        }
+        SendEmailRequest request = generateSendEmailRequest(to, updatedContent);
+        amazonSimpleEmailService.sendEmail(request);
     }
 
     private SendEmailRequest generateSendEmailRequest(String to, String content) {
