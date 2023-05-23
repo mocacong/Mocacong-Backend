@@ -20,7 +20,7 @@ public class AwsSESSender {
 
     private static final String FROM = "verify-email@mocacong.com";
     private static final String TITLE = "모카콩 이메일 인증";
-    private static final String VERIFY_EMAIL_FILE_PATH = "src/main/resources/static/verify-email.html";
+    private static final String VERIFY_EMAIL_FILE_PATH = "/src/main/resources/static/verify-email.html";
     private static final String INITIAL_CODE = "9999";
 
     private final AmazonSimpleEmailService amazonSimpleEmailService;
@@ -39,7 +39,9 @@ public class AwsSESSender {
     @Async
     public void sendToVerifyEmail(String to, String code) {
         try {
-            File file = new File(VERIFY_EMAIL_FILE_PATH);
+            String path = System.getProperty("user.dir") + VERIFY_EMAIL_FILE_PATH;
+            log.info("email path 가리키는 위치 = {}", path);
+            File file = new File(path);
             String contentHtml = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
             String updatedContent = contentHtml.replace(INITIAL_CODE, code);
 
