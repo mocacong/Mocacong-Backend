@@ -20,7 +20,7 @@ public class AwsSESSender {
 
     private static final String FROM = "verify-email@mocacong.com";
     private static final String TITLE = "모카콩 이메일 인증";
-    private static final String VERIFY_EMAIL_FILE_PATH = "/src/main/resources/static/verify-email.html";
+    private static final String VERIFY_EMAIL_FILE_PATH = "/verify-email.html";
     private static final String INITIAL_CODE = "9999";
 
     private final AmazonSimpleEmailService amazonSimpleEmailService;
