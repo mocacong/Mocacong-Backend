@@ -18,7 +18,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisCacheConfig {
 
-    private static final long DELTA_TO_AVOID_CONCURRENCY_TIME = 60000L;
+    private static final long DELTA_TO_AVOID_CONCURRENCY_TIME = 30 * 60 * 1000L;
 
     @Value("${security.jwt.token.expire-length}")
     private long accessTokenValidityInMilliseconds;
@@ -56,7 +56,7 @@ public class RedisCacheConfig {
     public CacheManager accessTokenCacheManager(RedisConnectionFactory redisConnectionFactory) {
         /*
          * accessToken 시간만큼 ttl 설정하되,
-         * 만료 직전 캐시 조회하여 로그인 안되는 동시성 이슈 방지를 위해 accessToken ttl 보다 1분 일찍 만료
+         * 만료 직전 캐시 조회하여 로그인 안되는 동시성 이슈 방지를 위해 accessToken ttl 보다 30분 일찍 만료
          */
         RedisCacheConfiguration redisCacheConfiguration = generateCacheConfiguration()
                 .entryTtl(Duration.ofMillis(accessTokenValidityInMilliseconds - DELTA_TO_AVOID_CONCURRENCY_TIME));
