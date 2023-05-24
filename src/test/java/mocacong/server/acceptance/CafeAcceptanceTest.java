@@ -228,7 +228,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(token)
                 .body(request)
-                .when().post("/cafes/studytype?studytype=solo")
+                .when().post("/cafes/studytypes?studytype=solo")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract()

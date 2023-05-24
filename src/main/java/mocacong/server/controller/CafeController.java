@@ -92,7 +92,7 @@ public class CafeController {
 
     @Operation(summary = "StudyType별로 카페 조회")
     @SecurityRequirement(name = "JWT")
-    @PostMapping(value = "/studytype")
+    @PostMapping(value = "/studytypes")
     public ResponseEntity<CafeFilterStudyTypeResponse> getCafesByStudyType(
             @RequestParam(required = false) String studytype,
             @RequestBody CafeFilterStudyTypeRequest request
