@@ -282,14 +282,8 @@ public class CafeService {
     }
 
     public CafeFilterFavoritesResponse filterCafesByFavorites(String email, CafeFilterFavoritesRequest request) {
-        List<Cafe> cafes = cafeRepository.findByFavoriteCafes(email);
-        Set<String> filteredCafeMapIds = cafes.stream()
-                .map(Cafe::getMapId)
-                .collect(Collectors.toSet());
-
-        List<String> filteredIds = request.getMapIds().stream()
-                .filter(filteredCafeMapIds::contains)
-                .collect(Collectors.toList());
+        List<String> mapIds = request.getMapIds();
+        List<String> filteredIds = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(email, mapIds);
 
         return new CafeFilterFavoritesResponse(filteredIds);
     }
