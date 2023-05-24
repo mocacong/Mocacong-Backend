@@ -3,7 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
-import mocacong.server.dto.request.CafeFilterRequest;
+import mocacong.server.dto.request.CafeFilterStudyTypeRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
@@ -271,7 +271,7 @@ public class CafeService {
                 .forEach(Score::removeMember);
     }
 
-    public CafeFilterResponse filterCafesByStudyType(String studyTypeValue, CafeFilterRequest requestBody) {
+    public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue, CafeFilterStudyTypeRequest requestBody) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
@@ -281,7 +281,7 @@ public class CafeService {
                 .filter(filteredCafeMapIds::contains)
                 .collect(Collectors.toList());
 
-        return new CafeFilterResponse(filteredIds);
+        return new CafeFilterStudyTypeResponse(filteredIds);
     }
 
     @Transactional

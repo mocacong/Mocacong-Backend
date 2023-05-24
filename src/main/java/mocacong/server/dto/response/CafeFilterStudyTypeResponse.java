@@ -8,6 +8,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString
-public class CafeFilterResponse {
+public class CafeFilterStudyTypeResponse {
     private List<String> mapIds;
 }

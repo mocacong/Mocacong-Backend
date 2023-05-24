@@ -1,7 +1,7 @@
 package mocacong.server.service;
 
 import mocacong.server.domain.*;
-import mocacong.server.dto.request.CafeFilterRequest;
+import mocacong.server.dto.request.CafeFilterStudyTypeRequest;
 import mocacong.server.dto.request.CafeRegisterRequest;
 import mocacong.server.dto.request.CafeReviewRequest;
 import mocacong.server.dto.request.CafeReviewUpdateRequest;
@@ -614,11 +614,11 @@ class CafeServiceTest {
         cafeService.saveCafeReview(member2.getEmail(), cafe4.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        CafeFilterRequest requestBody = new CafeFilterRequest(
+        CafeFilterStudyTypeRequest requestBody = new CafeFilterStudyTypeRequest(
                 List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId())
         );
 
-        CafeFilterResponse filteredCafes = cafeService.filterCafesByStudyType("solo", requestBody);
+        CafeFilterStudyTypeResponse filteredCafes = cafeService.filterCafesByStudyType("solo", requestBody);
 
         assertThat(filteredCafes.getMapIds())
                 .containsExactlyInAnyOrder(cafe1.getMapId(), cafe3.getMapId(), cafe4.getMapId());
@@ -634,9 +634,9 @@ class CafeServiceTest {
         cafeService.saveCafeReview(member.getEmail(), cafe1.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        CafeFilterRequest requestBody = new CafeFilterRequest(List.of(cafe1.getMapId()));
+        CafeFilterStudyTypeRequest requestBody = new CafeFilterStudyTypeRequest(List.of(cafe1.getMapId()));
 
-        CafeFilterResponse filteredCafes = cafeService.filterCafesByStudyType("group", requestBody);
+        CafeFilterStudyTypeResponse filteredCafes = cafeService.filterCafesByStudyType("group", requestBody);
 
         assertThat(filteredCafes.getMapIds()).isEmpty();
     }
