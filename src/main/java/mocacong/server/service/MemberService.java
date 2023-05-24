@@ -1,7 +1,6 @@
 package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
@@ -167,7 +166,7 @@ public class MemberService {
     public MyPageResponse findMyInfo(String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        return new MyPageResponse(member.getNickname(), member.getImgUrl());
+        return new MyPageResponse(member.getEmail(), member.getNickname(), member.getPhone(), member.getImgUrl());
     }
 
     @Transactional
