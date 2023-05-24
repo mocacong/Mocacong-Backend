@@ -12,6 +12,9 @@ spring:
           enabled: true
         show_sql: true
         format_sql: true
+  redis:
+    host: localhost
+    port: 16379
 
   h2:
     console:
