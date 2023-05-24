@@ -303,7 +303,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .as(MyPageResponse.class);
 
         assertAll(
+                () -> assertThat(actual.getEmail()).isEqualTo("kth990303@naver.com"),
                 () -> assertThat(actual.getNickname()).isEqualTo("케이"),
+                () -> assertThat(actual.getPhone()).isEqualTo("010-1234-5678"),
                 () -> assertThat(actual.getImgUrl()).isNull()
         );
     }
