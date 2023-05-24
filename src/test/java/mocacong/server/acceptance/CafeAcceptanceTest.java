@@ -2,7 +2,7 @@ package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
 import mocacong.server.dto.request.*;
-import mocacong.server.dto.response.CafeFilterResponse;
+import mocacong.server.dto.response.CafeFilterStudyTypeResponse;
 import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.CafeReviewUpdateResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -222,17 +222,17 @@ public class CafeAcceptanceTest extends AcceptanceTest {
         카페_리뷰_작성(token, mapId1, request1);
         카페_리뷰_작성(token, mapId2, request2);
         카페_리뷰_작성(token, mapId3, request3);
-        CafeFilterRequest request = new CafeFilterRequest(List.of(mapId1, mapId2, mapId3));
+        CafeFilterStudyTypeRequest request = new CafeFilterStudyTypeRequest(List.of(mapId1, mapId2, mapId3));
 
-        CafeFilterResponse actual = RestAssured.given().log().all()
+        CafeFilterStudyTypeResponse actual = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(token)
                 .body(request)
-                .when().get("/cafes?studytype=solo")
+                .when().post("/cafes/studytypes?studytype=solo")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
-                .as(CafeFilterResponse.class);
+                .as(CafeFilterStudyTypeResponse.class);
 
         assertThat(actual.getMapIds()).containsExactlyInAnyOrder(mapId1, mapId3);
     }
