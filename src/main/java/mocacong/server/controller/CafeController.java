@@ -93,8 +93,10 @@ public class CafeController {
     @Operation(summary = "StudyType별로 카페 조회")
     @SecurityRequirement(name = "JWT")
     @PostMapping(value = "/studytype")
-    public ResponseEntity<CafeFilterStudyTypeResponse> getCafesByStudyType(@RequestParam(required = false) String studytype,
-                                                                           @RequestBody CafeFilterStudyTypeRequest request) {
+    public ResponseEntity<CafeFilterStudyTypeResponse> getCafesByStudyType(
+            @RequestParam(required = false) String studytype,
+            @RequestBody CafeFilterStudyTypeRequest request
+    ) {
         CafeFilterStudyTypeResponse responseBody = cafeService.filterCafesByStudyType(studytype, request);
         return ResponseEntity.ok(responseBody);
     }
