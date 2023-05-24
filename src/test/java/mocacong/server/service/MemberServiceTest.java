@@ -298,17 +298,21 @@ class MemberServiceTest {
     @DisplayName("마이페이지로 내 정보를 조회한다")
     void findMyInfo() {
         String imgUrl = "test_img.jpg";
+        String email = "kth990303@naver.com";
         String nickname = "케이";
+        String phone = "010-1234-5678";
         MemberProfileImage memberProfileImage = new MemberProfileImage(imgUrl);
         memberProfileImageRepository.save(memberProfileImage);
-        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678",
-                memberProfileImage, Platform.MOCACONG, "1234");
+        Member member = new Member(email, "a1b2c3d4", "케이", phone, memberProfileImage,
+                Platform.MOCACONG, "1234");
         memberRepository.save(member);
 
-        MyPageResponse actual = memberService.findMyInfo(member.getEmail());
+        MyPageResponse actual = memberService.findMyInfo(email);
 
         assertAll(
+                () -> assertThat(actual.getEmail()).isEqualTo(email),
                 () -> assertThat(actual.getImgUrl()).isEqualTo(imgUrl),
+                () -> assertThat(actual.getPhone()).isEqualTo(phone),
                 () -> assertThat(actual.getNickname()).isEqualTo(nickname)
         );
     }
