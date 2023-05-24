@@ -1,10 +1,7 @@
 package mocacong.server.service;
 
 import mocacong.server.domain.*;
-import mocacong.server.dto.request.CafeFilterRequest;
-import mocacong.server.dto.request.CafeRegisterRequest;
-import mocacong.server.dto.request.CafeReviewRequest;
-import mocacong.server.dto.request.CafeReviewUpdateRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
@@ -589,7 +586,7 @@ class CafeServiceTest {
 
     @Test
     @DisplayName("studyTypeValue가 주어진 경우 해당 카페 목록을 필터링한다")
-    void getCafesFilter() {
+    void getCafesFilterStudyType() {
         Member member1 = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
         Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
         memberRepository.save(member1);
@@ -626,17 +623,61 @@ class CafeServiceTest {
 
     @Test
     @DisplayName("studyTypeValue에 해당하는 카페가 없는 경우 빈 리스트를 반환한다")
-    void getCafesFilterWhenNoMatch() {
+    void getCafesFilterStudyTypeWhenNoMatch() {
         Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
         memberRepository.save(member);
-        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
-        cafeRepository.save(cafe1);
-        cafeService.saveCafeReview(member.getEmail(), cafe1.getMapId(),
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        CafeFilterRequest requestBody = new CafeFilterRequest(List.of(cafe1.getMapId()));
+        CafeFilterRequest requestBody = new CafeFilterRequest(List.of(cafe.getMapId()));
 
         CafeFilterResponse filteredCafes = cafeService.filterCafesByStudyType("group", requestBody);
+
+        assertThat(filteredCafes.getMapIds()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("즐겨찾기가 등록된 카페가 있는 경우 해당 카페 목록을 필터링한다")
+    void getCafesFilterFavorites() {
+        Member member1 = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
+        Cafe cafe2 = new Cafe("2143154311111", "메리카페");
+        Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점");
+        Cafe cafe4 = new Cafe("1585656565441", "메리벅스");
+        cafeRepository.save(cafe1);
+        cafeRepository.save(cafe2);
+        cafeRepository.save(cafe3);
+        cafeRepository.save(cafe4);
+        favoriteRepository.save(new Favorite(member1, cafe1));
+        favoriteRepository.save(new Favorite(member1, cafe2));
+        favoriteRepository.save(new Favorite(member2, cafe3));
+        favoriteRepository.save(new Favorite(member2, cafe4));
+        CafeFilterFavoritesRequest requestBody = new CafeFilterFavoritesRequest(
+                List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId())
+        );
+
+        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member1.getEmail(), requestBody);
+
+        assertThat(filteredCafes.getMapIds())
+                .containsExactlyInAnyOrder(cafe1.getMapId(), cafe2.getMapId());
+    }
+
+    @Test
+    @DisplayName("즐겨찾기가 등록된 카페가 없는 경우 빈 리스트를 반환한다")
+    void getCafesFilterFavoritesWhenNoMatch() {
+        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+
+        CafeFilterFavoritesRequest requestBody = new CafeFilterFavoritesRequest(List.of(cafe.getMapId()));
+
+        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member.getEmail(), requestBody);
 
         assertThat(filteredCafes.getMapIds()).isEmpty();
     }
