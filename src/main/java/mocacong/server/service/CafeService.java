@@ -3,10 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
-import mocacong.server.dto.request.CafeFilterRequest;
-import mocacong.server.dto.request.CafeRegisterRequest;
-import mocacong.server.dto.request.CafeReviewRequest;
-import mocacong.server.dto.request.CafeReviewUpdateRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
@@ -271,17 +268,30 @@ public class CafeService {
                 .forEach(Score::removeMember);
     }
 
-    public CafeFilterResponse filterCafesByStudyType(String studyTypeValue, CafeFilterRequest requestBody) {
+    public CafeFilterResponse filterCafesByStudyType(String studyTypeValue, CafeFilterRequest request) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());
 
-        List<String> filteredIds = requestBody.getMapIds().stream()
+        List<String> filteredIds = request.getMapIds().stream()
                 .filter(filteredCafeMapIds::contains)
                 .collect(Collectors.toList());
 
         return new CafeFilterResponse(filteredIds);
+    }
+
+    public CafeFilterFavoritesResponse filterCafesByFavorites(String email, CafeFilterFavoritesRequest request) {
+        List<Cafe> cafes = cafeRepository.findByFavoriteCafes(email);
+        Set<String> filteredCafeMapIds = cafes.stream()
+                .map(Cafe::getMapId)
+                .collect(Collectors.toSet());
+
+        List<String> filteredIds = request.getMapIds().stream()
+                .filter(filteredCafeMapIds::contains)
+                .collect(Collectors.toList());
+
+        return new CafeFilterFavoritesResponse(filteredIds);
     }
 
     @Transactional

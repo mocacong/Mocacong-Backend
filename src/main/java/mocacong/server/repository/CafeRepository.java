@@ -20,6 +20,12 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
             "join f.cafe c " +
             "join f.member m " +
             "where m.email = :email")
+    List<Cafe> findByFavoriteCafes(String email);
+
+    @Query("select c from Favorite f " +
+            "join f.cafe c " +
+            "join f.member m " +
+            "where m.email = :email")
     Slice<Cafe> findByMyFavoriteCafes(String email, Pageable pageRequest);
 
     @Query("select c from Review r " +

@@ -99,8 +99,11 @@ public class CafeController {
     @Operation(summary = "즐겨찾기가 등록된 카페 조회")
     @SecurityRequirement(name = "JWT")
     @PostMapping("/favorites")
-    public ResponseEntity<CafeFilterFavoritesResponse> getCafesByFavorites(@RequestBody CafeFilterFavoritesRequest request) {
-        CafeFilterFavoritesResponse responseBody = cafeService.filterCafesByFavorites(request);
+    public ResponseEntity<CafeFilterFavoritesResponse> getCafesByFavorites(
+            @LoginUserEmail String email,
+            @RequestBody CafeFilterFavoritesRequest request
+    ) {
+        CafeFilterFavoritesResponse responseBody = cafeService.filterCafesByFavorites(email, request);
         return ResponseEntity.ok(responseBody);
     }
 
