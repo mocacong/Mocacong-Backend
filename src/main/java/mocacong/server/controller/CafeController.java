@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.dto.request.CafeFilterRequest;
-import mocacong.server.dto.request.CafeRegisterRequest;
-import mocacong.server.dto.request.CafeReviewRequest;
-import mocacong.server.dto.request.CafeReviewUpdateRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
 import mocacong.server.service.CafeService;
@@ -96,6 +93,14 @@ public class CafeController {
     public ResponseEntity<CafeFilterResponse> getCafesByStudyType(@RequestParam(required = false) String studytype,
                                                                   @RequestBody CafeFilterRequest request) {
         CafeFilterResponse responseBody = cafeService.filterCafesByStudyType(studytype, request);
+        return ResponseEntity.ok(responseBody);
+    }
+
+    @Operation(summary = "즐겨찾기가 등록된 카페 조회")
+    @SecurityRequirement(name = "JWT")
+    @PostMapping("/favorites")
+    public ResponseEntity<CafeFilterFavoritesResponse> getCafesByFavorites(@RequestBody CafeFilterFavoritesRequest request) {
+        CafeFilterFavoritesResponse responseBody = cafeService.filterCafesByFavorites(request);
         return ResponseEntity.ok(responseBody);
     }
 
