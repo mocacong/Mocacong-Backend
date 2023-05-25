@@ -641,10 +641,8 @@ class CafeServiceTest {
     @Test
     @DisplayName("즐겨찾기가 등록된 카페가 있는 경우 해당 카페 목록을 필터링한다")
     void getCafesFilterFavorites() {
-        Member member1 = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
-        Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        memberRepository.save(member);
         Cafe cafe1 = new Cafe("2143154352323", "케이카페");
         Cafe cafe2 = new Cafe("2143154311111", "메리카페");
         Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점");
@@ -653,15 +651,13 @@ class CafeServiceTest {
         cafeRepository.save(cafe2);
         cafeRepository.save(cafe3);
         cafeRepository.save(cafe4);
-        favoriteRepository.save(new Favorite(member1, cafe1));
-        favoriteRepository.save(new Favorite(member1, cafe2));
-        favoriteRepository.save(new Favorite(member2, cafe3));
-        favoriteRepository.save(new Favorite(member2, cafe4));
+        favoriteRepository.save(new Favorite(member, cafe1));
+        favoriteRepository.save(new Favorite(member, cafe2));
         CafeFilterFavoritesRequest requestBody = new CafeFilterFavoritesRequest(
                 List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId())
         );
 
-        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member1.getEmail(), requestBody);
+        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member.getEmail(), requestBody);
 
         assertThat(filteredCafes.getMapIds())
                 .containsExactlyInAnyOrder(cafe1.getMapId(), cafe2.getMapId());
