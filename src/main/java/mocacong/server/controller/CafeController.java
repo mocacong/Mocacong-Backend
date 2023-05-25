@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.LoginUserEmail;
@@ -89,10 +90,12 @@ public class CafeController {
 
     @Operation(summary = "StudyType별로 카페 조회")
     @SecurityRequirement(name = "JWT")
-    @GetMapping
-    public ResponseEntity<CafeFilterResponse> getCafesByStudyType(@RequestParam(required = false) String studytype,
-                                                                  @RequestBody CafeFilterRequest request) {
-        CafeFilterResponse responseBody = cafeService.filterCafesByStudyType(studytype, request);
+    @PostMapping(value = "/studytypes")
+    public ResponseEntity<CafeFilterStudyTypeResponse> getCafesByStudyType(
+            @RequestParam(required = false) String studytype,
+            @RequestBody CafeFilterStudyTypeRequest request
+    ) {
+        CafeFilterStudyTypeResponse responseBody = cafeService.filterCafesByStudyType(studytype, request);
         return ResponseEntity.ok(responseBody);
     }
 

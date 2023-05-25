@@ -268,7 +268,7 @@ public class CafeService {
                 .forEach(Score::removeMember);
     }
 
-    public CafeFilterResponse filterCafesByStudyType(String studyTypeValue, CafeFilterRequest request) {
+    public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue, CafeFilterStudyTypeRequest requestBody) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
@@ -278,7 +278,7 @@ public class CafeService {
                 .filter(filteredCafeMapIds::contains)
                 .collect(Collectors.toList());
 
-        return new CafeFilterResponse(filteredIds);
+        return new CafeFilterStudyTypeResponse(filteredIds);
     }
 
     public CafeFilterFavoritesResponse filterCafesByFavorites(String email, CafeFilterFavoritesRequest request) {

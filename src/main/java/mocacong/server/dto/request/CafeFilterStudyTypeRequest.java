@@ -8,6 +8,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @ToString
-public class CafeFilterRequest {
+public class CafeFilterStudyTypeRequest {
     private List<String> mapIds;
 }
