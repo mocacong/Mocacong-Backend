@@ -16,6 +16,11 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
     @Query("SELECT c FROM Cafe c WHERE c.cafeDetail.studyType = :studyType")
     List<Cafe> findByStudyTypeValue(StudyType studyType);
 
+    @Query("select c.mapId from Favorite f " +
+            "join f.cafe c join f.member m " +
+            "where c.mapId in :mapIds and m.email = :email")
+    List<String> findNearCafeMapIdsByMyFavoriteCafes(String email, List<String> mapIds);
+
     @Query("select c from Favorite f " +
             "join f.cafe c " +
             "join f.member m " +

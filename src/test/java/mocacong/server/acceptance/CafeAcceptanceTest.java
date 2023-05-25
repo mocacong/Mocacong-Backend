@@ -2,6 +2,7 @@ package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
 import mocacong.server.dto.request.*;
+import mocacong.server.dto.response.CafeFilterFavoritesResponse;
 import mocacong.server.dto.response.CafeFilterStudyTypeResponse;
 import mocacong.server.dto.response.CafeReviewResponse;
 import mocacong.server.dto.response.CafeReviewUpdateResponse;
@@ -203,7 +204,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
 
     @Test
     @DisplayName("studyTypeValue가 solo로 주어진 경우 해당 카페 목록을 필터링한다")
-    void getCafesFilter() {
+    void getCafesFilterStudyType() {
         String mapId1 = "12332312";
         String mapId2 = "12355412";
         String mapId3 = "18486512";
@@ -233,6 +234,36 @@ public class CafeAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.OK.value())
                 .extract()
                 .as(CafeFilterStudyTypeResponse.class);
+
+        assertThat(actual.getMapIds()).containsExactlyInAnyOrder(mapId1, mapId3);
+    }
+
+    @Test
+    @DisplayName("즐겨찾기가 등록된 카페 목록을 필터링한다")
+    void getCafesFilterFavorites() {
+        String mapId1 = "12332312";
+        String mapId2 = "12355412";
+        String mapId3 = "18486512";
+        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페 본점"));
+        카페_등록(new CafeRegisterRequest(mapId2, "메리네 카페 2호점"));
+        카페_등록(new CafeRegisterRequest(mapId3, "메리네 카페 3호점"));
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+
+        즐겨찾기_등록(token, mapId1);
+        즐겨찾기_등록(token, mapId3);
+        CafeFilterFavoritesRequest request = new CafeFilterFavoritesRequest(List.of(mapId1, mapId2, mapId3));
+
+        CafeFilterFavoritesResponse actual = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .body(request)
+                .when().post("/cafes/favorites")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CafeFilterFavoritesResponse.class);
 
         assertThat(actual.getMapIds()).containsExactlyInAnyOrder(mapId1, mapId3);
     }

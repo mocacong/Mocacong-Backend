@@ -3,10 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
-import mocacong.server.dto.request.CafeFilterStudyTypeRequest;
-import mocacong.server.dto.request.CafeRegisterRequest;
-import mocacong.server.dto.request.CafeReviewRequest;
-import mocacong.server.dto.request.CafeReviewUpdateRequest;
+import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.notfound.NotFoundCafeException;
@@ -282,6 +279,13 @@ public class CafeService {
                 .collect(Collectors.toList());
 
         return new CafeFilterStudyTypeResponse(filteredIds);
+    }
+
+    public CafeFilterFavoritesResponse filterCafesByFavorites(String email, CafeFilterFavoritesRequest request) {
+        List<String> mapIds = request.getMapIds();
+        List<String> filteredIds = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(email, mapIds);
+
+        return new CafeFilterFavoritesResponse(filteredIds);
     }
 
     @Transactional
