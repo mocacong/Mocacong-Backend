@@ -274,7 +274,7 @@ public class CafeService {
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());
 
-        List<String> filteredIds = request.getMapIds().stream()
+        List<String> filteredIds = requestBody.getMapIds().stream()
                 .filter(filteredCafeMapIds::contains)
                 .collect(Collectors.toList());
 

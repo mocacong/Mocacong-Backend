@@ -631,7 +631,7 @@ class CafeServiceTest {
         cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        CafeFilterStudyTypeRequest requestBody = new CafeFilterStudyTypeRequest(List.of(cafe1.getMapId()));
+        CafeFilterStudyTypeRequest requestBody = new CafeFilterStudyTypeRequest(List.of(cafe.getMapId()));
 
         CafeFilterStudyTypeResponse filteredCafes = cafeService.filterCafesByStudyType("group", requestBody);
 
