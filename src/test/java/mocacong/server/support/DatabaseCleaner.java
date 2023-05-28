@@ -1,15 +1,17 @@
 package mocacong.server.support;
 
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Table;
 import javax.persistence.metamodel.Type;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DatabaseCleaner {
@@ -20,6 +22,9 @@ public class DatabaseCleaner {
 
     @PersistenceContext
     EntityManager entityManager;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     private List<String> tableNames;
 
@@ -36,6 +41,7 @@ public class DatabaseCleaner {
 
     @Transactional
     public void execute() {
+        /* DB Truncate */
         entityManager.flush();
         entityManager.createNativeQuery(String.format(FOREIGN_KEY_RULE_UPDATE_FORMAT, "FALSE"))
                 .executeUpdate();
@@ -45,5 +51,10 @@ public class DatabaseCleaner {
         }
         entityManager.createNativeQuery(String.format(FOREIGN_KEY_RULE_UPDATE_FORMAT, "TRUE"))
                 .executeUpdate();
+
+        /* Redis Cache 제거 */
+        Objects.requireNonNull(redisTemplate.getConnectionFactory())
+                .getConnection()
+                .flushAll();
     }
 }

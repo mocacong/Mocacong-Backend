@@ -13,6 +13,7 @@ import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.MemberEvent;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class FavoriteService {
     private final MemberRepository memberRepository;
     private final CafeRepository cafeRepository;
 
+    @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public FavoriteSaveResponse save(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -47,6 +49,7 @@ public class FavoriteService {
                 });
     }
 
+    @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public void delete(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)

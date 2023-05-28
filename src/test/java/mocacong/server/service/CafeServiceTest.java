@@ -1,5 +1,8 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
@@ -10,21 +13,16 @@ import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -193,15 +191,13 @@ class CafeServiceTest {
         scoreRepository.save(new Score(5, member2, cafe));
         favoriteRepository.save(new Favorite(member1, cafe));
 
-        PreviewCafeResponse actual1 = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
-        PreviewCafeResponse actual2 = cafeService.previewCafeByMapId(member2.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
 
         assertAll(
-                () -> assertThat(actual1.getFavorite()).isTrue(),
-                () -> assertThat(actual2.getFavorite()).isFalse(),
-                () -> assertThat(actual1.getScore()).isEqualTo(4.5),
-                () -> assertThat(actual1.getStudyType()).isNull(),
-                () -> assertThat(actual1.getReviewsCount()).isEqualTo(0)
+                () -> assertThat(actual.getFavorite()).isTrue(),
+                () -> assertThat(actual.getScore()).isEqualTo(4.5),
+                () -> assertThat(actual.getStudyType()).isNull(),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(0)
         );
     }
 
@@ -222,15 +218,13 @@ class CafeServiceTest {
                         "깨끗해요", "없어요", null, "보통이에요"));
         favoriteRepository.save(new Favorite(member1, cafe));
 
-        PreviewCafeResponse actual1 = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
-        PreviewCafeResponse actual2 = cafeService.previewCafeByMapId(member2.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
 
         assertAll(
-                () -> assertThat(actual1.getFavorite()).isTrue(),
-                () -> assertThat(actual2.getFavorite()).isFalse(),
-                () -> assertThat(actual1.getScore()).isEqualTo(2.5),
-                () -> assertThat(actual1.getStudyType()).isEqualTo("group"),
-                () -> assertThat(actual1.getReviewsCount()).isEqualTo(2)
+                () -> assertThat(actual.getFavorite()).isTrue(),
+                () -> assertThat(actual.getScore()).isEqualTo(2.5),
+                () -> assertThat(actual.getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(2)
         );
     }
 

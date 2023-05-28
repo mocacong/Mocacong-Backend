@@ -18,6 +18,9 @@ spring:
         core-size: 2
         max-size: 10
         queue-capacity: 20
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
 
   h2:
     console:
