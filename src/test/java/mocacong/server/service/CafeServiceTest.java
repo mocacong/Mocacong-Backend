@@ -194,13 +194,13 @@ class CafeServiceTest {
         scoreRepository.save(new Score(5, member2, cafe));
         favoriteRepository.save(new Favorite(member1, cafe));
 
-        PreviewCafeResponse actual1 = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
 
         assertAll(
-                () -> assertThat(actual1.getFavorite()).isTrue(),
-                () -> assertThat(actual1.getScore()).isEqualTo(4.5),
-                () -> assertThat(actual1.getStudyType()).isNull(),
-                () -> assertThat(actual1.getReviewsCount()).isEqualTo(0)
+                () -> assertThat(actual.getFavorite()).isTrue(),
+                () -> assertThat(actual.getScore()).isEqualTo(4.5),
+                () -> assertThat(actual.getStudyType()).isNull(),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(0)
         );
     }
 
@@ -221,13 +221,13 @@ class CafeServiceTest {
                         "깨끗해요", "없어요", null, "보통이에요"));
         favoriteRepository.save(new Favorite(member1, cafe));
 
-        PreviewCafeResponse actual1 = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
 
         assertAll(
-                () -> assertThat(actual1.getFavorite()).isTrue(),
-                () -> assertThat(actual1.getScore()).isEqualTo(2.5),
-                () -> assertThat(actual1.getStudyType()).isEqualTo("group"),
-                () -> assertThat(actual1.getReviewsCount()).isEqualTo(2)
+                () -> assertThat(actual.getFavorite()).isTrue(),
+                () -> assertThat(actual.getScore()).isEqualTo(2.5),
+                () -> assertThat(actual.getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(2)
         );
     }
 
