@@ -224,7 +224,7 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
-                .orElseThrow(NotFoundReviewException::new);
+                .orElse(null);
         Score score = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
         return CafeMyReviewResponse.of(score, review);
