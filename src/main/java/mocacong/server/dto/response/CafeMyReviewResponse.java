@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mocacong.server.domain.CafeDetail;
 import mocacong.server.domain.Review;
 import mocacong.server.domain.Score;
 
@@ -23,16 +22,15 @@ public class CafeMyReviewResponse {
     private String myDesk;
 
     public static CafeMyReviewResponse of(Score score, Review review) {
-        CafeDetail cafeDetail = review.getCafeDetail();
         return new CafeMyReviewResponse(
                 score != null ? score.getScore() : null,
-                cafeDetail.getStudyTypeValue(),
-                cafeDetail.getWifiValue(),
-                cafeDetail.getParkingValue(),
-                cafeDetail.getToiletValue(),
-                cafeDetail.getPowerValue(),
-                cafeDetail.getSoundValue(),
-                cafeDetail.getDeskValue()
+                review != null ? review.getCafeDetail().getStudyTypeValue() : null,
+                review != null ? review.getCafeDetail().getWifiValue() : null,
+                review != null ? review.getCafeDetail().getParkingValue() : null,
+                review != null ? review.getCafeDetail().getToiletValue() : null,
+                review != null ? review.getCafeDetail().getPowerValue() : null,
+                review != null ? review.getCafeDetail().getSoundValue() : null,
+                review != null ? review.getCafeDetail().getDeskValue() : null
         );
     }
 }

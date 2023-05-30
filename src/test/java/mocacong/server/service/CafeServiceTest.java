@@ -1,8 +1,5 @@
 package mocacong.server.service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
@@ -13,16 +10,21 @@ import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @ServiceTest
 class CafeServiceTest {
@@ -514,6 +516,28 @@ class CafeServiceTest {
                 () -> assertThat(actual.getMyPower()).isEqualTo("충분해요"),
                 () -> assertThat(actual.getMySound()).isEqualTo("조용해요"),
                 () -> assertThat(actual.getMyDesk()).isEqualTo("편해요")
+        );
+    }
+
+    @Test
+    @DisplayName("작성하지 않은 카페에 대한 리뷰를 조회하는 경우 null을 반환한다")
+    void findNotRegisteredCafeReview() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+
+        CafeMyReviewResponse actual = cafeService.findMyCafeReview(member.getEmail(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getMyScore()).isNull(),
+                () -> assertThat(actual.getMyStudyType()).isNull(),
+                () -> assertThat(actual.getMyWifi()).isNull(),
+                () -> assertThat(actual.getMyParking()).isNull(),
+                () -> assertThat(actual.getMyToilet()).isNull(),
+                () -> assertThat(actual.getMyPower()).isNull(),
+                () -> assertThat(actual.getMySound()).isNull(),
+                () -> assertThat(actual.getMyDesk()).isNull()
         );
     }
 
