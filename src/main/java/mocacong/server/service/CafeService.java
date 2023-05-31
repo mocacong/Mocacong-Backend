@@ -1,11 +1,16 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -25,18 +30,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class CafeService {
 
+    public static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS = 5;
-
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
     private final ScoreRepository scoreRepository;
@@ -293,15 +293,24 @@ public class CafeService {
     }
 
     @Transactional
-    public void saveCafeImage(String email, String mapId, MultipartFile cafeImg) {
+    public void saveCafeImage(String email, String mapId, List<MultipartFile> cafeImages) {
+        validateCafeImagesCounts(cafeImages);
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
 
-        String imgUrl = awsS3Uploader.uploadImage(cafeImg);
-        CafeImage cafeImage = new CafeImage(imgUrl, true, cafe, member);
-        cafeImageRepository.save(cafeImage);
+        for (MultipartFile cafeImage : cafeImages) {
+            String imgUrl = awsS3Uploader.uploadImage(cafeImage);
+            CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
+            cafeImageRepository.save(uploadedCafeImage);
+        }
+    }
+
+    private void validateCafeImagesCounts(List<MultipartFile> cafeImages) {
+        if (cafeImages.size() > CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS) {
+            throw new ExceedCafeImagesCountsException();
+        }
     }
 
     @Transactional(readOnly = true)

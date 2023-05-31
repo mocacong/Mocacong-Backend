@@ -1,30 +1,29 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -336,12 +335,12 @@ class CafeServiceTest {
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
 
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), mapId);
         CafeImagesResponse actual2 = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
@@ -709,13 +708,59 @@ class CafeServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
 
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
 
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         assertAll(
                 () -> assertThat(actual.getCafeImages()).hasSize(1),
                 () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected)
         );
+    }
+
+    @Test
+    @DisplayName("카페 이미지를 한 번에 여러 개 저장할 수 있다")
+    void saveCafeImagesPerRequest() throws IOException {
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        MockMultipartFile mockMultipartFile1 =
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        MockMultipartFile mockMultipartFile2 =
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile1, mockMultipartFile2));
+
+        Cafe actual = cafeRepository.findByMapId(mapId)
+                .orElseThrow();
+        assertThat(actual.getCafeImages()).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("카페 이미지를 한 번에 세 개를 초과하여 저장하면 예외를 반환한다")
+    void saveCafeImagesManyPerRequest() throws IOException {
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        MockMultipartFile mockMultipartFile1 =
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        MockMultipartFile mockMultipartFile2 =
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
+        MockMultipartFile mockMultipartFile3 =
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+        MockMultipartFile mockMultipartFile4 =
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
+
+        assertThatThrownBy(() -> cafeService.saveCafeImage(
+                member.getEmail(),
+                mapId,
+                List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3, mockMultipartFile4)
+        )).isInstanceOf(ExceedCafeImagesCountsException.class);
     }
 
     @Test
@@ -731,8 +776,8 @@ class CafeServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
 
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
 
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         assertAll(
@@ -754,9 +799,9 @@ class CafeServiceTest {
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
 
         CafeImagesResponse actual = cafeService.findCafeImages("dlawotn3@naver.com", mapId, 0, 3);
 
@@ -780,8 +825,8 @@ class CafeServiceTest {
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
         CafeImagesResponse actual = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
@@ -808,10 +853,10 @@ class CafeServiceTest {
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member1.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member1.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member1.getEmail(), mapId, mockMultipartFile);
-        cafeService.saveCafeImage(member1.getEmail(), mapId, mockMultipartFile);
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
         CafeImagesResponse actual = cafeService.findCafeImages(member2.getEmail(), mapId, 0, 10);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
@@ -839,7 +884,7 @@ class CafeServiceTest {
         MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg", oldFileInputStream);
         MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(oldMockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
         CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
@@ -887,16 +932,16 @@ class CafeServiceTest {
         MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg", oldFileInputStream);
         MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(oldMockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
         CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
         cafeService.updateCafeImage(member.getEmail(), mapId, oldFindImage.getCafeImages().get(0).getId(), newMockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, oldMockMultipartFile);
+        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), mapId);
         CafeImagesResponse given = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
 
