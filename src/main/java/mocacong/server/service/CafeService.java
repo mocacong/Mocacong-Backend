@@ -6,6 +6,7 @@ import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -18,6 +19,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -27,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,14 +51,20 @@ public class CafeService {
     private final AwsS3Uploader awsS3Uploader;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    @Transactional
     public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
-        cafeRepository.findByMapId(request.getId())
-                .ifPresentOrElse(
-                        cafe1 -> {
-                        },
-                        () -> cafeRepository.save(cafe)
-                );
+        Optional<Cafe> existingCafe = cafeRepository.findByMapId(request.getId());
+
+        if (existingCafe.isEmpty()) {
+            try {
+                cafeRepository.save(cafe);
+            } catch (DataIntegrityViolationException e) {
+                throw new DuplicateCafeException();
+            }
+        } else {
+            throw new DuplicateCafeException();
+        }
     }
 
     @Transactional(readOnly = true)

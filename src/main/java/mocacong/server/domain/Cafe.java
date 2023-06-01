@@ -26,7 +26,7 @@ public class Cafe extends BaseTime {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "map_id", nullable = false)
+    @Column(name = "map_id", unique = true, nullable = false)
     private String mapId;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

@@ -4,6 +4,7 @@ import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
@@ -18,11 +19,17 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -67,10 +74,12 @@ class CafeServiceTest {
         cafeService.save(request1);
 
         CafeRegisterRequest request2 = new CafeRegisterRequest("20", "카페");
-        cafeService.save(request2);
 
         List<Cafe> actual = cafeRepository.findAll();
-        assertThat(actual).hasSize(1);
+        assertAll(
+                () -> assertThrows(DuplicateCafeException.class, () -> cafeService.save(request2)),
+                () -> assertThat(actual).hasSize(1)
+        );
     }
 
     @Test
@@ -935,6 +944,33 @@ class CafeServiceTest {
                 () -> assertThat(actual).hasSize(1),
                 () -> assertThat(actual).extracting("imgUrl")
                         .containsExactlyInAnyOrder("test_img.jpg")
+        );
+    }
+
+    @Test
+    @DisplayName("등록되지 않은 카페를 동시에 여러 번 등록하려 해도 한 번만 등록된다")
+    void saveCafeWithConcurrent() throws InterruptedException {
+        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페");
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        CountDownLatch latch = new CountDownLatch(3);
+        List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
+
+        for (int i = 0; i < 3; i++) {
+            executorService.execute(() -> {
+                try {
+                    cafeService.save(request);
+                } catch (DuplicateCafeException e) {
+                    exceptions.add(e); // 중복 예외를 리스트에 추가
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+
+        List<Cafe> actual = cafeRepository.findAll();
+        assertAll(
+                () -> assertThat(exceptions.isEmpty()).isFalse(),
+                () -> assertThat(actual).hasSize(1)
         );
     }
 }
