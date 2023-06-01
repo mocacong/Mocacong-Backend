@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "favorite")
+@Table(name = "favorite", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "member_id", "cafe_id" })
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Favorite extends BaseTime {

@@ -15,6 +15,7 @@ import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.MemberEvent;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -36,10 +37,14 @@ public class FavoriteService {
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-
         validateDuplicateFavorite(cafe.getId(), member.getId());
-        Favorite favorite = new Favorite(member, cafe);
-        return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId());
+
+        try{
+            Favorite favorite = new Favorite(member, cafe);
+            return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId());
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistsFavorite();
+        }
     }
 
     private void validateDuplicateFavorite(Long cafeId, Long memberId) {
