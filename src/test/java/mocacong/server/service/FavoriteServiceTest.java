@@ -119,7 +119,7 @@ class FavoriteServiceTest {
 
         List<Favorite> favorites = favoriteRepository.findAll();
         assertAll(
-                () -> assertThat(!exceptions.isEmpty()).isTrue(),
+                () -> assertThat(exceptions.isEmpty()).isFalse(),
                 () -> assertThat(favorites).hasSize(1)
         );
     }

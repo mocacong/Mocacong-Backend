@@ -530,7 +530,7 @@ class MemberServiceTest {
 
         List<Member> actual = memberRepository.findAll();
         assertAll(
-                () -> assertThat(!exceptions.isEmpty()).isTrue(),
+                () -> assertThat(exceptions.isEmpty()).isFalse(),
                 () -> assertThat(actual).hasSize(1)
         );
     }
