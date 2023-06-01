@@ -977,6 +977,38 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("회원이 한 카페에 동시에 여러 번 평점만 등록 시도해도 한 번만 등록된다")
+    void saveScoreWithConcurrent() throws InterruptedException {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        CountDownLatch latch = new CountDownLatch(3);
+        List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
+        CafeReviewRequest request = new CafeReviewRequest(4, null, null, null,
+                null, null, null, null);
+
+        for (int i = 0; i < 3; i++) {
+            executorService.execute(() -> {
+                try {
+                    cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(), request);
+                } catch (AlreadyExistsCafeReview e) {
+                    exceptions.add(e); // 중복 예외를 리스트에 추가
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+
+        List<Review> reviews = reviewRepository.findAll();
+        assertAll(
+                () -> assertThat(exceptions.isEmpty()).isFalse(),
+                () -> assertThat(reviews).hasSize(1)
+        );
+    }
+
+    @Test
     @DisplayName("회원이 한 카페에 동시에 여러 번 리뷰 등록 시도해도 한 번만 등록된다")
     void saveCafeReviewWithConcurrent() throws InterruptedException {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
@@ -1003,7 +1035,7 @@ class CafeServiceTest {
 
         List<Review> reviews = reviewRepository.findAll();
         assertAll(
-                () -> assertThat(!exceptions.isEmpty()).isTrue(),
+                () -> assertThat(exceptions.isEmpty()).isFalse(),
                 () -> assertThat(reviews).hasSize(1)
         );
     }
