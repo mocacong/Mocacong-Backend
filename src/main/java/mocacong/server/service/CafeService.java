@@ -5,6 +5,7 @@ import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
+import mocacong.server.exception.badrequest.AlreadyExistsCafeImageException;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
@@ -313,9 +314,13 @@ public class CafeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
 
-        String imgUrl = awsS3Uploader.uploadImage(cafeImg);
-        CafeImage cafeImage = new CafeImage(imgUrl, true, cafe, member);
-        cafeImageRepository.save(cafeImage);
+        try{
+            String imgUrl = awsS3Uploader.uploadImage(cafeImg);
+            CafeImage cafeImage = new CafeImage(imgUrl, true, cafe, member);
+            cafeImageRepository.save(cafeImage);
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistsCafeImageException();
+        }
     }
 
     @Transactional(readOnly = true)
