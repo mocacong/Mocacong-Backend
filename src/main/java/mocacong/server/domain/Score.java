@@ -25,11 +25,11 @@ public class Score extends BaseTime {
     private int score;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", unique = true)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_id", unique = true, nullable = false)
+    @JoinColumn(name = "cafe_id", nullable = false)
     private Cafe cafe;
 
     public Score(int score, Member member, Cafe cafe) {

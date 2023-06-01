@@ -19,11 +19,11 @@ public class Review extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", unique = true)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cafe_id", unique = true)
+    @JoinColumn(name = "cafe_id")
     private Cafe cafe;
 
     @Embedded
