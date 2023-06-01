@@ -222,7 +222,11 @@ public class CafeService {
                 Sound.from(request.getMySound())
         );
         Review review = new Review(member, cafe, cafeDetail);
-        reviewRepository.save(review);
+        try {
+            reviewRepository.save(review);
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistsCafeReview();
+        }
     }
 
     @Transactional(readOnly = true)

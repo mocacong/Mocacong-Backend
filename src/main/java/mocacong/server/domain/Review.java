@@ -8,7 +8,9 @@ import mocacong.server.domain.cafedetail.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "review")
+@Table(name = "review", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "member_id", "cafe_id" })
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseTime {
