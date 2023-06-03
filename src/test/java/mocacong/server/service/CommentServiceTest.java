@@ -12,13 +12,14 @@ import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
 class CommentServiceTest {
@@ -176,7 +177,7 @@ class CommentServiceTest {
         String mapId = "2143154352323";
         Member member1 = new Member(email1, "encodePassword", "케이", "010-1234-5678");
         memberRepository.save(member1);
-        Member member2 = new Member(email2, "encodePassword", "케이", "010-1234-5678");
+        Member member2 = new Member(email2, "encodePassword", "메리", "010-1234-5678");
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);

@@ -17,6 +17,7 @@ import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +52,12 @@ public class MemberService {
         validateDuplicateMember(request);
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        Member member = new Member(request.getEmail(), encodedPassword, request.getNickname(), request.getPhone());
-        return new MemberSignUpResponse(memberRepository.save(member).getId());
+        try{
+            Member member = new Member(request.getEmail(), encodedPassword, request.getNickname(), request.getPhone());
+            return new MemberSignUpResponse(memberRepository.save(member).getId());
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateMemberException();
+        }
     }
 
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {

@@ -1,13 +1,14 @@
 package mocacong.server.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.domain.cafedetail.*;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cafe")
@@ -25,7 +26,7 @@ public class Cafe extends BaseTime {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "map_id", nullable = false)
+    @Column(name = "map_id", unique = true, nullable = false)
     private String mapId;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)

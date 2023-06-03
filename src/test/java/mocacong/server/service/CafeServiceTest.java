@@ -7,6 +7,7 @@ import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
@@ -17,6 +18,7 @@ import mocacong.server.support.AwsS3Uploader;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.doNothing;
@@ -44,6 +46,8 @@ class CafeServiceTest {
     private FavoriteRepository favoriteRepository;
     @Autowired
     private CafeImageRepository cafeImageRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
@@ -66,10 +70,12 @@ class CafeServiceTest {
         cafeService.save(request1);
 
         CafeRegisterRequest request2 = new CafeRegisterRequest("20", "카페");
-        cafeService.save(request2);
 
         List<Cafe> actual = cafeRepository.findAll();
-        assertThat(actual).hasSize(1);
+        assertAll(
+                () -> assertThrows(DuplicateCafeException.class, () -> cafeService.save(request2)),
+                () -> assertThat(actual).hasSize(1)
+        );
     }
 
     @Test
@@ -851,7 +857,8 @@ class CafeServiceTest {
         memberRepository.save(member2);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
+                fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
         cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
         cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));

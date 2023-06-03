@@ -10,6 +10,7 @@ import mocacong.server.domain.cafedetail.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
+import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
@@ -23,6 +24,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -48,14 +50,15 @@ public class CafeService {
     private final AwsS3Uploader awsS3Uploader;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    @Transactional
     public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
-        cafeRepository.findByMapId(request.getId())
-                .ifPresentOrElse(
-                        cafe1 -> {
-                        },
-                        () -> cafeRepository.save(cafe)
-                );
+
+        try {
+            cafeRepository.save(cafe);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateCafeException();
+        }
     }
 
     @Transactional(readOnly = true)
@@ -213,7 +216,11 @@ public class CafeService {
                 Sound.from(request.getMySound())
         );
         Review review = new Review(member, cafe, cafeDetail);
-        reviewRepository.save(review);
+        try {
+            reviewRepository.save(review);
+        } catch (DataIntegrityViolationException e) {
+            throw new AlreadyExistsCafeReview();
+        }
     }
 
     @Transactional(readOnly = true)
@@ -272,13 +279,14 @@ public class CafeService {
                 .forEach(Score::removeMember);
     }
 
-    public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue, CafeFilterStudyTypeRequest requestBody) {
+    public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue,
+                                                              CafeFilterStudyTypeRequest request) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());
 
-        List<String> filteredIds = requestBody.getMapIds().stream()
+        List<String> filteredIds = request.getMapIds().stream()
                 .filter(filteredCafeMapIds::contains)
                 .collect(Collectors.toList());
 
