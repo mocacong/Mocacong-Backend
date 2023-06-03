@@ -33,13 +33,11 @@ public class FavoriteService {
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public FavoriteSaveResponse save(String email, String mapId) {
-        Cafe cafe = cafeRepository.findByMapId(mapId)
-                .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(NotFoundMemberException::new);
+        Cafe cafe = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email).orElseThrow(NotFoundMemberException::new);
         validateDuplicateFavorite(cafe.getId(), member.getId());
 
-        try{
+        try {
             Favorite favorite = new Favorite(member, cafe);
             return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId());
         } catch (DataIntegrityViolationException e) {
@@ -48,21 +46,17 @@ public class FavoriteService {
     }
 
     private void validateDuplicateFavorite(Long cafeId, Long memberId) {
-        favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafeId, memberId)
-                .ifPresent(fav -> {
-                    throw new AlreadyExistsFavorite();
-                });
+        favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafeId, memberId).ifPresent(fav -> {
+            throw new AlreadyExistsFavorite();
+        });
     }
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public void delete(String email, String mapId) {
-        Cafe cafe = cafeRepository.findByMapId(mapId)
-                .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(NotFoundMemberException::new);
-        Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
-                .orElseThrow(NotFoundFavoriteException::new);
+        Cafe cafe = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email).orElseThrow(NotFoundMemberException::new);
+        Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId()).orElseThrow(NotFoundFavoriteException::new);
 
         favoriteRepository.deleteById(favoriteId);
     }
@@ -70,8 +64,7 @@ public class FavoriteService {
     @EventListener
     public void deleteAllWhenMemberDelete(MemberEvent event) {
         Member member = event.getMember();
-        favoriteRepository.findAllByMemberId(member.getId())
-                .forEach(Favorite::removeMember);
+        favoriteRepository.findAllByMemberId(member.getId()).forEach(Favorite::removeMember);
     }
 
     @Async
