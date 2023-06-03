@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,15 +54,10 @@ public class CafeService {
     @Transactional
     public void save(CafeRegisterRequest request) {
         Cafe cafe = new Cafe(request.getId(), request.getName());
-        Optional<Cafe> existingCafe = cafeRepository.findByMapId(request.getId());
 
-        if (existingCafe.isEmpty()) {
-            try {
-                cafeRepository.save(cafe);
-            } catch (DataIntegrityViolationException e) {
-                throw new DuplicateCafeException();
-            }
-        } else {
+        try {
+            cafeRepository.save(cafe);
+        } catch (DataIntegrityViolationException e) {
             throw new DuplicateCafeException();
         }
     }
@@ -287,13 +281,13 @@ public class CafeService {
     }
 
     public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue,
-                                                              CafeFilterStudyTypeRequest requestBody) {
+                                                              CafeFilterStudyTypeRequest request) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());
 
-        List<String> filteredIds = requestBody.getMapIds().stream()
+        List<String> filteredIds = request.getMapIds().stream()
                 .filter(filteredCafeMapIds::contains)
                 .collect(Collectors.toList());
 
