@@ -29,7 +29,7 @@ public class Member extends BaseTime {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "nickname")
+    @Column(name = "nickname", unique = true)
     private String nickname;
 
     @Column(name = "phone")
