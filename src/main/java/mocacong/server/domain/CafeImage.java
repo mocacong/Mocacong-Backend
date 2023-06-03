@@ -17,7 +17,7 @@ public class CafeImage extends BaseTime {
     @Column(name = "cafe_image_id")
     private Long id;
 
-    @Column(name = "img_url", unique = true)
+    @Column(name = "img_url")
     private String imgUrl;
 
     @Column(name = "is_used")
