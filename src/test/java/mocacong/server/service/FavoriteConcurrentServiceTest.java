@@ -7,8 +7,6 @@ import mocacong.server.exception.badrequest.AlreadyExistsFavorite;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.service.FavoriteService;
-import mocacong.server.service.ServiceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +57,7 @@ public class FavoriteConcurrentServiceTest {
 
         List<Favorite> favorites = favoriteRepository.findAll();
         assertAll(
-                () -> assertThat(exceptions.isEmpty()).isFalse(),
+                () -> assertThat(exceptions).hasSize(2),
                 () -> assertThat(favorites).hasSize(1)
         );
     }

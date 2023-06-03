@@ -47,7 +47,7 @@ public class MemberConcurrentServiceTest {
 
         List<Member> actual = memberRepository.findAll();
         assertAll(
-                () -> assertThat(exceptions.isEmpty()).isFalse(),
+                () -> assertThat(exceptions).hasSize(2),
                 () -> assertThat(actual).hasSize(1)
         );
     }

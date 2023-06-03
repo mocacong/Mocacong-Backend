@@ -10,9 +10,6 @@ import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.ReviewRepository;
-import mocacong.server.service.CafeService;
-import mocacong.server.service.MemberService;
-import mocacong.server.service.ServiceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +59,7 @@ public class CafeConcurrentServiceTest {
 
         List<Cafe> actual = cafeRepository.findAll();
         assertAll(
-                () -> assertThat(exceptions.isEmpty()).isFalse(),
+                () -> assertThat(exceptions).hasSize(2),
                 () -> assertThat(actual).hasSize(1)
         );
     }
@@ -94,7 +91,7 @@ public class CafeConcurrentServiceTest {
 
         List<Review> reviews = reviewRepository.findAll();
         assertAll(
-                () -> assertThat(exceptions.isEmpty()).isFalse(),
+                () -> assertThat(exceptions).hasSize(2),
                 () -> assertThat(reviews).hasSize(1)
         );
     }
@@ -126,7 +123,7 @@ public class CafeConcurrentServiceTest {
 
         List<Review> reviews = reviewRepository.findAll();
         assertAll(
-                () -> assertThat(exceptions.isEmpty()).isFalse(),
+                () -> assertThat(exceptions).hasSize(2),
                 () -> assertThat(reviews).hasSize(1)
         );
     }
