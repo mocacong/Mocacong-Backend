@@ -33,8 +33,10 @@ public class FavoriteService {
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public FavoriteSaveResponse save(String email, String mapId) {
-        Cafe cafe = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email).orElseThrow(NotFoundMemberException::new);
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(NotFoundMemberException::new);
         validateDuplicateFavorite(cafe.getId(), member.getId());
 
         try {
@@ -56,7 +58,8 @@ public class FavoriteService {
     public void delete(String email, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email).orElseThrow(NotFoundMemberException::new);
-        Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId()).orElseThrow(NotFoundFavoriteException::new);
+        Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
+                .orElseThrow(NotFoundFavoriteException::new);
 
         favoriteRepository.deleteById(favoriteId);
     }
