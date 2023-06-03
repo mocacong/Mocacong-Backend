@@ -1,4 +1,4 @@
-package mocacong.server.concurrency;
+package mocacong.server.service;
 
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Favorite;

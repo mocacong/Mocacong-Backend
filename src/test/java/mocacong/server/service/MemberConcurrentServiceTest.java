@@ -1,11 +1,9 @@
-package mocacong.server.concurrency;
+package mocacong.server.service;
 
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.service.MemberService;
-import mocacong.server.service.ServiceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
