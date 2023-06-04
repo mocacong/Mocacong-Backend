@@ -205,7 +205,6 @@ public class CafeService {
 
     private void saveCafeDetails(CafeReviewRequest request, Cafe cafe, Member member) {
         Score score = new Score(request.getMyScore(), member, cafe);
-        scoreRepository.save(score);
         CafeDetail cafeDetail = new CafeDetail(
                 StudyType.from(request.getMyStudyType()),
                 Wifi.from(request.getMyWifi()),
@@ -217,6 +216,7 @@ public class CafeService {
         );
         Review review = new Review(member, cafe, cafeDetail);
         try {
+            scoreRepository.save(score);
             reviewRepository.save(review);
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyExistsCafeReview();

@@ -594,6 +594,34 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("등록한 카페 리뷰를 수정할 때 세부정보를 모두 null 값으로 성공적으로 수정한다")
+    public void updateCafeReviewWhenDetailsNull() {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
+                new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
+
+        CafeReviewUpdateResponse actual = cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(),
+                new CafeReviewUpdateRequest(5, "group", null, null,
+                        null, null, null, null));
+
+        assertAll(
+                () -> assertThat(actual.getScore()).isEqualTo(5.0),
+                () -> assertThat(actual.getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getWifi()).isNull(),
+                () -> assertThat(actual.getParking()).isNull(),
+                () -> assertThat(actual.getToilet()).isNull(),
+                () -> assertThat(actual.getPower()).isNull(),
+                () -> assertThat(actual.getSound()).isNull(),
+                () -> assertThat(actual.getDesk()).isNull(),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(1)
+        );
+    }
+
+    @Test
     @DisplayName("카페 리뷰를 등록한 적이 없다면 리뷰 수정은 불가능하다")
     public void updateCafeReviewNotFoundReview() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
