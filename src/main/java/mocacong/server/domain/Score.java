@@ -8,7 +8,9 @@ import mocacong.server.exception.badrequest.InvalidScoreException;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "score")
+@Table(name = "score", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "member_id", "cafe_id" })
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Score extends BaseTime {
