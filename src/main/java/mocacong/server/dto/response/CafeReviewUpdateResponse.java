@@ -27,12 +27,12 @@ public class CafeReviewUpdateResponse {
         return new CafeReviewUpdateResponse(
                 score,
                 cafeDetail.getStudyTypeValue(),
-                cafeDetail.getWifi().getValue(),
-                cafeDetail.getParking().getValue(),
-                cafeDetail.getToilet().getValue(),
-                cafeDetail.getPower().getValue(),
-                cafeDetail.getSound().getValue(),
-                cafeDetail.getDesk().getValue(),
+                cafeDetail.getWifiValue(),
+                cafeDetail.getParkingValue(),
+                cafeDetail.getToiletValue(),
+                cafeDetail.getPowerValue(),
+                cafeDetail.getSoundValue(),
+                cafeDetail.getDeskValue(),
                 reviewsCount
         );
     }
