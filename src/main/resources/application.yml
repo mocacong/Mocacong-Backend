@@ -1,0 +1,89 @@
+spring:
+  datasource:
+    url: jdbc:h2:~/test;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;
+    username: sa
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        create_empty_composites:
+          enabled: true
+        show_sql: true
+        format_sql: true
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 10
+        queue-capacity: 20
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+      resolve-lazily: true
+
+security.jwt.token:
+  secret-key: testtesttesttesttesttesttesttesttesttest
+  expire-length: 864000
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    region:
+      static: ${S3_REGION}
+    stack:
+      auto: false
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+
+aws:
+  ses:
+    access-key: ${SES_ACCESS_KEY}
+    secret-key: ${SES_SECRET_KEY}
+
+slack:
+  webhook:
+    url: test
+
+oauth:
+  apple:
+    iss: https://appleid.apple.com
+    client-id: ${OAUTH_APPLE_CLIENT_ID}
+    nonce: ${OAUTH_APPLE_NONCE}
+  kakao:
+    client-id: ${OAUTH_KAKAO_CLIENT_ID}
+    client-secret: ${OAUTH_KAKAO_CLIENT_SECRET}
+    redirect-uri: ${OAUTH_KAKAO_REDIRECT_URI}
+
+mocacong:
+  nonce: ${MOCACONG_NONCE}
+
+feign:
+  client:
+    config:
+      apple-public-key-client:
+        connectTimeout: 5000
+        readTimeout: 3000

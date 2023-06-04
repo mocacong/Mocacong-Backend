@@ -1,0 +1,54 @@
+name: Java CD with Gradle and Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: make application-prod.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-prod.yml
+          echo "${{ secrets.PROD_YML }}" >> ./application-prod.yml
+        shell: bash
+
+      - name: Grant execute permisson for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle (without Test)
+        run: ./gradlew clean build -x test --stacktrace
+
+      - name: Docker Hub build & push
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} .
+          docker images
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
+
+      - name: Deploy to Prod WAS Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.WAS_HOST }}
+          username: ${{ secrets.WAS_USERNAME }}
+          key: ${{ secrets.WAS_KEY }}
+          port: ${{ secrets.WAS_SSH_PORT }}
+          script: |
+            cd /home/ubuntu/Mocacong-Backend/
+            sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+            sudo docker rm -f $(sudo docker ps -qa)
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
+            sudo docker-compose up -d
+            sudo docker image prune -f
