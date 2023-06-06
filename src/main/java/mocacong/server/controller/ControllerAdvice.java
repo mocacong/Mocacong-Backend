@@ -1,5 +1,7 @@
 package mocacong.server.controller;
 
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mocacong.server.dto.response.ErrorResponse;
@@ -11,12 +13,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartException;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,28 +44,48 @@ public class ControllerAdvice {
     public ResponseEntity<ErrorResponse> handleJsonException(HttpMessageNotReadableException e) {
         log.warn("Json Exception ErrMessage={}\n", e.getMessage());
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(9000, "Json 형식이 올바르지 않습니다."));
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(9000, "Json 형식이 올바르지 않습니다."));
     }
 
     @ExceptionHandler(HttpMediaTypeException.class)
     public ResponseEntity<ErrorResponse> handleContentTypeException(HttpMediaTypeException e) {
         log.warn("ContentType Exception ErrMessage={}\n", e.getMessage());
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(9001, "ContentType 값이 올바르지 않습니다."));
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(9001, "ContentType 값이 올바르지 않습니다."));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleRequestMethodException(HttpRequestMethodNotSupportedException e) {
         log.warn("Http Method not supported Exception ErrMessage={}\n", e.getMessage());
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(9002, "해당 Http Method에 맞는 API가 존재하지 않습니다."));
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(9002, "해당 Http Method에 맞는 API가 존재하지 않습니다."));
     }
 
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<ErrorResponse> handleFileSizeLimitExceeded(MultipartException e) {
         log.error("File Size Limit Exception ErrMessage={}\n", e.getMessage());
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(9003, "이미지 용량이 10MB를 초과합니다."));
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(9003, "이미지 용량이 10MB를 초과합니다."));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestParamException(MissingServletRequestParameterException e) {
+        log.warn("Request Param is Missing! ErrMessage={}\n", e.getMessage());
+
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(9004, "요청 param 이름이 올바르지 않습니다."));
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingMultiPartParamException(MissingServletRequestPartException e) {
+        log.warn("MultipartFile Request Param is Missing! ErrMessage={}\n", e.getMessage());
+
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(9005, "요청 MultipartFile param 이름이 올바르지 않습니다."));
     }
 
     @ExceptionHandler(MocacongException.class)
