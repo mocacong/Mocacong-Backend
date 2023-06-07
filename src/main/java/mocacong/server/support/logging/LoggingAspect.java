@@ -33,7 +33,7 @@ public class LoggingAspect {
     }
 
     @Around("allComponents()")
-    public Object doLogTrace(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object trace(ProceedingJoinPoint joinPoint) throws Throwable {
         final String message = joinPoint.getSignature().toShortString();
         final Object[] args = joinPoint.getArgs();
         try {
@@ -48,7 +48,7 @@ public class LoggingAspect {
     }
 
     @Around("allController()")
-    public Object doLogRequest(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object request(ProceedingJoinPoint joinPoint) throws Throwable {
         loggingStatusManager.syncStatus();
         String taskId = loggingStatusManager.getTaskId();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -69,7 +69,7 @@ public class LoggingAspect {
             value = "execution(public * mocacong.server.controller..*Controller.*(..))",
             returning = "result"
     )
-    public void allControllerResponse(JoinPoint joinPoint, Object result) {
+    public void response(JoinPoint joinPoint, Object result) {
         String taskId = loggingStatusManager.getTaskId();
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String controllerMethodName = methodSignature.getMethod()
