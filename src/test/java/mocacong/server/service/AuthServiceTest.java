@@ -150,4 +150,23 @@ class AuthServiceTest {
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
         );
     }
+
+    @Test
+    @DisplayName("OAuth 로그인을 진행한 이메일로 자체 회원가입을 한다")
+    void signUpWithAppleEmail() {
+        String email = "kth@apple.com";
+        String platformId = "1234321";
+        when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
+                .thenReturn(new OAuthPlatformMemberResponse(platformId, email));
+        OAuthTokenResponse response = authService.appleOAuthLogin(new AppleLoginRequest("token"));
+        String encodedPassword = passwordEncoder.encode("a1b2c3d4");
+
+        Member member = new Member(email, encodedPassword, "케이", "010-1234-5678");
+        memberRepository.save(member);
+
+        assertAll(
+                () -> assertThat(response.getToken()).isNotNull(),
+                () -> assertThat(response.getEmail()).isEqualTo(member.getEmail())
+        );
+    }
 }
