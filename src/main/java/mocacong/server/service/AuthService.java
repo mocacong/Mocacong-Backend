@@ -8,6 +8,7 @@ import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.KakaoLoginRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
+import mocacong.server.exception.badrequest.DuplicateMemberException;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberRepository;
@@ -40,6 +41,10 @@ public class AuthService {
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
         OAuthPlatformMemberResponse applePlatformMember =
                 appleOAuthUserProvider.getApplePlatformMember(request.getToken());
+        memberRepository.findByEmailAndPlatform(applePlatformMember.getEmail(), Platform.APPLE)
+                .ifPresent(member -> {
+                    throw new DuplicateMemberException();
+                });
         return generateOAuthTokenResponse(
                 Platform.APPLE,
                 applePlatformMember.getEmail(),
@@ -50,6 +55,10 @@ public class AuthService {
     public OAuthTokenResponse kakaoOAuthLogin(KakaoLoginRequest request) {
         OAuthPlatformMemberResponse kakaoPlatformMember =
                 kakaoOAuthUserProvider.getKakaoPlatformMember(request.getCode());
+        memberRepository.findByEmailAndPlatform(kakaoPlatformMember.getEmail(), Platform.KAKAO)
+                .ifPresent(member -> {
+                    throw new DuplicateMemberException();
+                });
         return generateOAuthTokenResponse(
                 Platform.KAKAO,
                 kakaoPlatformMember.getEmail(),

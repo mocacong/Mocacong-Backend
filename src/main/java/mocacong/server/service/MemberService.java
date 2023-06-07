@@ -23,9 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -49,7 +47,7 @@ public class MemberService {
 
     public MemberSignUpResponse signUp(MemberSignUpRequest request) {
         validatePassword(request.getPassword());
-        validateDuplicateMember(request);
+        validateDuplicateMember(Platform.MOCACONG, request);
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         try{
@@ -60,8 +58,8 @@ public class MemberService {
         }
     }
 
-    private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
-        memberRepository.findByEmail(memberSignUpRequest.getEmail())
+    private void validateDuplicateMember(Platform platform, MemberSignUpRequest memberSignUpRequest) {
+        memberRepository.findByEmailAndPlatform(memberSignUpRequest.getEmail(), platform)
                 .ifPresent(member -> {
                     throw new DuplicateMemberException();
                 });
