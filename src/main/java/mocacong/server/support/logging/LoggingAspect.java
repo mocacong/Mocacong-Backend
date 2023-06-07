@@ -3,10 +3,13 @@ package mocacong.server.support.logging;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -60,5 +63,17 @@ public class LoggingAspect {
         } finally {
             loggingStatusManager.release();
         }
+    }
+
+    @AfterReturning(
+            value = "execution(public * mocacong.server.controller..*Controller.*(..))",
+            returning = "result"
+    )
+    public void allControllerResponse(JoinPoint joinPoint, Object result) {
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        String controllerMethodName = methodSignature.getMethod()
+                .getName();
+
+        log.info("method: {}, result: {}", controllerMethodName, result);
     }
 }
