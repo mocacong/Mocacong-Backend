@@ -70,10 +70,11 @@ public class LoggingAspect {
             returning = "result"
     )
     public void allControllerResponse(JoinPoint joinPoint, Object result) {
+        String taskId = loggingStatusManager.getTaskId();
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String controllerMethodName = methodSignature.getMethod()
                 .getName();
 
-        log.info("method: {}, result: {}", controllerMethodName, result);
+        log.info("[{}] method: {}, result: {}", taskId, controllerMethodName, result);
     }
 }
