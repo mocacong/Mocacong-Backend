@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import static java.lang.Integer.parseInt;
+import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
@@ -12,25 +16,19 @@ import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import static java.lang.Integer.parseInt;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ServiceTest
 class MemberServiceTest {
@@ -450,6 +448,22 @@ class MemberServiceTest {
                 () -> assertThat(actual).extracting("imgUrl")
                         .containsExactlyInAnyOrder("test_img.jpg")
         );
+    }
+
+    @Test
+    @DisplayName("프로필 이미지가 등록된 회원이 탈퇴하면 해당 프로필 이미지는 사용되지 않는 것으로 변경된다")
+    void deleteMemberAndProfileImage() {
+        MemberProfileImage memberProfileImage = new MemberProfileImage("test_img.jpg");
+        memberProfileImageRepository.save(memberProfileImage);
+        Member member = memberRepository.save(
+                new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678", memberProfileImage)
+        );
+
+        memberService.delete(member.getEmail());
+
+        MemberProfileImage actual = memberProfileImageRepository.findById(memberProfileImage.getId())
+                .orElseThrow();
+        assertThat(actual.getIsUsed()).isFalse();
     }
 
     @Test
