@@ -47,7 +47,7 @@ public class MemberService {
 
     public MemberSignUpResponse signUp(MemberSignUpRequest request) {
         validatePassword(request.getPassword());
-        validateDuplicateMember(Platform.MOCACONG, request);
+        validateDuplicateMember(request);
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         try{
@@ -58,14 +58,11 @@ public class MemberService {
         }
     }
 
-    private void validateDuplicateMember(Platform platform, MemberSignUpRequest memberSignUpRequest) {
-        if (memberRepository.existsByPlatformAndEmail(memberSignUpRequest.getEmail(), platform)) {
+    private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
+        if (memberRepository.existsByPlatformAndEmail(memberSignUpRequest.getEmail(), Platform.MOCACONG)) {
             throw new DuplicateMemberException();
         }
-        memberRepository.findByNickname(memberSignUpRequest.getNickname())
-                .ifPresent(member -> {
-                    throw new DuplicateNicknameException();
-                });
+        validateNickname(memberSignUpRequest.getNickname());
     }
 
     private void validateDuplicateNickname(String nickname) {
