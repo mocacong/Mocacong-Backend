@@ -59,10 +59,9 @@ public class MemberService {
     }
 
     private void validateDuplicateMember(Platform platform, MemberSignUpRequest memberSignUpRequest) {
-        memberRepository.findByEmailAndPlatform(memberSignUpRequest.getEmail(), platform)
-                .ifPresent(member -> {
-                    throw new DuplicateMemberException();
-                });
+        if (memberRepository.existsByPlatformAndEmail(memberSignUpRequest.getEmail(), platform)) {
+            throw new DuplicateMemberException();
+        }
         memberRepository.findByNickname(memberSignUpRequest.getNickname())
                 .ifPresent(member -> {
                     throw new DuplicateNicknameException();
