@@ -58,7 +58,7 @@ public class CafeController {
     public ResponseEntity<CafeReviewResponse> saveCafeReview(
             @LoginUserEmail String email,
             @PathVariable String mapId,
-            @RequestBody CafeReviewRequest request
+            @RequestBody @Valid CafeReviewRequest request
     ) {
         CafeReviewResponse response = cafeService.saveCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
@@ -81,7 +81,7 @@ public class CafeController {
     public ResponseEntity<CafeReviewUpdateResponse> updateCafeReview(
             @LoginUserEmail String email,
             @PathVariable String mapId,
-            @RequestBody CafeReviewUpdateRequest request
+            @RequestBody @Valid CafeReviewUpdateRequest request
     ) {
         CafeReviewUpdateResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
