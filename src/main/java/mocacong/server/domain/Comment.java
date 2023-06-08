@@ -26,7 +26,7 @@ public class Comment extends BaseTime {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name = "content", nullable = false, length = MAXIMUM_COMMENT_LENGTH + 2)
+    @Column(name = "content", nullable = false, length = MAXIMUM_COMMENT_LENGTH)
     private String content;
 
     public Comment(Cafe cafe, Member member, String content) {
