@@ -59,10 +59,10 @@ public class MemberService {
     }
 
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
-        if (memberRepository.existsByPlatformAndEmail(memberSignUpRequest.getEmail(), Platform.MOCACONG)) {
+        if (memberRepository.existsByEmailAndPlatform(memberSignUpRequest.getEmail(), Platform.MOCACONG)) {
             throw new DuplicateMemberException();
         }
-        validateNickname(memberSignUpRequest.getNickname());
+        validateDuplicateNickname(memberSignUpRequest.getNickname());
     }
 
     private void validateDuplicateNickname(String nickname) {
