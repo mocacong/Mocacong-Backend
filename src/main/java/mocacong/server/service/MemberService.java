@@ -66,10 +66,8 @@ public class MemberService {
     }
 
     private void validateDuplicateNickname(String nickname) {
-        memberRepository.findByNickname(nickname)
-                .ifPresent(member -> {
-                    throw new DuplicateNicknameException();
-                });
+        if (memberRepository.existsByNickname(nickname))
+            throw new DuplicateNicknameException();
     }
 
     @Transactional
@@ -152,8 +150,8 @@ public class MemberService {
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
         validateNickname(nickname);
 
-        Optional<Member> findMember = memberRepository.findByNickname(nickname);
-        return new IsDuplicateNicknameResponse(findMember.isPresent());
+        Boolean isPresent = memberRepository.existsByNickname(nickname);
+        return new IsDuplicateNicknameResponse(isPresent);
     }
 
     private void validateNickname(String nickname) {
