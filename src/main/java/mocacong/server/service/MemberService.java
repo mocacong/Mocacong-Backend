@@ -23,9 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -61,21 +59,15 @@ public class MemberService {
     }
 
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
-        memberRepository.findByEmail(memberSignUpRequest.getEmail())
-                .ifPresent(member -> {
-                    throw new DuplicateMemberException();
-                });
-        memberRepository.findByNickname(memberSignUpRequest.getNickname())
-                .ifPresent(member -> {
-                    throw new DuplicateNicknameException();
-                });
+        if (memberRepository.existsByEmailAndPlatform(memberSignUpRequest.getEmail(), Platform.MOCACONG)) {
+            throw new DuplicateMemberException();
+        }
+        validateDuplicateNickname(memberSignUpRequest.getNickname());
     }
 
     private void validateDuplicateNickname(String nickname) {
-        memberRepository.findByNickname(nickname)
-                .ifPresent(member -> {
-                    throw new DuplicateNicknameException();
-                });
+        if (memberRepository.existsByNickname(nickname))
+            throw new DuplicateNicknameException();
     }
 
     @Transactional
@@ -158,8 +150,8 @@ public class MemberService {
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
         validateNickname(nickname);
 
-        Optional<Member> findMember = memberRepository.findByNickname(nickname);
-        return new IsDuplicateNicknameResponse(findMember.isPresent());
+        Boolean isPresent = memberRepository.existsByNickname(nickname);
+        return new IsDuplicateNicknameResponse(isPresent);
     }
 
     private void validateNickname(String nickname) {

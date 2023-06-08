@@ -10,7 +10,9 @@ import javax.persistence.*;
 import java.util.regex.Pattern;
 
 @Entity
-@Table(name = "member")
+@Table(name = "member", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "platform", "email" })
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTime {
@@ -23,7 +25,7 @@ public class Member extends BaseTime {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "password")
