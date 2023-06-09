@@ -12,7 +12,7 @@ import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
-import mocacong.server.service.event.MemberEvent;
+import mocacong.server.service.event.DeleteMemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,7 +85,7 @@ public class MemberService {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         findMember.updateProfileImgUrl(null);
-        applicationEventPublisher.publishEvent(new MemberEvent(findMember));
+        applicationEventPublisher.publishEvent(new DeleteMemberEvent(findMember));
         memberRepository.delete(findMember);
     }
 

@@ -18,7 +18,7 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
-import mocacong.server.service.event.MemberEvent;
+import mocacong.server.service.event.DeleteMemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -270,7 +270,7 @@ public class CafeService {
     }
 
     @EventListener
-    public void updateReviewWhenMemberDelete(MemberEvent event) {
+    public void updateReviewWhenMemberDelete(DeleteMemberEvent event) {
         Long memberId = event.getMember()
                 .getId();
         reviewRepository.findAllByMemberId(memberId)
@@ -367,7 +367,7 @@ public class CafeService {
     }
 
     @EventListener
-    public void updateCafeImagesWhenMemberDelete(MemberEvent event) {
+    public void updateCafeImagesWhenMemberDelete(DeleteMemberEvent event) {
         Member member = event.getMember();
         cafeImageRepository.findAllByMemberId(member.getId())
                 .forEach(CafeImage::removeMember);

@@ -12,7 +12,7 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.service.event.MemberEvent;
+import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -65,7 +65,7 @@ public class FavoriteService {
     }
 
     @EventListener
-    public void deleteAllWhenMemberDelete(MemberEvent event) {
+    public void deleteAllWhenMemberDelete(DeleteMemberEvent event) {
         Member member = event.getMember();
         favoriteRepository.findAllByMemberId(member.getId()).forEach(Favorite::removeMember);
     }
@@ -73,7 +73,7 @@ public class FavoriteService {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener
-    public void deleteFavoritesWhenMemberDeleted(MemberEvent event) {
+    public void deleteFavoritesWhenMemberDeleted(DeleteMemberEvent event) {
         favoriteRepository.deleteAllByMemberIdIsNull();
     }
 }
