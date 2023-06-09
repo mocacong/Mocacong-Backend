@@ -22,13 +22,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -118,16 +118,19 @@ public class CafeService {
                 .limit(CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS)
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
-                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), true);
+                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(),
+                                comment.getContent(), true);
                     } else {
-                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(),
+                                comment.getWriterNickname(), comment.getContent(), false);
                     }
                 })
                 .collect(Collectors.toList());
     }
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
+        List<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId());
         List<CafeImageResponse> cafeImageResponses = cafeImages.stream()
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
@@ -135,15 +138,10 @@ public class CafeService {
                 })
                 .collect(Collectors.toList());
 
-        Comparator<CafeImageResponse> comparator = Comparator.comparing(CafeImageResponse::getIsMe,
-                        Comparator.reverseOrder())
-                .thenComparing(CafeImageResponse::getId, Comparator.reverseOrder());
-
-        return cafeImageResponses.stream().sorted(comparator)
+        return cafeImageResponses.stream()
                 .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
                 .collect(Collectors.toList());
     }
-
 
     @Transactional(readOnly = true)
     public MyFavoriteCafesResponse findMyFavoriteCafes(String email, Integer page, int count) {
@@ -344,31 +342,21 @@ public class CafeService {
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
+        Pageable pageable = PageRequest.of(page, count);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), pageable);
 
-        List<CafeImageResponse> cafeImageResponses = cafeImages.stream()
+        List<CafeImageResponse> responses = cafeImages
+                .getContent()
+                .stream()
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
 
-        Comparator<CafeImageResponse> comparator = Comparator.comparing(CafeImageResponse::getIsMe,
-                        Comparator.reverseOrder())
-                .thenComparing(CafeImageResponse::getId, Comparator.reverseOrder());
-        List<CafeImageResponse> sortedCafeImages = cafeImageResponses.stream()
-                .sorted(comparator)
-                .collect(Collectors.toList());
-
-        int startIndex = page * count;
-        int endIndex = Math.min(startIndex + count, sortedCafeImages.size());
-        List<CafeImageResponse> slicedCafeImages = sortedCafeImages.subList(startIndex, endIndex);
-
-        boolean isLast = endIndex >= sortedCafeImages.size();
-
-        return new CafeImagesResponse(isLast, slicedCafeImages);
+        return new CafeImagesResponse(cafeImages.isLast(), responses);
     }
-
 
     @Transactional
     public void updateCafeImage(String email, String mapId, Long cafeImageId, MultipartFile cafeImg) {
