@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
@@ -12,22 +16,16 @@ import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -48,8 +46,6 @@ class CafeServiceTest {
     private FavoriteRepository favoriteRepository;
     @Autowired
     private CafeImageRepository cafeImageRepository;
-    @Autowired
-    private ReviewRepository reviewRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
@@ -83,7 +79,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("평점, 리뷰 및 코멘트가 존재하지 않는 카페를 조회한다")
     void findCafe() {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -106,9 +102,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("평점이 존재하고 리뷰, 코멘트가 존재하지 않는 카페를 조회한다")
     void findCafeWithScore() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -134,9 +130,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("평점, 리뷰, 코멘트가 모두 존재하는 카페를 조회한다")
     void findCafeWithReviewsAndComments() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -172,7 +168,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("평점, 리뷰가 존재하지 않는 카페 정보를 미리보기한다")
     void previewCafe() {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -190,9 +186,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("평점이 존재하고 리뷰가 존재하지 않는 카페 정보를 미리보기한다")
     void previewCafeWithScore() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -213,9 +209,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("평점과 리뷰가 모두 존재하는 카페 정보를 미리보기한다")
     void previewCafeWithScoreAndReview() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -240,7 +236,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("카페를 조회할 때 댓글은 3개까지만 보여준다")
     void findCafeAndShowLimitComments() {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -264,9 +260,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("탈퇴한 회원이 작성한 리뷰와 코멘트가 존재하는 카페를 조회한다")
     void findCafeWithReviewsAndCommentsByDeleteMember() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -294,9 +290,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("평점, 리뷰, 코멘트가 존재하고 즐겨찾기가 등록된 카페를 조회한다")
     void findCafeWithAll() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -335,7 +331,7 @@ class CafeServiceTest {
     @DisplayName("카페를 조회할 때 이미지는 5개까지만 보여준다")
     void findCafeAndShowLimitImages() throws IOException {
         String expected = "test_img.jpg";
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -362,9 +358,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("회원이 즐겨찾기한 카페 목록들을 보여준다")
     void findMyFavoriteCafes() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -388,9 +384,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("회원이 리뷰를 남긴 카페 목록들을 보여준다")
     void findMyReviewCafes() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe1 = new Cafe("2143154352323", "케이카페");
         Cafe cafe2 = new Cafe("2154122541112", "메리카페");
@@ -421,9 +417,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("회원이 댓글을 작성한 카페 목록들을 보여준다")
     void findMyCommentCafes() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe1 = new Cafe("2143154352323", "케이카페");
         Cafe cafe2 = new Cafe("1212121212121", "메리카페");
@@ -448,9 +444,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("카페에 대한 리뷰를 작성하면 해당 카페 평점과 세부정보가 갱신된다")
     void saveCafeReview() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -479,9 +475,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("카페 리뷰 작성 후 studyType의 타입 개수가 동일하면 both를 반환한다")
     void saveCafeAndStudyTypesEquals() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -499,9 +495,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("특정 카페에 내가 작성한 리뷰를 볼 수 있다")
     void findMyCafeReview() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -529,7 +525,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("작성하지 않은 카페에 대한 리뷰를 조회하는 경우 null을 반환한다")
     void findNotRegisteredCafeReview() {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -551,9 +547,9 @@ class CafeServiceTest {
     @Test
     @DisplayName("이미 리뷰를 작성했으면 수정만 가능하고 새로 작성은 불가능하다")
     void cannotSaveManyReviews() {
-        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -570,7 +566,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("등록한 카페 리뷰를 성공적으로 수정한다")
     public void updateCafeReview() {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -598,7 +594,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("등록한 카페 리뷰를 수정할 때 세부정보를 모두 null 값으로 성공적으로 수정한다")
     public void updateCafeReviewWhenDetailsNull() {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -626,7 +622,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("카페 리뷰를 등록한 적이 없다면 리뷰 수정은 불가능하다")
     public void updateCafeReviewNotFoundReview() {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -640,8 +636,8 @@ class CafeServiceTest {
     @Test
     @DisplayName("studyTypeValue가 주어진 경우 해당 카페 목록을 필터링한다")
     void getCafesFilterStudyType() {
-        Member member1 = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
-        Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member("dlawotn3@naver.com", "encodePassword", "메리");
+        Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
         memberRepository.save(member2);
         Cafe cafe1 = new Cafe("2143154352323", "케이카페");
@@ -682,7 +678,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("studyTypeValue에 해당하는 카페가 없는 경우 빈 리스트를 반환한다")
     void getCafesFilterStudyTypeWhenNoMatch() {
-        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -699,7 +695,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("즐겨찾기가 등록된 카페가 있는 경우 해당 카페 목록을 필터링한다")
     void getCafesFilterFavorites() {
-        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
         Cafe cafe1 = new Cafe("2143154352323", "케이카페");
         Cafe cafe2 = new Cafe("2143154311111", "메리카페");
@@ -724,7 +720,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("즐겨찾기가 등록된 카페가 없는 경우 빈 리스트를 반환한다")
     void getCafesFilterFavoritesWhenNoMatch() {
-        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리", "010-1234-5678");
+        Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -742,7 +738,7 @@ class CafeServiceTest {
         String expected = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
@@ -763,7 +759,7 @@ class CafeServiceTest {
     void saveCafeImagesPerRequest() throws IOException {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         MockMultipartFile mockMultipartFile1 =
@@ -785,7 +781,7 @@ class CafeServiceTest {
     void saveCafeImageWhenNoneCafeImage() throws IOException {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         MockMultipartFile mockMultipartFile =
@@ -801,7 +797,7 @@ class CafeServiceTest {
     void saveCafeImagesManyPerRequest() throws IOException {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         MockMultipartFile mockMultipartFile1 =
@@ -826,7 +822,7 @@ class CafeServiceTest {
         String expected = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
@@ -850,7 +846,7 @@ class CafeServiceTest {
         String expected = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
@@ -876,7 +872,7 @@ class CafeServiceTest {
         String expected = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
@@ -902,9 +898,9 @@ class CafeServiceTest {
         String expected = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member1 = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member1 = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member1);
-        Member member2 = new Member("kth990303@naver.com", "a1b2c3d4", "다른사람", "010-1111-2222", null);
+        Member member2 = new Member("kth990303@naver.com", "a1b2c3d4", "다른사람", null);
         memberRepository.save(member2);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
@@ -934,7 +930,7 @@ class CafeServiceTest {
         String newImage = "test_img2.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream oldFileInputStream = new FileInputStream("src/test/resources/images/" + oldImage);
@@ -964,7 +960,7 @@ class CafeServiceTest {
         String newImage = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream newFileInputStream = new FileInputStream("src/test/resources/images/" + newImage);
@@ -980,7 +976,7 @@ class CafeServiceTest {
     void updateCafeImageAndShowLimitImages() throws IOException {
         String oldImage = "test_img.jpg";
         String newImage = "test_img2.jpg";
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -1019,7 +1015,7 @@ class CafeServiceTest {
     @DisplayName("사용하지 않는 카페 이미지들을 삭제한다")
     void deleteNotUsedCafeImages() {
         List<String> notUsedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);

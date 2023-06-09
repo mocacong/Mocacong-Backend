@@ -12,14 +12,13 @@ import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
 class CommentServiceTest {
@@ -40,7 +39,7 @@ class CommentServiceTest {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
         String expected = "공부하기 좋아요~🥰";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -57,7 +56,7 @@ class CommentServiceTest {
     void saveNotExistsCafe() {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
 
         assertThatThrownBy(() -> commentService.save(email, mapId, "공부하기 좋아요~🥰"))
@@ -69,7 +68,7 @@ class CommentServiceTest {
     void saveManyTimes() {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -84,7 +83,7 @@ class CommentServiceTest {
     void findComments() {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -109,8 +108,8 @@ class CommentServiceTest {
     void findOnlyMyComments() {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
-        Member member2 = new Member("mery@naver.com", "encodePassword", "메리", "010-1234-5679");
+        Member member = new Member(email, "encodePassword", "케이");
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");
@@ -137,7 +136,7 @@ class CommentServiceTest {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
         String comment = "공부하기 좋아요~🥰";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -157,7 +156,7 @@ class CommentServiceTest {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
         String comment = "공부하기 좋아요~🥰";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -175,9 +174,9 @@ class CommentServiceTest {
         String email1 = "kth990303@naver.com";
         String email2 = "mery@naver.com";
         String mapId = "2143154352323";
-        Member member1 = new Member(email1, "encodePassword", "케이", "010-1234-5678");
+        Member member1 = new Member(email1, "encodePassword", "케이");
         memberRepository.save(member1);
-        Member member2 = new Member(email2, "encodePassword", "메리", "010-1234-5678");
+        Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -192,7 +191,7 @@ class CommentServiceTest {
     void delete() {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -209,7 +208,7 @@ class CommentServiceTest {
     void deleteNotExistsComment() {
         String email = "kth990303@naver.com";
         String mapId = "2143154352323";
-        Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
@@ -224,8 +223,8 @@ class CommentServiceTest {
         String email1 = "kth990303@naver.com";
         String email2 = "dlawotn3@naver.com";
         String mapId = "2143154352323";
-        Member member1 = new Member(email1, "encodePassword", "케이", "010-1234-5678");
-        Member member2 = new Member(email2, "encodePassword", "메리", "010-1234-5678");
+        Member member1 = new Member(email1, "encodePassword", "케이");
+        Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");

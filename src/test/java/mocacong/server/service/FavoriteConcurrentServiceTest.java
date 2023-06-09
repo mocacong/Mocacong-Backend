@@ -35,7 +35,7 @@ public class FavoriteConcurrentServiceTest {
     @Test
     @DisplayName("회원이 한 카페를 동시에 여러 번 즐겨찾기 등록 시도해도 한 번만 등록된다")
     void saveFavoriteWithConcurrent() throws InterruptedException {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);

@@ -1,5 +1,10 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
@@ -22,10 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,8 +51,8 @@ public class MemberService {
         validateDuplicateMember(request);
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        try{
-            Member member = new Member(request.getEmail(), encodedPassword, request.getNickname(), request.getPhone());
+        try {
+            Member member = new Member(request.getEmail(), encodedPassword, request.getNickname());
             return new MemberSignUpResponse(memberRepository.save(member).getId());
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateMemberException();
@@ -93,8 +94,7 @@ public class MemberService {
     public MemberGetAllResponse getAllMembers() {
         List<Member> members = memberRepository.findAll();
         List<MemberGetResponse> memberGetResponses = members.stream()
-                .map(member -> new MemberGetResponse(member.getId(), member.getEmail(),
-                        member.getNickname(), member.getPhone()))
+                .map(member -> new MemberGetResponse(member.getId(), member.getEmail(), member.getNickname()))
                 .collect(Collectors.toList());
         return new MemberGetAllResponse(memberGetResponses);
     }
@@ -164,7 +164,7 @@ public class MemberService {
     public MyPageResponse findMyInfo(String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        return new MyPageResponse(member.getEmail(), member.getNickname(), member.getPhone(), member.getImgUrl());
+        return new MyPageResponse(member.getEmail(), member.getNickname(), member.getImgUrl());
     }
 
     @Transactional
@@ -184,11 +184,10 @@ public class MemberService {
     @Transactional
     public void updateProfileInfo(String email, MemberProfileUpdateRequest request) {
         String updateNickname = request.getNickname();
-        String updatePhone = request.getPhone();
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         validateDuplicateNickname(updateNickname);
-        member.updateProfileInfo(updateNickname, updatePhone);
+        member.updateProfileInfo(updateNickname);
     }
 
     @Transactional
@@ -219,6 +218,6 @@ public class MemberService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
 
-        return new GetUpdateProfileInfoResponse(member.getEmail(), member.getNickname(), member.getPhone());
+        return new GetUpdateProfileInfoResponse(member.getEmail(), member.getNickname());
     }
 }

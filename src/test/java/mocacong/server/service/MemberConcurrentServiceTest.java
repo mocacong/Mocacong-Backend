@@ -28,7 +28,7 @@ public class MemberConcurrentServiceTest {
     @Test
     @DisplayName("회원이 동시에 여러 번 가입 시도해도 한 번만 가입된다")
     void signUpWithConcurrent() throws InterruptedException {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);
         List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());

@@ -1,26 +1,25 @@
 package mocacong.server.acceptance;
 
 import io.restassured.RestAssured;
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.support.AwsSESSender;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 public class MemberAcceptanceTest extends AcceptanceTest {
 
@@ -34,7 +33,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원을 정상적으로 가입한다")
     void signUp() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -72,7 +71,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 정상적으로 탈퇴한다")
     void delete() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(request);
         String token = 로그인_토큰_발급(request.getEmail(), request.getPassword());
 
@@ -88,7 +87,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @DisplayName("리뷰나 코멘트를 달은 회원이 정상적으로 탈퇴한다")
     void deleteWhenSaveReviewsAndComments() {
         String mapId = "1234";
-        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
 
@@ -109,7 +108,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @DisplayName("즐겨찾기를 등록한 회원이 정상적으로 탈퇴한다")
     void deleteWhenSaveFavorites() {
         String mapId = "1234";
-        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
 
@@ -127,7 +126,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원은 올바르지 않은 형식의 필드로 가입할 수 없다")
     void signUpInvalidInputField() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "abcdefgh", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "abcdefgh", "케이");
         ErrorResponse response = 회원_가입(request)
                 .as(ErrorResponse.class);
 
@@ -138,7 +137,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @DisplayName("회원가입이 된 이메일로 이메일 인증을 요청할 수 있다")
     void verifyEmail() {
         String email = "kth990303@naver.com";
-        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(email, "a1b2c3d4", "케이");
         회원_가입(memberSignUpRequest);
         doNothing().when(awsSESSender).sendToVerifyEmail(anyString(), anyString());
         EmailVerifyCodeRequest request = new EmailVerifyCodeRequest(NONCE, email);
@@ -169,7 +168,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @DisplayName("비밀번호 찾기 요청으로 새로운 비밀번호로 변경한다")
     void findAndResetPassword() {
         String email = "kth990303@naver.com";
-        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest(email, "a1b2c3d4", "케이");
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
         ResetPasswordRequest request = new ResetPasswordRequest(NONCE, "password123");
@@ -186,7 +185,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("가입되어 있지 않은 이메일은 이메일 중복검사에서 걸리지 않는다")
     void isDuplicateWithNonExistingEmail() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -200,7 +199,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("이미 가입된 이메일은 이메일 중복검사에서 걸린다")
     void isDuplicateWithExistingEmail() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
 
         회원_가입(request);
 
@@ -216,7 +215,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("길이가 0인 이메일은 이메일 중복검사에서 예외를 던진다")
     void emailLengthIs0ReturnException() {
-        MemberSignUpRequest request = new MemberSignUpRequest("", "a1b2c3d4", "메리", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("", "a1b2c3d4", "메리");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -230,7 +229,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("존재하지 않는 닉네임은 닉네임 중복검사에서 걸리지 않는다")
     void isDuplicateWithNonExistingNickname() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -244,7 +243,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("이미 존재하는 닉네임은 닉네임 중복검사에서 걸린다")
     void isDuplicateWithExistingNickname() {
-        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -258,7 +257,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("길이가 0인 닉네임은 닉네임 중복검사에서 예외를 던진다")
     void nicknameLengthIs0ReturnException() {
-        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -272,9 +271,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원을 전체 조회한다")
     void getAllMembers() {
-        MemberSignUpRequest request1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(request1);
-        MemberSignUpRequest request2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        MemberSignUpRequest request2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리");
         회원_가입(request2);
 
         RestAssured.given().log().all()
@@ -289,7 +288,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("마이페이지로 내 정보를 조회한다")
     void findMyInfo() {
-        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -305,7 +304,6 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(actual.getEmail()).isEqualTo("kth990303@naver.com"),
                 () -> assertThat(actual.getNickname()).isEqualTo("케이"),
-                () -> assertThat(actual.getPhone()).isEqualTo("010-1234-5678"),
                 () -> assertThat(actual.getImgUrl()).isNull()
         );
     }
@@ -315,7 +313,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void findMyFavoriteCafes() {
         String mapId = "12332312";
         카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
-        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
         즐겨찾기_등록(token, mapId);
@@ -336,8 +334,8 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         String mapId2 = "12121212";
         카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페"));
         카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페"));
-        MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
-        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1111-1111");
+        MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리");
         회원_가입(signUpRequest1);
         회원_가입(signUpRequest2);
         String token1 = 로그인_토큰_발급(signUpRequest1.getEmail(), signUpRequest1.getPassword());
@@ -376,9 +374,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         String mapId2 = "12121212";
         카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페"));
         카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페"));
-        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
-        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("mery@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("mery@naver.com", "a1b2c3d4", "메리");
         회원_가입(signUpRequest2);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
         String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest.getPassword());
@@ -402,12 +400,11 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 정상적으로 회원정보를 수정한다")
     void updateProfileInfo() {
-        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
         String newNickname = "메리";
-        String newPhone = "010-1234-5678";
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPhone);
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname);
 
         RestAssured.given().log().all()
                 .auth().oauth2(token)
@@ -427,7 +424,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 옳은 비밀번호로 비밀번호 인증한다")
     void verifyPasswordWithTrue() {
-        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
         PasswordVerifyRequest request = new PasswordVerifyRequest("a1b2c3d4");
@@ -448,7 +445,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 틀린 비밀번호로 비밀번호 인증한다")
     void verifyPasswordWithFalse() {
-        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
         PasswordVerifyRequest request = new PasswordVerifyRequest("wrongpwd123");
@@ -469,7 +466,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("프로필 수정 페이지에서 내 정보를 조회한다")
     void getUpdateProfileInfo() {
-        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
 
@@ -484,8 +481,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 () -> assertThat(actual.getEmail()).isEqualTo("kth990303@naver.com"),
-                () -> assertThat(actual.getNickname()).isEqualTo("케이"),
-                () -> assertThat(actual.getPhone()).isEqualTo("010-1234-5678")
+                () -> assertThat(actual.getNickname()).isEqualTo("케이")
         );
     }
 }

@@ -53,7 +53,7 @@ class MemberServiceTest {
     @DisplayName("회원을 정상적으로 가입한다")
     void signUp() {
         String expected = "kth990303@naver.com";
-        MemberSignUpRequest request = new MemberSignUpRequest(expected, "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest(expected, "a1b2c3d4", "케이");
 
         memberService.signUp(request);
 
@@ -66,8 +66,8 @@ class MemberServiceTest {
     @DisplayName("이미 가입된 이메일이 존재하면 회원 가입 시에 예외를 반환한다")
     void signUpByDuplicateEmailMember() {
         String email = "kth990303@naver.com";
-        memberRepository.save(new Member(email, "1234", "케이", "010-1234-5678"));
-        MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+        memberRepository.save(new Member(email, "1234", "케이"));
+        MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이");
 
         assertThatThrownBy(() -> memberService.signUp(request))
                 .isInstanceOf(DuplicateMemberException.class);
@@ -77,8 +77,8 @@ class MemberServiceTest {
     @DisplayName("이미 가입된 닉네임이 존재하면 회원 가입 시에 예외를 반환한다")
     void signUpByDuplicateNicknameMember() {
         String nickname = "케이";
-        memberRepository.save(new Member("kth2@naver.com", "1234", nickname, "010-1234-5678"));
-        MemberSignUpRequest request = new MemberSignUpRequest("kth@naver.com", "a1b2c3d4", nickname, "010-1234-5678");
+        memberRepository.save(new Member("kth2@naver.com", "1234", nickname));
+        MemberSignUpRequest request = new MemberSignUpRequest("kth@naver.com", "a1b2c3d4", nickname);
 
         assertThatThrownBy(() -> memberService.signUp(request))
                 .isInstanceOf(DuplicateNicknameException.class);
@@ -124,7 +124,7 @@ class MemberServiceTest {
     @DisplayName("비밀번호가 8~20자가 아니면 예외를 반환한다")
     @ValueSource(strings = {"abcdef7", "abcdefgabcdefgabcde21"})
     void passwordLengthValidation(String password) {
-        assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest("kth990303@naver.com", password, "케이", "010-1234-5678")))
+        assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest("kth990303@naver.com", password, "케이")))
                 .isInstanceOf(InvalidPasswordException.class);
     }
 
@@ -132,7 +132,7 @@ class MemberServiceTest {
     @DisplayName("비밀번호가 소문자, 숫자를 모두 포함하지 않으면 예외를 반환한다")
     @ValueSource(strings = {"abcdefgh", "12345678"})
     void passwordConfigureValidation(String password) {
-        assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest("kth990303@naver.com", password, "케이", "010-1234-5678")))
+        assertThatThrownBy(() -> memberService.signUp(new MemberSignUpRequest("kth990303@naver.com", password, "케이")))
                 .isInstanceOf(InvalidPasswordException.class);
     }
 
@@ -216,7 +216,7 @@ class MemberServiceTest {
     @DisplayName("이미 존재하는 이메일인 경우 True를 반환한다")
     void isDuplicateEmailReturnTrue() {
         String email = "dlawotn3@naver.com";
-        MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest(email, "a1b2c3d4", "케이");
         memberService.signUp(request);
 
         IsDuplicateEmailResponse response = memberService.isDuplicateEmail(email);
@@ -238,7 +238,7 @@ class MemberServiceTest {
     @DisplayName("이미 존재하는 닉네임인 경우 True를 반환한다")
     void isDuplicateNicknameReturnTrue() {
         String nickname = "메리";
-        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", nickname, "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", nickname);
         memberService.signUp(request);
 
         IsDuplicateNicknameResponse response = memberService.isDuplicateNickname(nickname);
@@ -266,7 +266,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원을 정상적으로 탈퇴한다")
     void delete() {
-        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
+        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리"));
 
         memberService.delete(savedMember.getEmail());
 
@@ -284,8 +284,8 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원을 전체 조회한다")
     void getAllMembers() {
-        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
-        memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
+        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이"));
+        memberRepository.save(new Member("dlawotn3@naver.com", "a1b2c3d4", "메리"));
 
         MemberGetAllResponse actual = memberService.getAllMembers();
 
@@ -298,11 +298,9 @@ class MemberServiceTest {
         String imgUrl = "test_img.jpg";
         String email = "kth990303@naver.com";
         String nickname = "케이";
-        String phone = "010-1234-5678";
         MemberProfileImage memberProfileImage = new MemberProfileImage(imgUrl);
         memberProfileImageRepository.save(memberProfileImage);
-        Member member = new Member(email, "a1b2c3d4", "케이", phone, memberProfileImage,
-                Platform.MOCACONG, "1234");
+        Member member = new Member(email, "a1b2c3d4", "케이", memberProfileImage, Platform.MOCACONG, "1234");
         memberRepository.save(member);
 
         MyPageResponse actual = memberService.findMyInfo(email);
@@ -310,7 +308,6 @@ class MemberServiceTest {
         assertAll(
                 () -> assertThat(actual.getEmail()).isEqualTo(email),
                 () -> assertThat(actual.getImgUrl()).isEqualTo(imgUrl),
-                () -> assertThat(actual.getPhone()).isEqualTo(phone),
                 () -> assertThat(actual.getNickname()).isEqualTo(nickname)
         );
     }
@@ -319,7 +316,7 @@ class MemberServiceTest {
     @DisplayName("회원의 프로필 이미지를 변경하면 s3 서버와 연동하여 이미지를 업로드한다")
     void updateProfileImg() throws IOException {
         String expected = "test_img.jpg";
-        Member member = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678"));
+        Member member = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리"));
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
 
@@ -341,8 +338,7 @@ class MemberServiceTest {
         MemberProfileImage memberProfileImage = new MemberProfileImage("test.me.jpg");
         memberProfileImageRepository.save(memberProfileImage);
         Member member = memberRepository.save(
-                new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678",
-                        memberProfileImage, Platform.MOCACONG, "1234")
+                new Member("kth990303@naver.com", "a1b2c3d4", "메리", memberProfileImage, Platform.MOCACONG, "1234")
         );
 
         memberService.updateProfileImage(member.getEmail(), null);
@@ -363,18 +359,15 @@ class MemberServiceTest {
         String password = "a1b2c3d4";
         String originalNickname = "mery";
         String newNickname = "케이";
-        String originalPhone = "010-1111-1111";
-        String newPhone = "010-1234-1234";
-        Member member = new Member(email, passwordEncoder.encode(password), originalNickname, originalPhone);
+        Member member = new Member(email, passwordEncoder.encode(password), originalNickname);
         memberRepository.save(member);
 
-        memberService.updateProfileInfo(email, new MemberProfileUpdateRequest(newNickname, newPhone));
+        memberService.updateProfileInfo(email, new MemberProfileUpdateRequest(newNickname));
         Member updatedMember = memberRepository.findByEmail(member.getEmail())
                 .orElseThrow();
 
         assertAll(
-                () -> assertThat(updatedMember.getNickname()).isEqualTo(newNickname),
-                () -> assertThat(updatedMember.getPhone()).isEqualTo(newPhone)
+                () -> assertThat(updatedMember.getNickname()).isEqualTo(newNickname)
         );
     }
 
@@ -385,31 +378,12 @@ class MemberServiceTest {
         String password = "jisu1234";
         String originalNickname = "mery";
         String newNickname = "케이123";
-        String originalPhone = "010-1111-1111";
-        String newPhone = "010-1234-1234";
-        Member member = new Member(email, passwordEncoder.encode(password), originalNickname, originalPhone);
+        Member member = new Member(email, passwordEncoder.encode(password), originalNickname);
         memberRepository.save(member);
 
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPhone);
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname);
         assertThatThrownBy(() -> memberService.updateProfileInfo(member.getEmail(), request))
                 .isInstanceOf(InvalidNicknameException.class);
-    }
-
-    @Test
-    @DisplayName("회원이 잘못된 전화번호 형식으로 회원정보 수정을 시도하면 예외를 반환한다")
-    void updateBadPhoneWithValidateException() {
-        String email = "mery@naver.com";
-        String password = "jisu1234";
-        String originalNickname = "mery";
-        String newNickname = "케이";
-        String originalPhone = "010-1111-1111";
-        String newPhone = "010-0000";
-        Member member = new Member(email, passwordEncoder.encode(password), originalNickname, originalPhone);
-        memberRepository.save(member);
-
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, newPhone);
-        assertThatThrownBy(() -> memberService.updateProfileInfo(member.getEmail(), request))
-                .isInstanceOf(InvalidPhoneException.class);
     }
 
     @Test
@@ -419,11 +393,10 @@ class MemberServiceTest {
         String password = "jisu0708";
         String originalNickname = "mery";
         String newNickname = "케이";
-        String phone = "010-1111-1111";
-        memberRepository.save(new Member(email, password, originalNickname, phone));
-        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678"));
+        memberRepository.save(new Member(email, password, originalNickname));
+        memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이"));
 
-        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname, phone);
+        MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname);
         assertThatThrownBy(() -> memberService.updateProfileInfo(email, request))
                 .isInstanceOf(DuplicateNicknameException.class);
     }
@@ -456,7 +429,7 @@ class MemberServiceTest {
         MemberProfileImage memberProfileImage = new MemberProfileImage("test_img.jpg");
         memberProfileImageRepository.save(memberProfileImage);
         Member member = memberRepository.save(
-                new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678", memberProfileImage)
+                new Member("kth990303@naver.com", "a1b2c3d4", "케이", memberProfileImage)
         );
 
         memberService.delete(member.getEmail());
@@ -472,8 +445,7 @@ class MemberServiceTest {
         String email = "dlawotn3@naver.com";
         String password = "jisu1234";
         String nickname = "mery";
-        String phone = "010-1111-1111";
-        Member member = new Member(email, passwordEncoder.encode(password), nickname, phone);
+        Member member = new Member(email, passwordEncoder.encode(password), nickname);
         memberRepository.save(member);
         PasswordVerifyRequest request = new PasswordVerifyRequest("jisu1234");
 
@@ -488,8 +460,7 @@ class MemberServiceTest {
         String email = "dlawotn3@naver.com";
         String password = "jisu1234";
         String nickname = "mery";
-        String phone = "010-1111-1111";
-        Member member = new Member(email, passwordEncoder.encode(password), nickname, phone);
+        Member member = new Member(email, passwordEncoder.encode(password), nickname);
         memberRepository.save(member);
         PasswordVerifyRequest request = new PasswordVerifyRequest("wrongpwd123");
 
@@ -504,16 +475,14 @@ class MemberServiceTest {
         String email = "dlawotn3@naver.com";
         String password = "jisu1234";
         String nickname = "mery";
-        String phone = "010-1111-1111";
-        Member member = new Member(email, passwordEncoder.encode(password), nickname, phone);
+        Member member = new Member(email, passwordEncoder.encode(password), nickname);
         memberRepository.save(member);
 
         GetUpdateProfileInfoResponse actual = memberService.getUpdateProfileInfo(member.getEmail());
 
         assertAll(
                 () -> assertThat(actual.getEmail()).isEqualTo(email),
-                () -> assertThat(actual.getNickname()).isEqualTo(nickname),
-                () -> assertThat(actual.getPhone()).isEqualTo(phone)
+                () -> assertThat(actual.getNickname()).isEqualTo(nickname)
         );
     }
 }

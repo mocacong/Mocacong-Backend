@@ -10,16 +10,15 @@ import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.when;
 
 @ServiceTest
 class AuthServiceTest {
@@ -40,7 +39,7 @@ class AuthServiceTest {
         String email = "kth990303@naver.com";
         String password = "a1b2c3d4";
         String encodedPassword = passwordEncoder.encode("a1b2c3d4");
-        Member member = new Member("kth990303@naver.com", encodedPassword, "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", encodedPassword, "케이");
         memberRepository.save(member);
         AuthLoginRequest loginRequest = new AuthLoginRequest(email, password);
 
@@ -55,7 +54,7 @@ class AuthServiceTest {
         String email = "kth990303@naver.com";
         String password = "a1b2c3d4";
         String encodedPassword = passwordEncoder.encode(password);
-        Member member = new Member(email, encodedPassword, "케이", "010-1234-5678");
+        Member member = new Member(email, encodedPassword, "케이");
         memberRepository.save(member);
 
         AuthLoginRequest loginRequest = new AuthLoginRequest(email, "wrongPassword");
@@ -91,7 +90,6 @@ class AuthServiceTest {
                 expected,
                 passwordEncoder.encode("a1b2c3d4"),
                 "케이",
-                "010-1234-1234",
                 null,
                 Platform.APPLE,
                 platformId
@@ -135,7 +133,7 @@ class AuthServiceTest {
     void loginOAuthWithMocacongEmail() {
         String email = "kth@apple.com";
         String encodedPassword = passwordEncoder.encode("a1b2c3d4");
-        Member member = new Member(email, encodedPassword, "케이", "010-1234-5678");
+        Member member = new Member(email, encodedPassword, "케이");
         memberRepository.save(member);
         String platformId = "1234321";
         when(appleOAuthUserProvider.getApplePlatformMember(anyString()))
@@ -161,7 +159,7 @@ class AuthServiceTest {
         OAuthTokenResponse response = authService.appleOAuthLogin(new AppleLoginRequest("token"));
         String encodedPassword = passwordEncoder.encode("a1b2c3d4");
 
-        Member member = new Member(email, encodedPassword, "케이", "010-1234-5678");
+        Member member = new Member(email, encodedPassword, "케이");
         memberRepository.save(member);
 
         assertAll(

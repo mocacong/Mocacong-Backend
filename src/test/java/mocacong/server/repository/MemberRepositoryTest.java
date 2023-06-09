@@ -3,7 +3,6 @@ package mocacong.server.repository;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ class MemberRepositoryTest {
                 "kth@apple.com",
                 "a1b2c3d4",
                 "케이",
-                "010-1234-1234",
                 null,
                 Platform.APPLE,
                 "1234321"
