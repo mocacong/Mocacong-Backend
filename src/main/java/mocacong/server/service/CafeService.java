@@ -290,6 +290,7 @@ public class CafeService {
     public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue,
                                                               CafeFilterStudyTypeRequest request) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
+        cafes.addAll(cafeRepository.findByStudyTypeValue(StudyType.BOTH));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());

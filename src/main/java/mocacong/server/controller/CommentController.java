@@ -3,6 +3,7 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.CommentSaveRequest;
 import mocacong.server.dto.request.CommentUpdateRequest;
@@ -27,7 +28,7 @@ public class CommentController {
     public ResponseEntity<CommentSaveResponse> saveComment(
             @LoginUserEmail String email,
             @PathVariable String mapId,
-            @RequestBody CommentSaveRequest request
+            @RequestBody @Valid CommentSaveRequest request
     ) {
         CommentSaveResponse response = commentService.save(email, mapId, request.getContent());
         return ResponseEntity.ok(response);
@@ -66,7 +67,7 @@ public class CommentController {
             @LoginUserEmail String email,
             @PathVariable String mapId,
             @PathVariable Long commentId,
-            @RequestBody CommentUpdateRequest request
+            @RequestBody @Valid CommentUpdateRequest request
     ) {
         commentService.update(email, mapId, request.getContent(), commentId);
         return ResponseEntity.ok().build();

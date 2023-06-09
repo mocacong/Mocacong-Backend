@@ -3,8 +3,6 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
@@ -14,6 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @Tag(name = "Cafes", description = "카페")
 @RestController
@@ -58,7 +59,7 @@ public class CafeController {
     public ResponseEntity<CafeReviewResponse> saveCafeReview(
             @LoginUserEmail String email,
             @PathVariable String mapId,
-            @RequestBody CafeReviewRequest request
+            @RequestBody @Valid CafeReviewRequest request
     ) {
         CafeReviewResponse response = cafeService.saveCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
@@ -81,7 +82,7 @@ public class CafeController {
     public ResponseEntity<CafeReviewUpdateResponse> updateCafeReview(
             @LoginUserEmail String email,
             @PathVariable String mapId,
-            @RequestBody CafeReviewUpdateRequest request
+            @RequestBody @Valid CafeReviewUpdateRequest request
     ) {
         CafeReviewUpdateResponse response = cafeService.updateCafeReview(email, mapId, request);
         return ResponseEntity.ok(response);
@@ -91,7 +92,7 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @PostMapping(value = "/studytypes")
     public ResponseEntity<CafeFilterStudyTypeResponse> getCafesByStudyType(
-            @RequestParam(required = false) String studytype,
+            @RequestParam String studytype,
             @RequestBody CafeFilterStudyTypeRequest request
     ) {
         CafeFilterStudyTypeResponse responseBody = cafeService.filterCafesByStudyType(studytype, request);

@@ -77,7 +77,7 @@ public class Cafe extends BaseTime {
             StudyType studyType = review.getStudyType();
             if (studyType == StudyType.SOLO) solo++;
             else if (studyType == StudyType.GROUP) group++;
-            else {
+            else if (studyType == StudyType.BOTH) {
                 solo++;
                 group++;
             }

@@ -648,10 +648,12 @@ class CafeServiceTest {
         Cafe cafe2 = new Cafe("2143154311111", "메리카페");
         Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점");
         Cafe cafe4 = new Cafe("1585656565441", "메리벅스");
+        Cafe cafe5 = new Cafe("1582212121441", "메리설빙");
         cafeRepository.save(cafe1);
         cafeRepository.save(cafe2);
         cafeRepository.save(cafe3);
         cafeRepository.save(cafe4);
+        cafeRepository.save(cafe5);
         cafeService.saveCafeReview(member1.getEmail(), cafe1.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
@@ -664,14 +666,17 @@ class CafeServiceTest {
         cafeService.saveCafeReview(member2.getEmail(), cafe4.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
+        cafeService.saveCafeReview(member2.getEmail(), cafe5.getMapId(),
+                new CafeReviewRequest(4, "both", "빵빵해요", "여유로워요",
+                        "깨끗해요", "충분해요", "조용해요", "편해요"));
         CafeFilterStudyTypeRequest requestBody = new CafeFilterStudyTypeRequest(
-                List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId())
+                List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId(), cafe5.getMapId())
         );
 
         CafeFilterStudyTypeResponse filteredCafes = cafeService.filterCafesByStudyType("solo", requestBody);
 
         assertThat(filteredCafes.getMapIds())
-                .containsExactlyInAnyOrder(cafe1.getMapId(), cafe3.getMapId(), cafe4.getMapId());
+                .containsExactlyInAnyOrder(cafe1.getMapId(), cafe3.getMapId(), cafe4.getMapId(), cafe5.getMapId());
     }
 
     @Test
