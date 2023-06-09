@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -31,6 +27,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -282,6 +283,7 @@ public class CafeService {
     public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue,
                                                               CafeFilterStudyTypeRequest request) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
+        cafes.addAll(cafeRepository.findByStudyTypeValue(StudyType.BOTH));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());
