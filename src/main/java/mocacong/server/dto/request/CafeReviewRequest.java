@@ -1,5 +1,6 @@
 package mocacong.server.dto.request;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 
@@ -11,7 +12,10 @@ public class CafeReviewRequest {
 
     @NotNull(message = "3009:공백일 수 없습니다.")
     private Integer myScore;
+
+    @NotBlank(message = "3009:공백일 수 없습니다.")
     private String myStudyType;
+
     private String myWifi;
     private String myParking;
     private String myToilet;
