@@ -238,6 +238,7 @@ public class CafeService {
         return CafeMyReviewResponse.of(score, review);
     }
 
+    @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public CafeReviewUpdateResponse updateCafeReview(String email, String mapId, CafeReviewUpdateRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
