@@ -84,6 +84,7 @@ public class MemberService {
     public void delete(String email) {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
+        findMember.updateProfileImgUrl(null);
         applicationEventPublisher.publishEvent(new MemberEvent(findMember));
         memberRepository.delete(findMember);
     }
