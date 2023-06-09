@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -26,11 +22,16 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityManager;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -127,15 +128,22 @@ public class CafeService {
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
         List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
-        return cafeImages
-                .stream()
-                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
+        List<CafeImageResponse> cafeImageResponses = cafeImages.stream()
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
+
+        Comparator<CafeImageResponse> comparator = Comparator.comparing(CafeImageResponse::getIsMe,
+                        Comparator.reverseOrder())
+                .thenComparing(CafeImageResponse::getId, Comparator.reverseOrder());
+
+        return cafeImageResponses.stream().sorted(comparator)
+                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
+                .collect(Collectors.toList());
     }
+
 
     @Transactional(readOnly = true)
     public MyFavoriteCafesResponse findMyFavoriteCafes(String email, Integer page, int count) {
@@ -335,20 +343,31 @@ public class CafeService {
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
-        Pageable pageable = PageRequest.of(page, count);
-        Slice<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId(), pageable);
+        List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
 
-        List<CafeImageResponse> responses = cafeImages
-                .getContent()
-                .stream()
+        List<CafeImageResponse> cafeImageResponses = cafeImages.stream()
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
 
-        return new CafeImagesResponse(cafeImages.isLast(), responses);
+        Comparator<CafeImageResponse> comparator = Comparator.comparing(CafeImageResponse::getIsMe,
+                        Comparator.reverseOrder())
+                .thenComparing(CafeImageResponse::getId, Comparator.reverseOrder());
+        List<CafeImageResponse> sortedCafeImages = cafeImageResponses.stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+
+        int startIndex = page * count;
+        int endIndex = Math.min(startIndex + count, sortedCafeImages.size());
+        List<CafeImageResponse> slicedCafeImages = sortedCafeImages.subList(startIndex, endIndex);
+
+        boolean isLast = endIndex >= sortedCafeImages.size();
+
+        return new CafeImagesResponse(isLast, slicedCafeImages);
     }
+
 
     @Transactional
     public void updateCafeImage(String email, String mapId, Long cafeImageId, MultipartFile cafeImg) {
