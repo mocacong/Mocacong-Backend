@@ -1041,7 +1041,7 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(2).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(3).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
-                () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
+                () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
         );
     }
