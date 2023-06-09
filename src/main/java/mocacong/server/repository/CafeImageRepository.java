@@ -11,5 +11,7 @@ public interface CafeImageRepository extends JpaRepository<CafeImage, Long> {
 
     List<CafeImage> findAllByCafeIdAndIsUsedTrue(Long cafeId);
 
+    List<CafeImage> findAllByMemberId(Long memberId);
+
     List<CafeImage> findAllByIsUsedFalse();
 }

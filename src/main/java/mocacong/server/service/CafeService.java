@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -27,11 +31,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -365,6 +364,13 @@ public class CafeService {
         String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
         CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
+    }
+
+    @EventListener
+    public void updateCafeImagesWhenMemberDelete(MemberEvent event) {
+        Member member = event.getMember();
+        cafeImageRepository.findAllByMemberId(member.getId())
+                .forEach(CafeImage::removeMember);
     }
 
     @Transactional

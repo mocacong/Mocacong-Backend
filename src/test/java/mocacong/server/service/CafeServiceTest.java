@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
@@ -12,22 +16,16 @@ import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ServiceTest
 class CafeServiceTest {
@@ -48,8 +46,6 @@ class CafeServiceTest {
     private FavoriteRepository favoriteRepository;
     @Autowired
     private CafeImageRepository cafeImageRepository;
-    @Autowired
-    private ReviewRepository reviewRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
@@ -1012,6 +1008,27 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
+        );
+    }
+
+    @Test
+    @DisplayName("탈퇴한 회원의 카페 이미지는 삭제되지 않고 이미지 작성자를 null 처리한다")
+    void cafeImagesWhenMemberDelete() throws IOException {
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/test_img.jpg");
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", fileInputStream);
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member.getEmail(), cafe.getMapId(), List.of(mockMultipartFile));
+
+        memberService.delete(member.getEmail());
+        List<CafeImage> actual = cafeImageRepository.findAll();
+
+        assertAll(
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual.get(0).getMember()).isNull()
         );
     }
 
