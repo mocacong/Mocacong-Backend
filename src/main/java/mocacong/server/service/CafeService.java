@@ -129,18 +129,20 @@ public class CafeService {
     }
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        List<CafeImage> cafeImages = cafeImageRepository.
-                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId());
-        List<CafeImageResponse> cafeImageResponses = cafeImages.stream()
+        Pageable pageable = PageRequest.of(0, 5);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
+
+        List<CafeImageResponse> cafeImageResponses = cafeImages
+                .getContent()
+                .stream()
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
 
-        return cafeImageResponses.stream()
-                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
-                .collect(Collectors.toList());
+        return cafeImageResponses;
     }
 
     @Transactional(readOnly = true)
