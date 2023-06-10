@@ -10,11 +10,15 @@ import java.util.List;
 
 public interface CafeImageRepository extends JpaRepository<CafeImage, Long> {
 
-    @Query("SELECT ci FROM CafeImage ci WHERE ci.cafe.id = :cafeId AND ci.isUsed = true ORDER BY ci.id DESC")
-    List<CafeImage> findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(Long cafeId);
+    @Query("SELECT ci FROM CafeImage ci WHERE ci.cafe.id = :cafeId AND ci.isUsed = true " +
+            "ORDER BY CASE WHEN ci.member.id = :memberId THEN 0 ELSE 1 END, " +
+            "CASE WHEN ci.member.id = :memberId THEN ci.id END DESC, ci.id DESC")
+    List<CafeImage> findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(Long cafeId, Long memberId);
 
-    @Query("SELECT ci FROM CafeImage ci WHERE ci.cafe.id = :cafeId AND ci.isUsed = true ORDER BY ci.id DESC")
-    Slice<CafeImage> findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(Long cafeId, Pageable pageable);
+    @Query("SELECT ci FROM CafeImage ci WHERE ci.cafe.id = :cafeId AND ci.isUsed = true " +
+            "ORDER BY CASE WHEN ci.member.id = :memberId THEN 0 ELSE 1 END, " +
+            "CASE WHEN ci.member.id = :memberId THEN ci.id END DESC, ci.id DESC")
+    Slice<CafeImage> findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(Long cafeId, Long memberId, Pageable pageable);
 
     List<CafeImage> findAllByIsUsedFalse();
 }

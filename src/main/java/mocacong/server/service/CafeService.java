@@ -130,7 +130,7 @@ public class CafeService {
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
         List<CafeImage> cafeImages = cafeImageRepository.
-                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId());
+                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId());
         List<CafeImageResponse> cafeImageResponses = cafeImages.stream()
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
@@ -344,7 +344,7 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
         Slice<CafeImage> cafeImages = cafeImageRepository.
-                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), pageable);
+                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
 
         List<CafeImageResponse> responses = cafeImages
                 .getContent()
