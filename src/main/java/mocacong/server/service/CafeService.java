@@ -132,7 +132,7 @@ public class CafeService {
         Slice<CafeImage> cafeImages = cafeImageRepository.
                 findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
 
-        List<CafeImageResponse> cafeImageResponses = cafeImages
+        return cafeImages
                 .getContent()
                 .stream()
                 .map(cafeImage -> {
@@ -140,8 +140,6 @@ public class CafeService {
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
                 })
                 .collect(Collectors.toList());
-
-        return cafeImageResponses;
     }
 
     @Transactional(readOnly = true)
