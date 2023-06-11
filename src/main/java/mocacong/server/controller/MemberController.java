@@ -71,7 +71,7 @@ public class MemberController {
     @Operation(summary = "마이페이지 - 즐겨찾기 조회")
     @SecurityRequirement(name = "JWT")
     @GetMapping("/mypage/stars")
-    public ResponseEntity<MyFavoriteCafesResponse> findMyInfo(
+    public ResponseEntity<MyFavoriteCafesResponse> findMyFavoriteCafes(
             @LoginUserEmail String email,
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count

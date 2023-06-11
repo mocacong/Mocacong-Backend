@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -14,7 +18,7 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
-import mocacong.server.service.event.MemberEvent;
+import mocacong.server.service.event.DeleteMemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,11 +31,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -276,7 +275,7 @@ public class CafeService {
     }
 
     @EventListener
-    public void updateReviewWhenMemberDelete(MemberEvent event) {
+    public void updateReviewWhenMemberDelete(DeleteMemberEvent event) {
         Long memberId = event.getMember()
                 .getId();
         reviewRepository.findAllByMemberId(memberId)
@@ -371,6 +370,13 @@ public class CafeService {
         String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
         CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
+    }
+
+    @EventListener
+    public void updateCafeImagesWhenMemberDelete(DeleteMemberEvent event) {
+        Member member = event.getMember();
+        cafeImageRepository.findAllByMemberId(member.getId())
+                .forEach(CafeImage::removeMember);
     }
 
     @Transactional

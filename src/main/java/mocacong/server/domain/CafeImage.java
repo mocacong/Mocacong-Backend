@@ -39,7 +39,11 @@ public class CafeImage extends BaseTime {
     }
 
     public boolean isOwned(Member member) {
-        return this.member.equals(member);
+        return this.member != null && this.member.equals(member);
+    }
+
+    public void removeMember() {
+        this.member = null;
     }
 
     public void setIsUsed(Boolean isUsed) {

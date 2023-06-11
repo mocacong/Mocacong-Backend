@@ -17,7 +17,7 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.service.event.MemberEvent;
+import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -113,7 +113,7 @@ public class CommentService {
     }
 
     @EventListener
-    public void updateCommentWhenMemberDelete(MemberEvent event) {
+    public void updateCommentWhenMemberDelete(DeleteMemberEvent event) {
         Member member = event.getMember();
         commentRepository.findAllByMemberId(member.getId())
                 .forEach(Comment::removeMember);

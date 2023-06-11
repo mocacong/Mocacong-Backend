@@ -15,5 +15,7 @@ public interface CafeImageRepository extends JpaRepository<CafeImage, Long> {
             "CASE WHEN ci.member.id = :memberId THEN ci.id END DESC, ci.id DESC")
     Slice<CafeImage> findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(Long cafeId, Long memberId, Pageable pageable);
 
+    List<CafeImage> findAllByMemberId(Long memberId);
+
     List<CafeImage> findAllByIsUsedFalse();
 }
