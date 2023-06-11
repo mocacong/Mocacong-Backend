@@ -928,6 +928,80 @@ class CafeServiceTest {
     }
 
     @Test
+    @DisplayName("자신이 등록한 이미지부터 최신 순으로 이미지를 조회한다")
+    void findCafeImagesReturnOrderedImages() throws IOException {
+        String expected = "test_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member1 = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
+        memberRepository.save(member1);
+        Member member2 = new Member("kth990303@naver.com", "a1b2c3d4", "다른사람", "010-1111-2222", null);
+        memberRepository.save(member2);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
+                fileInputStream);
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
+        CafeImagesResponse actual = cafeService.findCafeImages(member2.getEmail(), mapId, 0, 10);
+
+        List<CafeImageResponse> cafeImages = actual.getCafeImages();
+
+        assertAll(
+                () -> assertThat(actual.getIsEnd()).isTrue(),
+                () -> assertThat(cafeImages).hasSize(4),
+                // 최신 순으로 정렬되었는지 검증
+                () -> assertThat(cafeImages.get(0).getId()).isEqualTo(4),
+                () -> assertThat(cafeImages.get(1).getId()).isEqualTo(3),
+                () -> assertThat(cafeImages.get(2).getId()).isEqualTo(2),
+                () -> assertThat(cafeImages.get(3).getId()).isEqualTo(1),
+                () -> assertThat(cafeImages.get(0).getIsMe()).isTrue(),
+                () -> assertThat(cafeImages.get(2).getIsMe()).isFalse()
+        );
+    }
+
+    @Test
+    @DisplayName("타인이 나중에 이미지를 등록해도 자신이 등록한 이미지부터 최신 순으로 조회한다")
+    void findCafeImagesReturnOrderedMyImages() throws IOException {
+        String expected = "test_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member1 = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리",
+                "010-1234-5678", null);
+        memberRepository.save(member1);
+        Member member2 = new Member("kth990303@naver.com", "a1b2c3d4", "다른사람",
+                "010-1111-2222", null);
+        memberRepository.save(member2);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
+                fileInputStream);
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
+        CafeImagesResponse actual = cafeService.findCafeImages(member2.getEmail(), mapId, 0, 10);
+
+        List<CafeImageResponse> cafeImages = actual.getCafeImages();
+
+        assertAll(
+                () -> assertThat(actual.getIsEnd()).isTrue(),
+                () -> assertThat(cafeImages).hasSize(4),
+                // 자신이 올린 사진부터 최신 순으로 정렬되었는지 검증
+                () -> assertThat(cafeImages.get(0).getId()).isEqualTo(3),
+                () -> assertThat(cafeImages.get(1).getId()).isEqualTo(1),
+                () -> assertThat(cafeImages.get(2).getId()).isEqualTo(4),
+                () -> assertThat(cafeImages.get(3).getId()).isEqualTo(2),
+                () -> assertThat(cafeImages.get(0).getIsMe()).isTrue(),
+                () -> assertThat(cafeImages.get(2).getIsMe()).isFalse()
+        );
+    }
+
+    @Test
     @DisplayName("카페 이미지를 성공적으로 수정한다")
     void updateCafeImage() throws IOException {
         String oldImage = "test_img.jpg";
@@ -1010,7 +1084,7 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(2).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(3).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
-                () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
+                () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
         );
     }

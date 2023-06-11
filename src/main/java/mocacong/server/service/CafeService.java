@@ -39,7 +39,6 @@ public class CafeService {
 
     public static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
-    private static final int CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS = 5;
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
     private final ScoreRepository scoreRepository;
@@ -118,19 +117,24 @@ public class CafeService {
                 .limit(CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS)
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
-                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), true);
+                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(),
+                                comment.getContent(), true);
                     } else {
-                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(),
+                                comment.getWriterNickname(), comment.getContent(), false);
                     }
                 })
                 .collect(Collectors.toList());
     }
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
+        Pageable pageable = PageRequest.of(0, 5);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
+
         return cafeImages
+                .getContent()
                 .stream()
-                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
@@ -339,7 +343,8 @@ public class CafeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
-        Slice<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId(), pageable);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
 
         List<CafeImageResponse> responses = cafeImages
                 .getContent()
