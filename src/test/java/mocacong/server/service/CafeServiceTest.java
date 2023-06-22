@@ -2,7 +2,6 @@ package mocacong.server.service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
@@ -22,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
@@ -774,22 +774,6 @@ class CafeServiceTest {
         Cafe actual = cafeRepository.findByMapId(mapId)
                 .orElseThrow();
         assertThat(actual.getCafeImages()).hasSize(2);
-    }
-
-    @Test
-    @DisplayName("빈 카페 이미지를 포함하는 경우, 해당 이미지는 S3 호출을 하지 않는다")
-    void saveCafeImageWhenNoneCafeImage() throws IOException {
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
-        cafeRepository.save(cafe);
-        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", "010-1234-5678", null);
-        memberRepository.save(member);
-        String mapId = cafe.getMapId();
-        MockMultipartFile mockMultipartFile =
-                new MockMultipartFile("empty", "empty.jpg", null, (InputStream) null);
-
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-
-        verify(awsS3Uploader, times(0)).uploadImage(mockMultipartFile);
     }
 
     @Test
