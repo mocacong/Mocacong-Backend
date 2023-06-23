@@ -27,7 +27,7 @@ public class CafeImageRepositoryTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("내가 올린 카페 이미지부터 조회한다")
+    @DisplayName("내가 올린 카페 이미지부터 등록 순으로 조회한다")
     void findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc() throws IOException {
         Pageable pageable = PageRequest.of(0, 5);
         Cafe cafe = cafeRepository.save(new Cafe("1", "케이카페"));

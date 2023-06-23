@@ -989,7 +989,7 @@ class CafeServiceTest {
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(cafeImages).hasSize(4),
-                // 자신이 올린 사진부터 최신 순으로 정렬되었는지 검증
+                // 자신이 올린 사진부터 등록 순으로 정렬되었는지 검증
                 () -> assertThat(cafeImages.get(0).getId()).isEqualTo(1),
                 () -> assertThat(cafeImages.get(1).getId()).isEqualTo(3),
                 () -> assertThat(cafeImages.get(2).getId()).isEqualTo(2),
