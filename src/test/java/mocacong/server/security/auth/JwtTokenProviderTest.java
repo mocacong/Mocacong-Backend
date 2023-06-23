@@ -2,12 +2,13 @@ package mocacong.server.security.auth;
 
 import mocacong.server.exception.unauthorized.InvalidTokenException;
 import mocacong.server.exception.unauthorized.TokenExpiredException;
-import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class JwtTokenProviderTest {
