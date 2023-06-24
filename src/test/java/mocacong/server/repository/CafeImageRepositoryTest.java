@@ -27,7 +27,7 @@ public class CafeImageRepositoryTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("내가 올린 카페 이미지부터 최신순으로 조회한다")
+    @DisplayName("내가 올린 카페 이미지부터 등록 순으로 조회한다")
     void findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc() throws IOException {
         Pageable pageable = PageRequest.of(0, 5);
         Cafe cafe = cafeRepository.save(new Cafe("1", "케이카페"));
@@ -48,17 +48,17 @@ public class CafeImageRepositoryTest {
         cafeImageRepository.save(cafeImage5);
         cafeImageRepository.save(cafeImage6);
 
-        Slice<CafeImage> actual = cafeImageRepository.findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(),
+        Slice<CafeImage> actual = cafeImageRepository.findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(),
                 member1.getId(), pageable); // member1로 카페 이미지 조회
         List<CafeImage> cafeImages = actual.getContent();
 
         assertAll(
                 () -> assertThat(cafeImages).hasSize(5),
-                () -> assertThat(cafeImages.get(0)).isEqualTo(cafeImage5),
-                () -> assertThat(cafeImages.get(1)).isEqualTo(cafeImage4),
-                () -> assertThat(cafeImages.get(2)).isEqualTo(cafeImage2),
-                () -> assertThat(cafeImages.get(3)).isEqualTo(cafeImage1),
-                () -> assertThat(cafeImages.get(4)).isEqualTo(cafeImage6)
+                () -> assertThat(cafeImages.get(0)).isEqualTo(cafeImage1),
+                () -> assertThat(cafeImages.get(1)).isEqualTo(cafeImage2),
+                () -> assertThat(cafeImages.get(2)).isEqualTo(cafeImage4),
+                () -> assertThat(cafeImages.get(3)).isEqualTo(cafeImage5),
+                () -> assertThat(cafeImages.get(4)).isEqualTo(cafeImage3)
         );
     }
 }

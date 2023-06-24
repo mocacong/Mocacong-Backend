@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -31,6 +27,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -129,7 +130,7 @@ public class CafeService {
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
         Pageable pageable = PageRequest.of(0, 5);
         Slice<CafeImage> cafeImages = cafeImageRepository.
-                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
 
         return cafeImages
                 .getContent()
@@ -335,7 +336,7 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
         Slice<CafeImage> cafeImages = cafeImageRepository.
-                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
 
         List<CafeImageResponse> responses = cafeImages
                 .getContent()

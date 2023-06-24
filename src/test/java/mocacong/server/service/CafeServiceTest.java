@@ -908,7 +908,7 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("자신이 등록한 이미지부터 최신 순으로 이미지를 조회한다")
+    @DisplayName("자신이 등록한 이미지부터 등록 순으로 이미지를 조회한다")
     void findCafeImagesReturnOrderedImages() throws IOException {
         String expected = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
@@ -933,18 +933,18 @@ class CafeServiceTest {
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(cafeImages).hasSize(4),
-                // 최신 순으로 정렬되었는지 검증
-                () -> assertThat(cafeImages.get(0).getId()).isEqualTo(4),
-                () -> assertThat(cafeImages.get(1).getId()).isEqualTo(3),
-                () -> assertThat(cafeImages.get(2).getId()).isEqualTo(2),
-                () -> assertThat(cafeImages.get(3).getId()).isEqualTo(1),
+                // 등록 순으로 정렬되었는지 검증
+                () -> assertThat(cafeImages.get(0).getId()).isEqualTo(3),
+                () -> assertThat(cafeImages.get(1).getId()).isEqualTo(4),
+                () -> assertThat(cafeImages.get(2).getId()).isEqualTo(1),
+                () -> assertThat(cafeImages.get(3).getId()).isEqualTo(2),
                 () -> assertThat(cafeImages.get(0).getIsMe()).isTrue(),
                 () -> assertThat(cafeImages.get(2).getIsMe()).isFalse()
         );
     }
 
     @Test
-    @DisplayName("타인이 나중에 이미지를 등록해도 자신이 등록한 이미지부터 최신 순으로 조회한다")
+    @DisplayName("타인이 나중에 이미지를 등록해도 자신이 등록한 이미지부터 등록 순으로 조회한다")
     void findCafeImagesReturnOrderedMyImages() throws IOException {
         String expected = "test_img.jpg";
         Cafe cafe = new Cafe("2143154352323", "케이카페");
@@ -971,11 +971,11 @@ class CafeServiceTest {
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(cafeImages).hasSize(4),
-                // 자신이 올린 사진부터 최신 순으로 정렬되었는지 검증
-                () -> assertThat(cafeImages.get(0).getId()).isEqualTo(3),
-                () -> assertThat(cafeImages.get(1).getId()).isEqualTo(1),
-                () -> assertThat(cafeImages.get(2).getId()).isEqualTo(4),
-                () -> assertThat(cafeImages.get(3).getId()).isEqualTo(2),
+                // 자신이 올린 사진부터 등록 순으로 정렬되었는지 검증
+                () -> assertThat(cafeImages.get(0).getId()).isEqualTo(1),
+                () -> assertThat(cafeImages.get(1).getId()).isEqualTo(3),
+                () -> assertThat(cafeImages.get(2).getId()).isEqualTo(2),
+                () -> assertThat(cafeImages.get(3).getId()).isEqualTo(4),
                 () -> assertThat(cafeImages.get(0).getIsMe()).isTrue(),
                 () -> assertThat(cafeImages.get(2).getIsMe()).isFalse()
         );
@@ -1064,7 +1064,7 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(2).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(3).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
-                () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img.jpg"),
+                () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
         );
     }
