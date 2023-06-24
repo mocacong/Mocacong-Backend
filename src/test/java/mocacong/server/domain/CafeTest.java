@@ -151,4 +151,24 @@ class CafeTest {
         );
     }
 
+    @Test
+    @DisplayName("카페의 스터디 타입을 반환한다")
+    void getStudyType() {
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        Cafe cafe = new Cafe("1", "케이카페");
+        CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD);
+        Review review = new Review(member, cafe, cafeDetail);
+        cafe.addReview(review);
+        cafe.updateCafeDetails();
+
+        assertThat(cafe.getStudyType()).isEqualTo("solo");
+    }
+
+    @Test
+    @DisplayName("리뷰가 없는 카페의 스터디 타입은 null 을 반환한다")
+    void getStudyTypeWhenNotHasReviews() {
+        Cafe cafe = new Cafe("1", "케이카페");
+
+        assertThat(cafe.getStudyType()).isNull();
+    }
 }
