@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import mocacong.server.dto.response.ErrorResponse;
 import mocacong.server.exception.MocacongException;
 import mocacong.server.support.SlackAlarmGenerator;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -86,6 +87,14 @@ public class ControllerAdvice {
 
         return ResponseEntity.badRequest()
                 .body(new ErrorResponse(9005, "요청 MultipartFile param 이름이 올바르지 않습니다."));
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ErrorResponse> handleMissingMultiPartParamException(FileUploadException e) {
+        log.warn("File Upload Exception! Please check request. ErrMessage={}\n", e.getMessage());
+
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(9006, "요청 파일이 올바르지 않습니다. 파일 손상 여부나 요청 형식을 확인해주세요."));
     }
 
     @ExceptionHandler(MocacongException.class)

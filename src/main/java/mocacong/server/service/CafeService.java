@@ -316,10 +316,6 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         for (MultipartFile cafeImage : cafeImages) {
-            if (checkInvalidUploadFile(cafeImage)) {
-                continue;
-            }
-
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
             cafeImageRepository.save(uploadedCafeImage);
@@ -330,10 +326,6 @@ public class CafeService {
         if (cafeImages.size() > CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS) {
             throw new ExceedCafeImagesCountsException();
         }
-    }
-
-    private boolean checkInvalidUploadFile(MultipartFile multipartFile) {
-        return multipartFile.getSize() == 0;
     }
 
     @Transactional(readOnly = true)
