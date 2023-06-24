@@ -17,8 +17,8 @@ import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
-import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.DeleteMemberEvent;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -315,10 +315,6 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         for (MultipartFile cafeImage : cafeImages) {
-            if (checkInvalidUploadFile(cafeImage)) {
-                continue;
-            }
-
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
             cafeImageRepository.save(uploadedCafeImage);
@@ -329,10 +325,6 @@ public class CafeService {
         if (cafeImages.size() > CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS) {
             throw new ExceedCafeImagesCountsException();
         }
-    }
-
-    private boolean checkInvalidUploadFile(MultipartFile multipartFile) {
-        return multipartFile.getSize() == 0;
     }
 
     @Transactional(readOnly = true)
