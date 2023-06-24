@@ -1,5 +1,9 @@
 package mocacong.server.service;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -27,11 +31,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -148,7 +147,7 @@ public class CafeService {
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.findAverageScore()))
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
@@ -163,7 +162,7 @@ public class CafeService {
                 .stream()
                 .map(cafe -> {
                     int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
-                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), score);
+                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), score);
                 })
                 .collect(Collectors.toList());
         return new MyReviewCafesResponse(myReviewCafes.isLast(), responses);
@@ -179,6 +178,7 @@ public class CafeService {
                 .map(comment -> new MyCommentCafeResponse(
                         comment.getCafe().getMapId(),
                         comment.getCafe().getName(),
+                        comment.getCafe().getStudyType(),
                         comment.getContent()
                 ))
                 .collect(Collectors.toList());
