@@ -130,7 +130,7 @@ public class CafeService {
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
         Pageable pageable = PageRequest.of(0, 5);
         Slice<CafeImage> cafeImages = cafeImageRepository.
-                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
 
         return cafeImages
                 .getContent()
@@ -148,7 +148,7 @@ public class CafeService {
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.findAverageScore()))
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
@@ -163,7 +163,7 @@ public class CafeService {
                 .stream()
                 .map(cafe -> {
                     int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
-                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), score);
+                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), score);
                 })
                 .collect(Collectors.toList());
         return new MyReviewCafesResponse(myReviewCafes.isLast(), responses);
@@ -179,6 +179,7 @@ public class CafeService {
                 .map(comment -> new MyCommentCafeResponse(
                         comment.getCafe().getMapId(),
                         comment.getCafe().getName(),
+                        comment.getCafe().getStudyType(),
                         comment.getContent()
                 ))
                 .collect(Collectors.toList());
@@ -316,10 +317,6 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         for (MultipartFile cafeImage : cafeImages) {
-            if (checkInvalidUploadFile(cafeImage)) {
-                continue;
-            }
-
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
             cafeImageRepository.save(uploadedCafeImage);
@@ -332,10 +329,6 @@ public class CafeService {
         }
     }
 
-    private boolean checkInvalidUploadFile(MultipartFile multipartFile) {
-        return multipartFile.getSize() == 0;
-    }
-
     @Transactional(readOnly = true)
     public CafeImagesResponse findCafeImages(Long memberId, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -344,7 +337,7 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
         Slice<CafeImage> cafeImages = cafeImageRepository.
-                findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc(cafe.getId(), member.getId(), pageable);
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
 
         List<CafeImageResponse> responses = cafeImages
                 .getContent()

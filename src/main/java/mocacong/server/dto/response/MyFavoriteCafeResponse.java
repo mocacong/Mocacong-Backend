@@ -10,5 +10,6 @@ public class MyFavoriteCafeResponse {
 
     private String mapId;
     private String name;
+    private String studyType;
     private double score;
 }

@@ -1,24 +1,21 @@
 package mocacong.server.domain;
 
+import java.util.regex.Pattern;
+import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
-import mocacong.server.exception.badrequest.InvalidPhoneException;
-
-import javax.persistence.*;
-import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "member", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "platform", "email" })
+        @UniqueConstraint(columnNames = {"platform", "email"})
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTime {
 
     private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]{2,6}$");
-    private static final Pattern PHONE_REGEX = Pattern.compile("^01[\\d\\-]{8,12}$");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +31,6 @@ public class Member extends BaseTime {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
-    @Column(name = "phone")
-    private String phone;
-
     @OneToOne
     @JoinColumn(name = "member_profile_image_id")
     private MemberProfileImage memberProfileImage;
@@ -49,33 +43,31 @@ public class Member extends BaseTime {
     private String platformId;
 
     public Member(
-            String email, String password, String nickname, String phone, MemberProfileImage memberProfileImage,
+            String email, String password, String nickname, MemberProfileImage memberProfileImage,
             Platform platform, String platformId
     ) {
-        validateMemberInfo(nickname, phone);
+        validateNickname(nickname);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.phone = phone;
         this.memberProfileImage = memberProfileImage;
         this.platform = platform;
         this.platformId = platformId;
     }
 
-    public Member(String email, String password, String nickname, String phone, MemberProfileImage memberProfileImage) {
+    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage) {
         this(
                 email,
                 password,
                 nickname,
-                phone,
                 memberProfileImage,
                 Platform.MOCACONG,
                 null
         );
     }
 
-    public Member(String email, String password, String nickname, String phone) {
-        this(email, password, nickname, phone, null, Platform.MOCACONG, null);
+    public Member(String email, String password, String nickname) {
+        this(email, password, nickname, null, Platform.MOCACONG, null);
     }
 
     public Member(String email, Platform platform, String platformId) {
@@ -107,26 +99,14 @@ public class Member extends BaseTime {
         }
     }
 
-    public void updateProfileInfo(String nickname, String phone) {
-        validateMemberInfo(nickname, phone);
-        this.nickname = nickname;
-        this.phone = phone;
-    }
-
-    private void validateMemberInfo(String nickname, String phone) {
+    public void updateProfileInfo(String nickname) {
         validateNickname(nickname);
-        validatePhone(phone);
+        this.nickname = nickname;
     }
 
     private void validateNickname(String nickname) {
         if (!NICKNAME_REGEX.matcher(nickname).matches()) {
             throw new InvalidNicknameException();
-        }
-    }
-
-    private void validatePhone(String phone) {
-        if (!PHONE_REGEX.matcher(phone).matches()) {
-            throw new InvalidPhoneException();
         }
     }
 

@@ -1,5 +1,11 @@
 package mocacong.server.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Review;
@@ -10,26 +16,16 @@ import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.ReviewRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @ServiceTest
 public class CafeConcurrentServiceTest {
     @Autowired
     private CafeService cafeService;
-    @Autowired
-    private MemberService memberService;
     @Autowired
     private CafeRepository cafeRepository;
     @Autowired
@@ -67,7 +63,7 @@ public class CafeConcurrentServiceTest {
     @Test
     @DisplayName("회원이 한 카페에 동시에 여러 번 평점만 등록 시도해도 한 번만 등록된다")
     void saveScoreWithConcurrent() throws InterruptedException {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -99,8 +95,8 @@ public class CafeConcurrentServiceTest {
     @Test
     @DisplayName("회원이 한 카페에 동시에 여러 번 리뷰 등록 시도해도 한 번만 등록된다")
     void saveCafeReviewWithConcurrent() throws InterruptedException {
-        Member member = memberRepository.save(new Member("kth990303@naver.com", "encodePassword",
-                "케이", "010-1234-5678"));
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
+        memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
         ExecutorService executorService = Executors.newFixedThreadPool(3);

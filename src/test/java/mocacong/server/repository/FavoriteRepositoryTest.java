@@ -25,7 +25,7 @@ class FavoriteRepositoryTest {
     @DisplayName("카페 id, 멤버 id로 즐겨찾기 id를 조회한다")
     void findByCafeIdAndMemberId() {
         Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페"));
-        Member savedMember = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이", "010-1234-5678"));
+        Member savedMember = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         Favorite favorite = new Favorite(savedMember, savedCafe);
         favoriteRepository.save(favorite);
 
