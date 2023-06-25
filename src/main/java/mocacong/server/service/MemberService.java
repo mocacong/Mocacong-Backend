@@ -115,13 +115,13 @@ public class MemberService {
     public EmailVerifyCodeResponse sendEmailVerifyCode(EmailVerifyCodeRequest request) {
         validateNonce(request.getNonce());
         String requestEmail = request.getEmail();
-        memberRepository.findByEmailAndPlatform(requestEmail, Platform.MOCACONG)
+        Member member = memberRepository.findByEmailAndPlatform(requestEmail, Platform.MOCACONG)
                 .orElseThrow(NotFoundMemberException::new);
         Random random = new Random();
         int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
         String code = String.format("%04d", randomNumber);
         awsSESSender.sendToVerifyEmail(requestEmail, code);
-        String token = jwtTokenProvider.createToken(requestEmail);
+        String token = jwtTokenProvider.createToken(member.getId());
         return new EmailVerifyCodeResponse(token, code);
     }
 

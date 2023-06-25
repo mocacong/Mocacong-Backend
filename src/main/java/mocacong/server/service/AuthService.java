@@ -78,9 +78,7 @@ public class AuthService {
     }
 
     private String issueToken(final Member findMember) {
-        String email = findMember.getEmail();
-
-        return jwtTokenProvider.createToken(email);
+        return jwtTokenProvider.createToken(findMember.getId());
     }
 
     private void validatePassword(final Member findMember, final String password) {
