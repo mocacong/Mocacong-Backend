@@ -115,7 +115,7 @@ public class MemberService {
     public EmailVerifyCodeResponse sendEmailVerifyCode(EmailVerifyCodeRequest request) {
         validateNonce(request.getNonce());
         String requestEmail = request.getEmail();
-        memberRepository.findByEmail(requestEmail)
+        memberRepository.findByEmailAndPlatform(requestEmail, Platform.MOCACONG)
                 .orElseThrow(NotFoundMemberException::new);
         Random random = new Random();
         int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
