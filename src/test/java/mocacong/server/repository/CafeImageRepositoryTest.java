@@ -1,20 +1,17 @@
 package mocacong.server.repository;
 
+import java.util.List;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.CafeImage;
 import mocacong.server.domain.Member;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-
-import java.io.IOException;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @RepositoryTest
 public class CafeImageRepositoryTest {
@@ -28,13 +25,11 @@ public class CafeImageRepositoryTest {
 
     @Test
     @DisplayName("내가 올린 카페 이미지부터 등록 순으로 조회한다")
-    void findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc() throws IOException {
+    void findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc() {
         Pageable pageable = PageRequest.of(0, 5);
         Cafe cafe = cafeRepository.save(new Cafe("1", "케이카페"));
-        Member member1 = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이",
-                "010-1234-5678"));
-        Member member2 = memberRepository.save(new Member("dla@naver.com", "abcd1234", "메리",
-                "010-1234-5678"));
+        Member member1 = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
+        Member member2 = memberRepository.save(new Member("dla@naver.com", "abcd1234", "메리"));
         CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member1);
         CafeImage cafeImage2 = new CafeImage("test_img2.jpg", true, cafe, member1);
         CafeImage cafeImage3 = new CafeImage("test_img.jpg", true, cafe, member2);

@@ -7,8 +7,8 @@ import mocacong.server.dto.request.KakaoLoginRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
-import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
+import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.kakao.KakaoOAuthUserProvider;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +33,7 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 정상적으로 로그인한다")
     void login() {
-        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리");
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)

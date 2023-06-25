@@ -10,6 +10,5 @@ public class MyPageResponse {
 
     private String email;
     private String nickname;
-    private String phone;
     private String imgUrl;
 }

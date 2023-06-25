@@ -12,7 +12,7 @@ class CommentTest {
     @Test
     @DisplayName("코멘트 길이가 200자를 초과하면 예외를 반환한다")
     void validateCommentLength() {
-        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
         Cafe cafe = new Cafe("1", "케이카페");
         assertThatThrownBy(() -> new Comment(cafe, member, createLongComment(201)))
                 .isInstanceOf(ExceedCommentLengthException.class);
@@ -29,7 +29,7 @@ class CommentTest {
     @Test
     @DisplayName("댓글 작성자 닉네임을 반환한다")
     void getWriterNickname() {
-        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
         Cafe cafe = new Cafe("1", "케이카페");
         Comment comment = new Comment(cafe, member, "안녕하세요");
 
@@ -39,7 +39,7 @@ class CommentTest {
     @Test
     @DisplayName("댓글 작성자 프로필 이미지 url을 반환한다")
     void getWriterImgUrl() {
-        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678", new MemberProfileImage("test_img.jpg"));
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", new MemberProfileImage("test_img.jpg"));
         Cafe cafe = new Cafe("1", "케이카페");
         Comment comment = new Comment(cafe, member, "안녕하세요");
 
@@ -49,8 +49,8 @@ class CommentTest {
     @Test
     @DisplayName("코멘트가 해당 회원이 작성한 게 맞는지 여부를 반환한다")
     void isWrittenByMember() {
-        Member member1 = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
-        Member member2 = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        Member member1 = new Member("kth@naver.com", "a1b2c3d4", "케이");
+        Member member2 = new Member("kth@naver.com", "a1b2c3d4", "케이");
         Cafe cafe = new Cafe("1", "케이카페");
         Comment comment = new Comment(cafe, member1, "안녕하세요");
 

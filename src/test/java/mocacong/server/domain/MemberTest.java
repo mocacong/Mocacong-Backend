@@ -1,7 +1,6 @@
 package mocacong.server.domain;
 
 import mocacong.server.exception.badrequest.InvalidNicknameException;
-import mocacong.server.exception.badrequest.InvalidPhoneException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -17,7 +16,7 @@ class MemberTest {
     @DisplayName("모든 정보를 올바른 형식으로 입력하면 회원이 생성된다")
     void createMember() {
         assertDoesNotThrow(
-                () -> new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678")
+                () -> new Member("kth990303@naver.com", "a1b2c3d4", "케이")
         );
     }
 
@@ -60,7 +59,7 @@ class MemberTest {
     @ValueSource(strings = {"ㄱㅁㄴㄷㄹ", "ㅏㅣㅓㅜ", "가ㅏ누ㅟ"})
     void createMemberNicknameOnlyOnset(String nickname) {
         assertDoesNotThrow(
-                () -> new Member("kth990303@naver.com", "a1b2c3d4", nickname, "010-1234-5678")
+                () -> new Member("kth990303@naver.com", "a1b2c3d4", nickname)
         );
     }
 
@@ -68,7 +67,7 @@ class MemberTest {
     @DisplayName("닉네임이 2~6자가 아니면 예외를 반환한다")
     @ValueSource(strings = {"일", "일이삼사오육칠"})
     void nicknameLengthValidation(String nickname) {
-        assertThatThrownBy(() -> new Member("kth990303@naver.com", "a1b2c3d4", nickname, "010-1234-5678"))
+        assertThatThrownBy(() -> new Member("kth990303@naver.com", "a1b2c3d4", nickname))
                 .isInstanceOf(InvalidNicknameException.class);
     }
 
@@ -76,23 +75,15 @@ class MemberTest {
     @DisplayName("닉네임이 영어 또는 한글이 아니면 예외를 반환한다")
     @ValueSource(strings = {"123", "愛してるよ"})
     void nicknameConfigureValidation(String nickname) {
-        assertThatThrownBy(() -> new Member("kth990303@naver.com", "a1b2c3d4", nickname, "010-1234-5678"))
+        assertThatThrownBy(() -> new Member("kth990303@naver.com", "a1b2c3d4", nickname))
                 .isInstanceOf(InvalidNicknameException.class);
-    }
-
-    @ParameterizedTest
-    @DisplayName("전화번호가 01로 시작하지 않거나 하이픈 포함 10~14자가 아니면 예외를 반환한다")
-    @ValueSource(strings = {"030-1234-5678", "01-123-45", "010-12345-56789", "010123456", "012345678901234"})
-    void phoneValidation(String phone) {
-        assertThatThrownBy(() -> new Member("kth990303@naver.com", "a1b2c3d4", "케이", phone))
-                .isInstanceOf(InvalidPhoneException.class);
     }
 
     @Test
     @DisplayName("회원의 프로필 이미지가 존재하면 해당 이미지 url을 올바르게 반환한다")
     void getImgUrlWhenHasImage() {
         String expected = "test_img.jpg";
-        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678", new MemberProfileImage(expected));
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", new MemberProfileImage(expected));
 
         String actual = member.getImgUrl();
 
@@ -102,7 +93,7 @@ class MemberTest {
     @Test
     @DisplayName("회원의 프로필 이미지가 존재하지 않으면 해당 이미지 url 반환은 null을 반환한다")
     void getImgUrlWhenHasNotImage() {
-        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
 
         String actual = member.getImgUrl();
 
@@ -114,7 +105,7 @@ class MemberTest {
     void updateProfileImgUrl() {
         String expected = "test_img.jpg";
         MemberProfileImage memberProfileImage = new MemberProfileImage("before.jpg");
-        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이", "010-1234-5678",
+        Member member = new Member("kth@naver.com", "a1b2c3d4", "케이",
                 memberProfileImage, Platform.MOCACONG, "1234");
 
         member.updateProfileImgUrl(new MemberProfileImage(expected));

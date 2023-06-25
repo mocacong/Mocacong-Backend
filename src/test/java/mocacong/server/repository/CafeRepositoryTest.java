@@ -36,7 +36,7 @@ class CafeRepositoryTest {
         Cafe savedCafe2 = cafeRepository.save(new Cafe(mapId2, "케이카페2"));
         Cafe savedCafe3 = cafeRepository.save(new Cafe(mapId3, "케이카페3"));
         Cafe savedCafe4 = cafeRepository.save(new Cafe(mapId4, "케이카페4"));
-        Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이", "010-1234-5678"));
+        Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         favoriteRepository.save(new Favorite(member, savedCafe1));
         favoriteRepository.save(new Favorite(member, savedCafe2));
         favoriteRepository.save(new Favorite(member, savedCafe3));
@@ -59,7 +59,7 @@ class CafeRepositoryTest {
         Cafe savedCafe2 = cafeRepository.save(new Cafe("2", "케이카페2"));
         Cafe savedCafe3 = cafeRepository.save(new Cafe("3", "케이카페3"));
         Cafe savedCafe4 = cafeRepository.save(new Cafe("4", "케이카페4"));
-        Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이", "010-1234-5678"));
+        Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         favoriteRepository.save(new Favorite(member, savedCafe1));
         favoriteRepository.save(new Favorite(member, savedCafe2));
         favoriteRepository.save(new Favorite(member, savedCafe3));
@@ -85,7 +85,7 @@ class CafeRepositoryTest {
         Cafe savedCafe4 = cafeRepository.save(new Cafe("4", "케이카페4"));
         CafeDetail cafeDetail = new CafeDetail(StudyType.BOTH, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.NORMAL,
                 Power.NONE, Sound.LOUD);
-        Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이", "010-1234-5678"));
+        Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         reviewRepository.save(new Review(member, savedCafe1, cafeDetail));
         reviewRepository.save(new Review(member, savedCafe2, cafeDetail));
         reviewRepository.save(new Review(member, savedCafe3, cafeDetail));
