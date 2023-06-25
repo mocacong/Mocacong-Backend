@@ -13,8 +13,8 @@ import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
+import mocacong.server.service.event.DeleteMemberEvent;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
-import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +39,6 @@ public class CafeService {
 
     public static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
-    private static final int CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS = 5;
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
     private final ScoreRepository scoreRepository;
@@ -118,19 +117,24 @@ public class CafeService {
                 .limit(CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS)
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
-                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), true);
+                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(),
+                                comment.getContent(), true);
                     } else {
-                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(),
+                                comment.getWriterNickname(), comment.getContent(), false);
                     }
                 })
                 .collect(Collectors.toList());
     }
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
+        Pageable pageable = PageRequest.of(0, 5);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
+
         return cafeImages
+                .getContent()
                 .stream()
-                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
@@ -238,6 +242,7 @@ public class CafeService {
         return CafeMyReviewResponse.of(score, review);
     }
 
+    @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
     public CafeReviewUpdateResponse updateCafeReview(String email, String mapId, CafeReviewUpdateRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -271,7 +276,7 @@ public class CafeService {
     }
 
     @EventListener
-    public void updateReviewWhenMemberDelete(MemberEvent event) {
+    public void updateReviewWhenMemberDelete(DeleteMemberEvent event) {
         Long memberId = event.getMember()
                 .getId();
         reviewRepository.findAllByMemberId(memberId)
@@ -311,10 +316,6 @@ public class CafeService {
                 .orElseThrow(NotFoundMemberException::new);
 
         for (MultipartFile cafeImage : cafeImages) {
-            if (checkInvalidUploadFile(cafeImage)) {
-                continue;
-            }
-
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
             cafeImageRepository.save(uploadedCafeImage);
@@ -327,10 +328,6 @@ public class CafeService {
         }
     }
 
-    private boolean checkInvalidUploadFile(MultipartFile multipartFile) {
-        return multipartFile.getSize() == 0;
-    }
-
     @Transactional(readOnly = true)
     public CafeImagesResponse findCafeImages(String email, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -338,7 +335,8 @@ public class CafeService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
-        Slice<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId(), pageable);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
 
         List<CafeImageResponse> responses = cafeImages
                 .getContent()
@@ -365,6 +363,13 @@ public class CafeService {
         String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
         CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
         cafeImageRepository.save(cafeImage);
+    }
+
+    @EventListener
+    public void updateCafeImagesWhenMemberDelete(DeleteMemberEvent event) {
+        Member member = event.getMember();
+        cafeImageRepository.findAllByMemberId(member.getId())
+                .forEach(CafeImage::removeMember);
     }
 
     @Transactional

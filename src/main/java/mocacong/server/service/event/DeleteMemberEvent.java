@@ -6,7 +6,7 @@ import mocacong.server.domain.Member;
 
 @Getter
 @RequiredArgsConstructor
-public class MemberEvent {
+public class DeleteMemberEvent {
 
     private final Member member;
 }
