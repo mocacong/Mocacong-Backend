@@ -10,5 +10,6 @@ public class MyReviewCafeResponse {
 
     private String mapId;
     private String name;
+    private String studyType;
     private int myScore;
 }

@@ -89,6 +89,10 @@ public class Cafe extends BaseTime {
         else return StudyType.GROUP;
     }
 
+    public String getStudyType() {
+        return cafeDetail.getStudyTypeValue();
+    }
+
     public double findAverageScore() {
         return score.stream()
                 .mapToDouble(Score::getScore)
