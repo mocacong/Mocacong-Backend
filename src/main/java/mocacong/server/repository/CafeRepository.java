@@ -18,18 +18,18 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
 
     @Query("select c.mapId from Favorite f " +
             "join f.cafe c join f.member m " +
-            "where c.mapId in :mapIds and m.email = :email")
-    List<String> findNearCafeMapIdsByMyFavoriteCafes(String email, List<String> mapIds);
+            "where c.mapId in :mapIds and m.id = :id")
+    List<String> findNearCafeMapIdsByMyFavoriteCafes(Long id, List<String> mapIds);
 
     @Query("select c from Favorite f " +
             "join f.cafe c " +
             "join f.member m " +
-            "where m.email = :email")
-    Slice<Cafe> findByMyFavoriteCafes(String email, Pageable pageRequest);
+            "where m.id = :id")
+    Slice<Cafe> findByMyFavoriteCafes(Long id, Pageable pageRequest);
 
     @Query("select c from Review r " +
             "join r.cafe c " +
             "join r.member m " +
-            "where m.email = :email")
-    Slice<Cafe> findByMyReviewCafes(String email, Pageable pageRequest);
+            "where m.id = :id")
+    Slice<Cafe> findByMyReviewCafes(Long id, Pageable pageRequest);
 }

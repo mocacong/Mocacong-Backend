@@ -3,16 +3,17 @@ package mocacong.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.CommentSaveRequest;
 import mocacong.server.dto.request.CommentUpdateRequest;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
-import mocacong.server.security.auth.LoginUserEmail;
+import mocacong.server.security.auth.LoginUserId;
 import mocacong.server.service.CommentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Tag(name = "Comments", description = "댓글")
 @RestController
@@ -26,11 +27,11 @@ public class CommentController {
     @SecurityRequirement(name = "JWT")
     @PostMapping
     public ResponseEntity<CommentSaveResponse> saveComment(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestBody @Valid CommentSaveRequest request
     ) {
-        CommentSaveResponse response = commentService.save(email, mapId, request.getContent());
+        CommentSaveResponse response = commentService.save(memberId, mapId, request.getContent());
         return ResponseEntity.ok(response);
     }
 
@@ -38,12 +39,12 @@ public class CommentController {
     @SecurityRequirement(name = "JWT")
     @GetMapping
     public ResponseEntity<CommentsResponse> findComments(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count
     ) {
-        CommentsResponse response = commentService.findAll(email, mapId, page, count);
+        CommentsResponse response = commentService.findAll(memberId, mapId, page, count);
         return ResponseEntity.ok(response);
     }
 
@@ -51,12 +52,12 @@ public class CommentController {
     @SecurityRequirement(name = "JWT")
     @GetMapping("/me")
     public ResponseEntity<CommentsResponse> findCommentsByMe(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count
     ) {
-        CommentsResponse response = commentService.findCafeCommentsOnlyMyComments(email, mapId, page, count);
+        CommentsResponse response = commentService.findCafeCommentsOnlyMyComments(memberId, mapId, page, count);
         return ResponseEntity.ok(response);
     }
 
@@ -64,12 +65,12 @@ public class CommentController {
     @SecurityRequirement(name = "JWT")
     @PutMapping("/{commentId}")
     public ResponseEntity<Void> updateComment(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @PathVariable Long commentId,
             @RequestBody @Valid CommentUpdateRequest request
     ) {
-        commentService.update(email, mapId, request.getContent(), commentId);
+        commentService.update(memberId, mapId, request.getContent(), commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -77,11 +78,11 @@ public class CommentController {
     @SecurityRequirement(name = "JWT")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @PathVariable Long commentId
     ) {
-        commentService.delete(email, mapId, commentId);
+        commentService.delete(memberId, mapId, commentId);
         return ResponseEntity.ok().build();
     }
 }

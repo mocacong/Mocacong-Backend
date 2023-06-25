@@ -20,7 +20,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.hasParameterAnnotation(LoginUserEmail.class);
+        return parameter.hasParameterAnnotation(LoginUserId.class);
     }
 
     @Override

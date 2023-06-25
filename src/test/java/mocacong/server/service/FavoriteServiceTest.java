@@ -40,7 +40,7 @@ class FavoriteServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        FavoriteSaveResponse actual = favoriteService.save(member.getEmail(), cafe.getMapId());
+        FavoriteSaveResponse actual = favoriteService.save(member.getId(), cafe.getMapId());
 
         List<Favorite> favorites = favoriteRepository.findAll();
         assertAll(
@@ -56,9 +56,9 @@ class FavoriteServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        favoriteService.save(member.getEmail(), cafe.getMapId());
+        favoriteService.save(member.getId(), cafe.getMapId());
 
-        assertThatThrownBy(() -> favoriteService.save(member.getEmail(), cafe.getMapId()))
+        assertThatThrownBy(() -> favoriteService.save(member.getId(), cafe.getMapId()))
                 .isInstanceOf(AlreadyExistsFavorite.class);
     }
 
@@ -72,7 +72,7 @@ class FavoriteServiceTest {
         Favorite favorite = new Favorite(member, cafe);
         favoriteRepository.save(favorite);
 
-        favoriteService.delete(member.getEmail(), cafe.getMapId());
+        favoriteService.delete(member.getId(), cafe.getMapId());
 
         assertThat(favoriteRepository.findById(favorite.getId())).isEmpty();
     }
@@ -86,6 +86,6 @@ class FavoriteServiceTest {
         cafeRepository.save(cafe);
 
         assertThrows(NotFoundFavoriteException.class,
-                () -> favoriteService.delete(member.getEmail(), cafe.getMapId()));
+                () -> favoriteService.delete(member.getId(), cafe.getMapId()));
     }
 }

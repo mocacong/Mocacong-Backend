@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.response.FavoriteSaveResponse;
-import mocacong.server.security.auth.LoginUserEmail;
+import mocacong.server.security.auth.LoginUserId;
 import mocacong.server.service.FavoriteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +22,10 @@ public class FavoriteController {
     @SecurityRequirement(name = "JWT")
     @PostMapping
     public ResponseEntity<FavoriteSaveResponse> saveFavoriteCafe(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId
     ) {
-        FavoriteSaveResponse response = favoriteService.save(email, mapId);
+        FavoriteSaveResponse response = favoriteService.save(memberId, mapId);
         return ResponseEntity.ok(response);
     }
 
@@ -33,10 +33,10 @@ public class FavoriteController {
     @SecurityRequirement(name = "JWT")
     @DeleteMapping
     public ResponseEntity<Void> deleteFavoriteCafe(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId
     ) {
-        favoriteService.delete(email, mapId);
+        favoriteService.delete(memberId, mapId);
         return ResponseEntity.ok().build();
     }
 }

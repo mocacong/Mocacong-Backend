@@ -81,8 +81,8 @@ public class MemberService {
     }
 
     @Transactional
-    public void delete(String email) {
-        Member findMember = memberRepository.findByEmail(email)
+    public void delete(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         findMember.updateProfileImgUrl(null);
         applicationEventPublisher.publishEvent(new DeleteMemberEvent(findMember));
@@ -102,7 +102,7 @@ public class MemberService {
     public IsDuplicateEmailResponse isDuplicateEmail(String email) {
         validateEmail(email);
 
-        Optional<Member> findMember = memberRepository.findByEmail(email);
+        Optional<Member> findMember = memberRepository.findByEmailAndPlatform(email, Platform.MOCACONG);
         return new IsDuplicateEmailResponse(findMember.isPresent());
     }
 
@@ -126,9 +126,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void resetPassword(String email, ResetPasswordRequest request) {
+    public void resetPassword(Long memberId, ResetPasswordRequest request) {
         validateNonce(request.getNonce());
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         String updatePassword = request.getPassword();
         validatePassword(updatePassword);
@@ -161,15 +161,15 @@ public class MemberService {
         }
     }
 
-    public MyPageResponse findMyInfo(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public MyPageResponse findMyInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         return new MyPageResponse(member.getEmail(), member.getNickname(), member.getPhone(), member.getImgUrl());
     }
 
     @Transactional
-    public void updateProfileImage(String email, MultipartFile profileImg) {
-        Member member = memberRepository.findByEmail(email)
+    public void updateProfileImage(Long memberId, MultipartFile profileImg) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         if (profileImg == null) {
             member.updateProfileImgUrl(null);
@@ -182,10 +182,10 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateProfileInfo(String email, MemberProfileUpdateRequest request) {
+    public void updateProfileInfo(Long memberId, MemberProfileUpdateRequest request) {
         String updateNickname = request.getNickname();
         String updatePhone = request.getPhone();
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         validateDuplicateNickname(updateNickname);
         member.updateProfileInfo(updateNickname, updatePhone);
@@ -205,8 +205,8 @@ public class MemberService {
         memberProfileImageRepository.deleteAllByIdInBatch(ids);
     }
 
-    public PasswordVerifyResponse verifyPassword(String email, PasswordVerifyRequest request) {
-        Member member = memberRepository.findByEmail(email)
+    public PasswordVerifyResponse verifyPassword(Long memberId, PasswordVerifyRequest request) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         String storedPassword = member.getPassword();
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -215,8 +215,8 @@ public class MemberService {
         return new PasswordVerifyResponse(isSuccess);
     }
 
-    public GetUpdateProfileInfoResponse getUpdateProfileInfo(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public GetUpdateProfileInfoResponse getUpdateProfileInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         return new GetUpdateProfileInfoResponse(member.getEmail(), member.getNickname(), member.getPhone());

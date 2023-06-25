@@ -80,7 +80,7 @@ public class CafeConcurrentServiceTest {
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
-                    cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(), request);
+                    cafeService.saveCafeReview(member.getId(), cafe.getMapId(), request);
                 } catch (AlreadyExistsCafeReview e) {
                     exceptions.add(e); // 중복 예외를 리스트에 추가
                 }
@@ -99,8 +99,8 @@ public class CafeConcurrentServiceTest {
     @Test
     @DisplayName("회원이 한 카페에 동시에 여러 번 리뷰 등록 시도해도 한 번만 등록된다")
     void saveCafeReviewWithConcurrent() throws InterruptedException {
-        Member member = new Member("kth990303@naver.com", "encodePassword", "케이", "010-1234-5678");
-        memberRepository.save(member);
+        Member member = memberRepository.save(new Member("kth990303@naver.com", "encodePassword",
+                "케이", "010-1234-5678"));
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
         ExecutorService executorService = Executors.newFixedThreadPool(3);
@@ -112,7 +112,7 @@ public class CafeConcurrentServiceTest {
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
-                    cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(), request);
+                    cafeService.saveCafeReview(member.getId(), cafe.getMapId(), request);
                 } catch (AlreadyExistsCafeReview e) {
                     exceptions.add(e); // 중복 예외를 리스트에 추가
                 }

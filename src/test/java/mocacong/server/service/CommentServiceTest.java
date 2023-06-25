@@ -45,7 +45,7 @@ class CommentServiceTest {
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
 
-        CommentSaveResponse savedComment = commentService.save(email, mapId, expected);
+        CommentSaveResponse savedComment = commentService.save(member.getId(), mapId, expected);
 
         Comment actual = commentRepository.findById(savedComment.getId())
                 .orElseThrow(NotFoundCommentException::new);
@@ -60,7 +60,7 @@ class CommentServiceTest {
         Member member = new Member(email, "encodePassword", "케이", "010-1234-5678");
         memberRepository.save(member);
 
-        assertThatThrownBy(() -> commentService.save(email, mapId, "공부하기 좋아요~🥰"))
+        assertThatThrownBy(() -> commentService.save(member.getId(), mapId, "공부하기 좋아요~🥰"))
                 .isInstanceOf(NotFoundCafeException.class);
     }
 
@@ -74,9 +74,9 @@ class CommentServiceTest {
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
 
-        commentService.save(email, mapId, "공부하기 좋아요~🥰");
+        commentService.save(member.getId(), mapId, "공부하기 좋아요~🥰");
 
-        assertDoesNotThrow(() -> commentService.save(email, mapId, "공부하기 좋아요~🥰"));
+        assertDoesNotThrow(() -> commentService.save(member.getId(), mapId, "공부하기 좋아요~🥰"));
     }
 
     @Test
@@ -93,7 +93,7 @@ class CommentServiceTest {
         commentRepository.save(new Comment(cafe, member, "댓글3"));
         commentRepository.save(new Comment(cafe, member, "댓글4"));
 
-        CommentsResponse actual = commentService.findAll(email, mapId, 0, 3);
+        CommentsResponse actual = commentService.findAll(member.getId(), mapId, 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isFalse(),
@@ -120,7 +120,7 @@ class CommentServiceTest {
         commentRepository.save(new Comment(cafe, member, "댓글3"));
         commentRepository.save(new Comment(cafe, member2, "댓글4"));
 
-        CommentsResponse actual = commentService.findCafeCommentsOnlyMyComments(email, mapId, 0, 3);
+        CommentsResponse actual = commentService.findCafeCommentsOnlyMyComments(member.getId(), mapId, 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
@@ -141,10 +141,10 @@ class CommentServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse savedComment = commentService.save(email, mapId, comment);
+        CommentSaveResponse savedComment = commentService.save(member.getId(), mapId, comment);
         String expected = "조용하고 좋네요";
 
-        commentService.update(email, mapId, expected, savedComment.getId());
+        commentService.update(member.getId(), mapId, expected, savedComment.getId());
 
         Comment updatedComment = commentRepository.findById(savedComment.getId())
                 .orElseThrow(NotFoundCommentException::new);
@@ -161,12 +161,12 @@ class CommentServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse savedComment = commentService.save(email, mapId, comment);
+        CommentSaveResponse savedComment = commentService.save(member.getId(), mapId, comment);
         String expected = "조용하고 좋네요";
 
-        commentService.update(email, mapId, expected, savedComment.getId());
+        commentService.update(member.getId(), mapId, expected, savedComment.getId());
 
-        assertDoesNotThrow(() -> commentService.update(email, mapId, expected, savedComment.getId()));
+        assertDoesNotThrow(() -> commentService.update(member.getId(), mapId, expected, savedComment.getId()));
     }
 
     @Test
@@ -181,9 +181,9 @@ class CommentServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse savedComment = commentService.save(email1, mapId, "조용하고 좋네요");
+        CommentSaveResponse savedComment = commentService.save(member1.getId(), mapId, "조용하고 좋네요");
 
-        assertThatThrownBy(() -> commentService.update(email2, mapId, "몰래 이 코멘트를 바꿔", savedComment.getId()))
+        assertThatThrownBy(() -> commentService.update(member2.getId(), mapId, "몰래 이 코멘트를 바꿔", savedComment.getId()))
                 .isInstanceOf(InvalidCommentUpdateException.class);
     }
 
@@ -196,10 +196,10 @@ class CommentServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse response = commentService.save(email, mapId, "공부하기 좋아요~🥰");
+        CommentSaveResponse response = commentService.save(member.getId(), mapId, "공부하기 좋아요~🥰");
 
-        commentService.delete(email, mapId, response.getId());
-        CommentsResponse actual = commentService.findAll(email, mapId, 0, 3);
+        commentService.delete(member.getId(), mapId, response.getId());
+        CommentsResponse actual = commentService.findAll(member.getId(), mapId, 0, 3);
 
         assertThat(actual.getComments()).hasSize(0);
     }
@@ -214,7 +214,7 @@ class CommentServiceTest {
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
 
-        assertThatThrownBy(() -> commentService.delete(email, mapId, 9999L))
+        assertThatThrownBy(() -> commentService.delete(member.getId(), mapId, 9999L))
                 .isInstanceOf(NotFoundCommentException.class);
     }
 
@@ -230,9 +230,9 @@ class CommentServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse response = commentService.save(email1, mapId, "공부하기 좋아요~🥰");
+        CommentSaveResponse response = commentService.save(member1.getId(), mapId, "공부하기 좋아요~🥰");
 
-        assertThatThrownBy(() -> commentService.delete(email2, mapId, response.getId()))
+        assertThatThrownBy(() -> commentService.delete(member2.getId(), mapId, response.getId()))
                 .isInstanceOf(InvalidCommentDeleteException.class);
     }
 }
