@@ -1,15 +1,16 @@
 package mocacong.server.domain;
 
-import java.util.regex.Pattern;
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.InvalidNicknameException;
 
+import javax.persistence.*;
+import java.util.regex.Pattern;
+
 @Entity
 @Table(name = "member", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"platform", "email"})
+        @UniqueConstraint(columnNames = {"email", "platform"})
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
