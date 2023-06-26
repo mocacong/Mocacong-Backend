@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import static java.lang.Integer.parseInt;
-import java.util.List;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
@@ -16,19 +12,25 @@ import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+
+import static java.lang.Integer.parseInt;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @ServiceTest
 class MemberServiceTest {
@@ -94,7 +96,7 @@ class MemberServiceTest {
 
         memberService.signUpByOAuthMember(request);
 
-        Member actual = memberRepository.findByEmail(savedMember.getEmail())
+        Member actual = memberRepository.findById(savedMember.getId())
                 .orElseThrow();
         assertThat(actual.getNickname()).isEqualTo("케이");
     }
@@ -179,7 +181,7 @@ class MemberServiceTest {
         Member member = memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
         ResetPasswordRequest request = new ResetPasswordRequest(NONCE, updatePassword);
 
-        memberService.resetPassword(email, request);
+        memberService.resetPassword(member.getId(), request);
 
         Member actual = memberRepository.findById(member.getId())
                 .orElseThrow();
@@ -194,10 +196,10 @@ class MemberServiceTest {
     @DisplayName("올바르지 않은 비밀번호로 비밀번호 찾기 요청을 받을 경우 예외를 반환한다")
     void findAndResetPasswordWhenInvalidPassword() {
         String email = "kth990303@naver.com";
-        memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
+        Member member = memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
         ResetPasswordRequest request = new ResetPasswordRequest(NONCE, "123");
 
-        assertThatThrownBy(() -> memberService.resetPassword(email, request))
+        assertThatThrownBy(() -> memberService.resetPassword(member.getId(), request))
                 .isInstanceOf(InvalidPasswordException.class);
     }
 
@@ -205,10 +207,10 @@ class MemberServiceTest {
     @DisplayName("nonce 값이 올바르지 않은, 유효한 비밀번호 찾기 요청이 아닌 경우 비밀번호 변경이 안되고 예외를 반환한다")
     void findAndResetPasswordWhenInvalidNonce() {
         String email = "kth990303@naver.com";
-        memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
+        Member member = memberRepository.save(new Member(email, Platform.MOCACONG, "1234"));
         ResetPasswordRequest request = new ResetPasswordRequest("invalid_nonce", "password123");
 
-        assertThatThrownBy(() -> memberService.resetPassword(email, request))
+        assertThatThrownBy(() -> memberService.resetPassword(member.getId(), request))
                 .isInstanceOf(InvalidNonceException.class);
     }
 
@@ -268,7 +270,7 @@ class MemberServiceTest {
     void delete() {
         Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리"));
 
-        memberService.delete(savedMember.getEmail());
+        memberService.delete(savedMember.getId());
 
         List<Member> actual = memberRepository.findAll();
         assertThat(actual).hasSize(0);
@@ -277,7 +279,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("존재하지 않는 회원을 탈퇴 시에 예외를 반환한다")
     void deleteByNotFoundMember() {
-        assertThatThrownBy(() -> memberService.delete("dlawotn3@naver.com"))
+        assertThatThrownBy(() -> memberService.delete(1L))
                 .isInstanceOf(NotFoundMemberException.class);
     }
 
@@ -303,7 +305,7 @@ class MemberServiceTest {
         Member member = new Member(email, "a1b2c3d4", "케이", memberProfileImage, Platform.MOCACONG, "1234");
         memberRepository.save(member);
 
-        MyPageResponse actual = memberService.findMyInfo(email);
+        MyPageResponse actual = memberService.findMyInfo(member.getId());
 
         assertAll(
                 () -> assertThat(actual.getEmail()).isEqualTo(email),
@@ -321,9 +323,9 @@ class MemberServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
 
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        memberService.updateProfileImage(member.getEmail(), mockMultipartFile);
+        memberService.updateProfileImage(member.getId(), mockMultipartFile);
 
-        Member actual = memberRepository.findByEmail(member.getEmail())
+        Member actual = memberRepository.findById(member.getId())
                 .orElseThrow();
 
         assertAll(
@@ -341,9 +343,9 @@ class MemberServiceTest {
                 new Member("kth990303@naver.com", "a1b2c3d4", "메리", memberProfileImage, Platform.MOCACONG, "1234")
         );
 
-        memberService.updateProfileImage(member.getEmail(), null);
+        memberService.updateProfileImage(member.getId(), null);
 
-        Member actual = memberRepository.findByEmail(member.getEmail())
+        Member actual = memberRepository.findById(member.getId())
                 .orElseThrow();
 
         assertAll(
@@ -362,8 +364,8 @@ class MemberServiceTest {
         Member member = new Member(email, passwordEncoder.encode(password), originalNickname);
         memberRepository.save(member);
 
-        memberService.updateProfileInfo(email, new MemberProfileUpdateRequest(newNickname));
-        Member updatedMember = memberRepository.findByEmail(member.getEmail())
+        memberService.updateProfileInfo(member.getId(), new MemberProfileUpdateRequest(newNickname));
+        Member updatedMember = memberRepository.findById(member.getId())
                 .orElseThrow();
 
         assertAll(
@@ -382,7 +384,7 @@ class MemberServiceTest {
         memberRepository.save(member);
 
         MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname);
-        assertThatThrownBy(() -> memberService.updateProfileInfo(member.getEmail(), request))
+        assertThatThrownBy(() -> memberService.updateProfileInfo(member.getId(), request))
                 .isInstanceOf(InvalidNicknameException.class);
     }
 
@@ -393,11 +395,11 @@ class MemberServiceTest {
         String password = "jisu0708";
         String originalNickname = "mery";
         String newNickname = "케이";
-        memberRepository.save(new Member(email, password, originalNickname));
+        Member member = memberRepository.save(new Member(email, password, originalNickname));
         memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "케이"));
 
         MemberProfileUpdateRequest request = new MemberProfileUpdateRequest(newNickname);
-        assertThatThrownBy(() -> memberService.updateProfileInfo(email, request))
+        assertThatThrownBy(() -> memberService.updateProfileInfo(member.getId(), request))
                 .isInstanceOf(DuplicateNicknameException.class);
     }
 
@@ -432,7 +434,7 @@ class MemberServiceTest {
                 new Member("kth990303@naver.com", "a1b2c3d4", "케이", memberProfileImage)
         );
 
-        memberService.delete(member.getEmail());
+        memberService.delete(member.getId());
 
         MemberProfileImage actual = memberProfileImageRepository.findById(memberProfileImage.getId())
                 .orElseThrow();
@@ -449,7 +451,7 @@ class MemberServiceTest {
         memberRepository.save(member);
         PasswordVerifyRequest request = new PasswordVerifyRequest("jisu1234");
 
-        PasswordVerifyResponse actual = memberService.verifyPassword(email, request);
+        PasswordVerifyResponse actual = memberService.verifyPassword(member.getId(), request);
 
         assertThat(actual.getIsSuccess()).isTrue();
     }
@@ -464,7 +466,7 @@ class MemberServiceTest {
         memberRepository.save(member);
         PasswordVerifyRequest request = new PasswordVerifyRequest("wrongpwd123");
 
-        PasswordVerifyResponse actual = memberService.verifyPassword(email, request);
+        PasswordVerifyResponse actual = memberService.verifyPassword(member.getId(), request);
 
         assertThat(actual.getIsSuccess()).isFalse();
     }
@@ -478,7 +480,7 @@ class MemberServiceTest {
         Member member = new Member(email, passwordEncoder.encode(password), nickname);
         memberRepository.save(member);
 
-        GetUpdateProfileInfoResponse actual = memberService.getUpdateProfileInfo(member.getEmail());
+        GetUpdateProfileInfoResponse actual = memberService.getUpdateProfileInfo(member.getId());
 
         assertAll(
                 () -> assertThat(actual.getEmail()).isEqualTo(email),

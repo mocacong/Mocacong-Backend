@@ -29,7 +29,7 @@ public class AuthService {
     private final KakaoOAuthUserProvider kakaoOAuthUserProvider;
 
     public TokenResponse login(AuthLoginRequest request) {
-        Member findMember = memberRepository.findByEmail(request.getEmail())
+        Member findMember = memberRepository.findByEmailAndPlatform(request.getEmail(), Platform.MOCACONG)
                 .orElseThrow(NotFoundMemberException::new);
         validatePassword(findMember, request.getPassword());
 
@@ -78,9 +78,7 @@ public class AuthService {
     }
 
     private String issueToken(final Member findMember) {
-        String email = findMember.getEmail();
-
-        return jwtTokenProvider.createToken(email);
+        return jwtTokenProvider.createToken(findMember.getId());
     }
 
     private void validatePassword(final Member findMember, final String password) {

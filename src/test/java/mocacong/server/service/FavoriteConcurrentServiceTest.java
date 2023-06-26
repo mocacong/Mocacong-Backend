@@ -46,7 +46,7 @@ public class FavoriteConcurrentServiceTest {
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
-                    favoriteService.save(member.getEmail(), cafe.getMapId());
+                    favoriteService.save(member.getId(), cafe.getMapId());
                 } catch (AlreadyExistsFavorite e) {
                     exceptions.add(e); // 중복 예외를 리스트에 추가
                 }

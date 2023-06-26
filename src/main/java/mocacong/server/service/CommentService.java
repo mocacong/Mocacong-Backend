@@ -1,7 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
@@ -24,6 +22,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -33,10 +34,10 @@ public class CommentService {
     private final CafeRepository cafeRepository;
     private final CommentRepository commentRepository;
 
-    public CommentSaveResponse save(String email, String mapId, String content) {
+    public CommentSaveResponse save(Long memberId, String mapId, String content) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Comment comment = new Comment(cafe, member, content);
 
@@ -44,10 +45,10 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public CommentsResponse findAll(String email, String mapId, Integer page, int count) {
+    public CommentsResponse findAll(Long memberId, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Comment> comments = commentRepository.findAllByCafeId(cafe.getId(), PageRequest.of(page, count));
         List<CommentResponse> responses = findCommentResponses(member, comments);
@@ -55,10 +56,10 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public CommentsResponse findCafeCommentsOnlyMyComments(String email, String mapId, Integer page, int count) {
+    public CommentsResponse findCafeCommentsOnlyMyComments(Long memberId, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Comment> comments =
                 commentRepository.findAllByCafeIdAndMemberId(cafe.getId(), member.getId(), PageRequest.of(page, count));
@@ -79,10 +80,10 @@ public class CommentService {
     }
 
     @Transactional
-    public void update(String email, String mapId, String content, Long commentId) {
+    public void update(Long memberId, String mapId, String content, Long commentId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Comment comment = cafe.getComments().stream()
                 .filter(c -> c.getId().equals(commentId))
@@ -96,10 +97,10 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(String email, String mapId, Long commentId) {
+    public void delete(Long memberId, String mapId, Long commentId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Comment comment = cafe.getComments().stream()
                 .filter(c -> c.getId().equals(commentId))

@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
-import mocacong.server.security.auth.LoginUserEmail;
+import mocacong.server.security.auth.LoginUserId;
 import mocacong.server.service.CafeService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +35,10 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @GetMapping("/{mapId}")
     public ResponseEntity<FindCafeResponse> findCafeByMapId(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId
     ) {
-        FindCafeResponse response = cafeService.findCafeByMapId(email, mapId);
+        FindCafeResponse response = cafeService.findCafeByMapId(memberId, mapId);
         return ResponseEntity.ok(response);
     }
 
@@ -46,10 +46,10 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @GetMapping("/{mapId}/preview")
     public ResponseEntity<PreviewCafeResponse> previewCafeByMapId(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId
     ) {
-        PreviewCafeResponse response = cafeService.previewCafeByMapId(email, mapId);
+        PreviewCafeResponse response = cafeService.previewCafeByMapId(memberId, mapId);
         return ResponseEntity.ok(response);
     }
 
@@ -57,11 +57,11 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @PostMapping("/{mapId}")
     public ResponseEntity<CafeReviewResponse> saveCafeReview(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestBody @Valid CafeReviewRequest request
     ) {
-        CafeReviewResponse response = cafeService.saveCafeReview(email, mapId, request);
+        CafeReviewResponse response = cafeService.saveCafeReview(memberId, mapId, request);
         return ResponseEntity.ok(response);
     }
 
@@ -69,10 +69,10 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @GetMapping("/{mapId}/me")
     public ResponseEntity<CafeMyReviewResponse> findMyCafeReview(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId
     ) {
-        CafeMyReviewResponse response = cafeService.findMyCafeReview(email, mapId);
+        CafeMyReviewResponse response = cafeService.findMyCafeReview(memberId, mapId);
         return ResponseEntity.ok(response);
     }
 
@@ -80,11 +80,11 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @PutMapping("/{mapId}")
     public ResponseEntity<CafeReviewUpdateResponse> updateCafeReview(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestBody @Valid CafeReviewUpdateRequest request
     ) {
-        CafeReviewUpdateResponse response = cafeService.updateCafeReview(email, mapId, request);
+        CafeReviewUpdateResponse response = cafeService.updateCafeReview(memberId, mapId, request);
         return ResponseEntity.ok(response);
     }
 
@@ -103,10 +103,10 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @PostMapping("/favorites")
     public ResponseEntity<CafeFilterFavoritesResponse> getCafesByFavorites(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @RequestBody CafeFilterFavoritesRequest request
     ) {
-        CafeFilterFavoritesResponse responseBody = cafeService.filterCafesByFavorites(email, request);
+        CafeFilterFavoritesResponse responseBody = cafeService.filterCafesByFavorites(memberId, request);
         return ResponseEntity.ok(responseBody);
     }
 
@@ -114,11 +114,11 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @PostMapping(value = "/{mapId}/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> saveCafeImage(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestParam(value = "files") List<MultipartFile> multipartFiles
     ) {
-        cafeService.saveCafeImage(email, mapId, multipartFiles);
+        cafeService.saveCafeImage(memberId, mapId, multipartFiles);
         return ResponseEntity.ok().build();
     }
 
@@ -126,12 +126,12 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @GetMapping("/{mapId}/img")
     public ResponseEntity<CafeImagesResponse> getCafeImages(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count
     ) {
-        CafeImagesResponse response = cafeService.findCafeImages(email, mapId, page, count);
+        CafeImagesResponse response = cafeService.findCafeImages(memberId, mapId, page, count);
         return ResponseEntity.ok(response);
     }
 
@@ -139,12 +139,12 @@ public class CafeController {
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/{mapId}/img/{cafeImageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateCafeImage(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @PathVariable String mapId,
             @PathVariable Long cafeImageId,
             @RequestParam(value = "file") MultipartFile multipartFile
     ) {
-        cafeService.updateCafeImage(email, mapId, cafeImageId, multipartFile);
+        cafeService.updateCafeImage(memberId, mapId, cafeImageId, multipartFile);
         return ResponseEntity.ok().build();
     }
 }

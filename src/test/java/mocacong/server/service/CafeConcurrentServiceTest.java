@@ -76,7 +76,7 @@ public class CafeConcurrentServiceTest {
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
-                    cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(), request);
+                    cafeService.saveCafeReview(member.getId(), cafe.getMapId(), request);
                 } catch (AlreadyExistsCafeReview e) {
                     exceptions.add(e); // 중복 예외를 리스트에 추가
                 }
@@ -108,7 +108,7 @@ public class CafeConcurrentServiceTest {
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
-                    cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(), request);
+                    cafeService.saveCafeReview(member.getId(), cafe.getMapId(), request);
                 } catch (AlreadyExistsCafeReview e) {
                     exceptions.add(e); // 중복 예외를 리스트에 추가
                 }

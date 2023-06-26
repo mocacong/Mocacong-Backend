@@ -42,7 +42,7 @@ class CafeRepositoryTest {
         favoriteRepository.save(new Favorite(member, savedCafe3));
         List<String> mapIds = List.of(mapId1, mapId2, mapId3, mapId4);
 
-        List<String> actual = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(member.getEmail(), mapIds);
+        List<String> actual = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(member.getId(), mapIds);
 
         assertAll(
                 () -> assertThat(actual).hasSize(3),
@@ -64,7 +64,7 @@ class CafeRepositoryTest {
         favoriteRepository.save(new Favorite(member, savedCafe2));
         favoriteRepository.save(new Favorite(member, savedCafe3));
 
-        Slice<Cafe> actual = cafeRepository.findByMyFavoriteCafes(member.getEmail(), PageRequest.of(1, 2));
+        Slice<Cafe> actual = cafeRepository.findByMyFavoriteCafes(member.getId(), PageRequest.of(1, 2));
 
         assertAll(
                 () -> assertThat(actual).hasSize(1),
@@ -90,7 +90,7 @@ class CafeRepositoryTest {
         reviewRepository.save(new Review(member, savedCafe2, cafeDetail));
         reviewRepository.save(new Review(member, savedCafe3, cafeDetail));
 
-        Slice<Cafe> actual = cafeRepository.findByMyReviewCafes(member.getEmail(), PageRequest.of(1, 2));
+        Slice<Cafe> actual = cafeRepository.findByMyReviewCafes(member.getId(), PageRequest.of(1, 2));
 
         assertAll(
                 () -> assertThat(actual).hasSize(1),

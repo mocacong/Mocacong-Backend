@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -31,6 +27,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -61,11 +62,11 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public FindCafeResponse findCafeByMapId(String email, String mapId) {
+    public FindCafeResponse findCafeByMapId(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         CafeDetail cafeDetail = cafe.getCafeDetail();
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Score scoreByLoginUser = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
@@ -94,11 +95,11 @@ public class CafeService {
 
     @Cacheable(key = "#mapId", value = "cafePreviewCache", cacheManager = "cafeCacheManager")
     @Transactional(readOnly = true)
-    public PreviewCafeResponse previewCafeByMapId(String email, String mapId) {
+    public PreviewCafeResponse previewCafeByMapId(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         CafeDetail cafeDetail = cafe.getCafeDetail();
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
@@ -142,8 +143,8 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public MyFavoriteCafesResponse findMyFavoriteCafes(String email, Integer page, int count) {
-        Slice<Cafe> myFavoriteCafes = cafeRepository.findByMyFavoriteCafes(email, PageRequest.of(page, count));
+    public MyFavoriteCafesResponse findMyFavoriteCafes(Long memberId, Integer page, int count) {
+        Slice<Cafe> myFavoriteCafes = cafeRepository.findByMyFavoriteCafes(memberId, PageRequest.of(page, count));
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
@@ -153,10 +154,10 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public MyReviewCafesResponse findMyReviewCafes(String email, Integer page, int count) {
-        Member member = memberRepository.findByEmail(email)
+    public MyReviewCafesResponse findMyReviewCafes(Long memberId, Integer page, int count) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
-        Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(email, PageRequest.of(page, count));
+        Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(memberId, PageRequest.of(page, count));
         List<MyReviewCafeResponse> responses = myReviewCafes
                 .getContent()
                 .stream()
@@ -169,8 +170,8 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public MyCommentCafesResponse findMyCommentCafes(String email, int page, int count) {
-        Member member = memberRepository.findByEmail(email)
+    public MyCommentCafesResponse findMyCommentCafes(Long memberId, int page, int count) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Comment> comments = commentRepository.findByMemberId(member.getId(), PageRequest.of(page, count));
 
@@ -187,10 +188,10 @@ public class CafeService {
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
-    public CafeReviewResponse saveCafeReview(String email, String mapId, CafeReviewRequest request) {
+    public CafeReviewResponse saveCafeReview(Long memberId, String mapId, CafeReviewRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         checkAlreadySaveCafeReview(cafe, member);
 
@@ -229,10 +230,10 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public CafeMyReviewResponse findMyCafeReview(String email, String mapId) {
+    public CafeMyReviewResponse findMyCafeReview(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
@@ -244,10 +245,10 @@ public class CafeService {
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
-    public CafeReviewUpdateResponse updateCafeReview(String email, String mapId, CafeReviewUpdateRequest request) {
+    public CafeReviewUpdateResponse updateCafeReview(Long memberId, String mapId, CafeReviewUpdateRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         updateCafeReviewDetails(request, cafe, member);
@@ -300,19 +301,19 @@ public class CafeService {
         return new CafeFilterStudyTypeResponse(filteredIds);
     }
 
-    public CafeFilterFavoritesResponse filterCafesByFavorites(String email, CafeFilterFavoritesRequest request) {
+    public CafeFilterFavoritesResponse filterCafesByFavorites(Long memberId, CafeFilterFavoritesRequest request) {
         List<String> mapIds = request.getMapIds();
-        List<String> filteredIds = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(email, mapIds);
+        List<String> filteredIds = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(memberId, mapIds);
 
         return new CafeFilterFavoritesResponse(filteredIds);
     }
 
     @Transactional
-    public void saveCafeImage(String email, String mapId, List<MultipartFile> cafeImages) {
+    public void saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
         validateCafeImagesCounts(cafeImages);
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         for (MultipartFile cafeImage : cafeImages) {
@@ -329,10 +330,10 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public CafeImagesResponse findCafeImages(String email, String mapId, Integer page, int count) {
+    public CafeImagesResponse findCafeImages(Long memberId, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
         Slice<CafeImage> cafeImages = cafeImageRepository.
@@ -351,10 +352,10 @@ public class CafeService {
     }
 
     @Transactional
-    public void updateCafeImage(String email, String mapId, Long cafeImageId, MultipartFile cafeImg) {
+    public void updateCafeImage(Long memberId, String mapId, Long cafeImageId, MultipartFile cafeImg) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         CafeImage notUsedImage = cafeImageRepository.findById(cafeImageId)
                 .orElseThrow(NotFoundCafeImageException::new);

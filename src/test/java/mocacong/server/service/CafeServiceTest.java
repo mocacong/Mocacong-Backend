@@ -15,17 +15,18 @@ import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mock.web.MockMultipartFile;
+import java.io.InputStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mock.web.MockMultipartFile;
+import static org.mockito.Mockito.*;
 
 @ServiceTest
 class CafeServiceTest {
@@ -84,7 +85,7 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isFalse(),
@@ -113,7 +114,7 @@ class CafeServiceTest {
         Score score2 = new Score(5, member2, cafe);
         scoreRepository.save(score2);
 
-        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isFalse(),
@@ -136,10 +137,10 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "both", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
         Comment comment1 = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
@@ -149,7 +150,7 @@ class CafeServiceTest {
         Comment comment3 = new Comment(cafe, member1, "다시 와봐도 똑같네요. 리뷰 수정할까 하다가 그대로 남겨요..");
         commentRepository.save(comment3);
 
-        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isFalse(),
@@ -173,7 +174,7 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isFalse(),
@@ -196,7 +197,7 @@ class CafeServiceTest {
         scoreRepository.save(new Score(5, member2, cafe));
         favoriteRepository.save(new Favorite(member1, cafe));
 
-        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isTrue(),
@@ -215,15 +216,15 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(3, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "both", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
         favoriteRepository.save(new Favorite(member1, cafe));
 
-        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getEmail(), cafe.getMapId());
+        PreviewCafeResponse actual = cafeService.previewCafeByMapId(member1.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isTrue(),
@@ -249,7 +250,7 @@ class CafeServiceTest {
         Comment comment4 = new Comment(cafe, member, "댓글4");
         commentRepository.save(comment4);
 
-        FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getCommentsCount()).isEqualTo(4),
@@ -266,14 +267,15 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(), new CafeReviewRequest(1, "group", "느려요", "없어요",
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(), new CafeReviewRequest(1,
+                "group", "느려요", "없어요",
                 "불편해요", "없어요", "북적북적해요", "불편해요"));
         Comment comment = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
         commentRepository.save(comment);
-        memberService.delete(member1.getEmail());
+        memberService.delete(member1.getId());
         memberRepository.delete(member1);
 
-        FindCafeResponse actual = cafeService.findCafeByMapId(member2.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member2.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isFalse(),
@@ -296,10 +298,10 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "group", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
         Comment comment1 = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
@@ -311,7 +313,7 @@ class CafeServiceTest {
         Favorite favorite = new Favorite(member1, cafe);
         favoriteRepository.save(favorite);
 
-        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getEmail(), cafe.getMapId());
+        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getFavorite()).isTrue(),
@@ -337,17 +339,18 @@ class CafeServiceTest {
         cafeRepository.save(cafe);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
+                fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
 
-        FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), mapId);
-        CafeImagesResponse actual2 = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
+        FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), mapId);
+        CafeImagesResponse actual2 = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
 
         assertAll(
                 () -> assertThat(actual.getCafeImages()).hasSize(5),
@@ -364,16 +367,16 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "group", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
         Favorite favorite = new Favorite(member1, cafe);
         favoriteRepository.save(favorite);
 
-        MyFavoriteCafesResponse actual = cafeService.findMyFavoriteCafes(member1.getEmail(), 0, 3);
+        MyFavoriteCafesResponse actual = cafeService.findMyFavoriteCafes(member1.getId(), 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
@@ -392,17 +395,17 @@ class CafeServiceTest {
         Cafe cafe2 = new Cafe("2154122541112", "메리카페");
         cafeRepository.save(cafe1);
         cafeRepository.save(cafe2);
-        cafeService.saveCafeReview(member1.getEmail(), cafe1.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe1.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
-        cafeService.saveCafeReview(member1.getEmail(), cafe2.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe2.getMapId(),
                 new CafeReviewRequest(5, "group", "느려요", "없어요",
                         "불편해요", "없어요", "북적북적해요", "불편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe1.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe1.getMapId(),
                 new CafeReviewRequest(2, "group", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
 
-        MyReviewCafesResponse actual = cafeService.findMyReviewCafes(member1.getEmail(), 0, 3);
+        MyReviewCafesResponse actual = cafeService.findMyReviewCafes(member1.getId(), 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
@@ -430,7 +433,7 @@ class CafeServiceTest {
         commentRepository.save(new Comment(cafe2, member1, "댓글3"));
         commentRepository.save(new Comment(cafe2, member2, "댓글4"));
 
-        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getEmail(), 0, 5);
+        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getId(), 0, 5);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
@@ -450,11 +453,11 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
 
-        CafeReviewResponse actual = cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        CafeReviewResponse actual = cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "solo", "빵빵해요", "협소해요",
                         "깨끗해요", "충분해요", "적당해요", "편해요"));
 
@@ -482,10 +485,10 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        CafeReviewResponse actual = cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        CafeReviewResponse actual = cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "group", "빵빵해요", "협소해요",
                         "깨끗해요", "충분해요", "적당해요", "편해요"));
 
@@ -501,14 +504,14 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "group", "적당해요", "협소해요",
                         "불편해요", "없어요", "적당해요", "불편해요"));
 
-        CafeMyReviewResponse actual = cafeService.findMyCafeReview(member1.getEmail(), cafe.getMapId());
+        CafeMyReviewResponse actual = cafeService.findMyCafeReview(member1.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getMyScore()).isEqualTo(4),
@@ -530,7 +533,7 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        CafeMyReviewResponse actual = cafeService.findMyCafeReview(member.getEmail(), cafe.getMapId());
+        CafeMyReviewResponse actual = cafeService.findMyCafeReview(member.getId(), cafe.getMapId());
 
         assertAll(
                 () -> assertThat(actual.getMyScore()).isNull(),
@@ -553,11 +556,11 @@ class CafeServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
 
-        assertThatThrownBy(() -> cafeService.saveCafeReview(member1.getEmail(), cafe.getMapId(),
+        assertThatThrownBy(() -> cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(2, "group", "빵빵해요", "협소해요",
                         "깨끗해요", "충분해요", "적당해요", "편해요")))
                 .isInstanceOf(AlreadyExistsCafeReview.class);
@@ -570,11 +573,11 @@ class CafeServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
 
-        CafeReviewUpdateResponse actual = cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(),
+        CafeReviewUpdateResponse actual = cafeService.updateCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewUpdateRequest(5, "group", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "불편해요"));
 
@@ -598,11 +601,11 @@ class CafeServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
 
-        CafeReviewUpdateResponse actual = cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(),
+        CafeReviewUpdateResponse actual = cafeService.updateCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewUpdateRequest(5, "group", null, null,
                         null, null, null, null));
 
@@ -627,8 +630,8 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
 
-        assertThatThrownBy(() -> cafeService.updateCafeReview(member.getEmail(), cafe.getMapId(), new CafeReviewUpdateRequest(5,
-                "solo", "빵빵해요", "여유로워요",
+        assertThatThrownBy(() -> cafeService.updateCafeReview(member.getId(), cafe.getMapId(),
+                new CafeReviewUpdateRequest(5, "solo", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "불편해요")))
                 .isInstanceOf(NotFoundReviewException.class);
     }
@@ -650,19 +653,19 @@ class CafeServiceTest {
         cafeRepository.save(cafe3);
         cafeRepository.save(cafe4);
         cafeRepository.save(cafe5);
-        cafeService.saveCafeReview(member1.getEmail(), cafe1.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe1.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        cafeService.saveCafeReview(member1.getEmail(), cafe2.getMapId(),
+        cafeService.saveCafeReview(member1.getId(), cafe2.getMapId(),
                 new CafeReviewRequest(2, "group", "빵빵해요", "여유로워요",
                         "깨끗해요", "없어요", "조용해요", "편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe3.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe3.getMapId(),
                 new CafeReviewRequest(5, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe4.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe4.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
-        cafeService.saveCafeReview(member2.getEmail(), cafe5.getMapId(),
+        cafeService.saveCafeReview(member2.getId(), cafe5.getMapId(),
                 new CafeReviewRequest(4, "both", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
         CafeFilterStudyTypeRequest requestBody = new CafeFilterStudyTypeRequest(
@@ -682,7 +685,7 @@ class CafeServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
-        cafeService.saveCafeReview(member.getEmail(), cafe.getMapId(),
+        cafeService.saveCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                         "깨끗해요", "충분해요", "조용해요", "편해요"));
         CafeFilterStudyTypeRequest requestBody = new CafeFilterStudyTypeRequest(List.of(cafe.getMapId()));
@@ -711,7 +714,7 @@ class CafeServiceTest {
                 List.of(cafe1.getMapId(), cafe2.getMapId(), cafe3.getMapId(), cafe4.getMapId())
         );
 
-        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member.getEmail(), requestBody);
+        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member.getId(), requestBody);
 
         assertThat(filteredCafes.getMapIds())
                 .containsExactlyInAnyOrder(cafe1.getMapId(), cafe2.getMapId());
@@ -727,7 +730,7 @@ class CafeServiceTest {
 
         CafeFilterFavoritesRequest requestBody = new CafeFilterFavoritesRequest(List.of(cafe.getMapId()));
 
-        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member.getEmail(), requestBody);
+        CafeFilterFavoritesResponse filteredCafes = cafeService.filterCafesByFavorites(member.getId(), requestBody);
 
         assertThat(filteredCafes.getMapIds()).isEmpty();
     }
@@ -742,10 +745,11 @@ class CafeServiceTest {
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
+                fileInputStream);
 
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
 
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         assertAll(
@@ -769,7 +773,7 @@ class CafeServiceTest {
 
         when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
         when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile1, mockMultipartFile2));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile1, mockMultipartFile2));
 
         Cafe actual = cafeRepository.findByMapId(mapId)
                 .orElseThrow();
@@ -785,16 +789,20 @@ class CafeServiceTest {
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         MockMultipartFile mockMultipartFile1 =
-                new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img.jpg"));
         MockMultipartFile mockMultipartFile2 =
-                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img2.jpg"));
         MockMultipartFile mockMultipartFile3 =
-                new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img.jpg"));
         MockMultipartFile mockMultipartFile4 =
-                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img2.jpg"));
 
         assertThatThrownBy(() -> cafeService.saveCafeImage(
-                member.getEmail(),
+                member.getId(),
                 mapId,
                 List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3, mockMultipartFile4)
         )).isInstanceOf(ExceedCafeImagesCountsException.class);
@@ -813,8 +821,8 @@ class CafeServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
 
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
 
         Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
         assertAll(
@@ -836,11 +844,11 @@ class CafeServiceTest {
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
 
-        CafeImagesResponse actual = cafeService.findCafeImages("dlawotn3@naver.com", mapId, 0, 3);
+        CafeImagesResponse actual = cafeService.findCafeImages(member.getId(), mapId, 0, 3);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
@@ -862,9 +870,9 @@ class CafeServiceTest {
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg", fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(mockMultipartFile));
-        CafeImagesResponse actual = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        CafeImagesResponse actual = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
@@ -891,11 +899,11 @@ class CafeServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
                 fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        CafeImagesResponse actual = cafeService.findCafeImages(member2.getEmail(), mapId, 0, 10);
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        CafeImagesResponse actual = cafeService.findCafeImages(member2.getId(), mapId, 0, 10);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
@@ -922,11 +930,11 @@ class CafeServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
                 fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
-        CafeImagesResponse actual = cafeService.findCafeImages(member2.getEmail(), mapId, 0, 10);
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(mockMultipartFile));
+        CafeImagesResponse actual = cafeService.findCafeImages(member2.getId(), mapId, 0, 10);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
@@ -958,11 +966,11 @@ class CafeServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", expected, "jpg",
                 fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member2.getEmail(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member1.getEmail(), mapId, List.of(mockMultipartFile));
-        CafeImagesResponse actual = cafeService.findCafeImages(member2.getEmail(), mapId, 0, 10);
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
+        CafeImagesResponse actual = cafeService.findCafeImages(member2.getId(), mapId, 0, 10);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
@@ -991,20 +999,24 @@ class CafeServiceTest {
         String mapId = cafe.getMapId();
         FileInputStream oldFileInputStream = new FileInputStream("src/test/resources/images/" + oldImage);
         FileInputStream newFileInputStream = new FileInputStream("src/test/resources/images/" + newImage);
-        MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg", oldFileInputStream);
-        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
+        MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg",
+                oldFileInputStream);
+        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg",
+                newFileInputStream);
         when(awsS3Uploader.uploadImage(oldMockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
-        CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
-        cafeService.updateCafeImage(member.getEmail(), mapId, oldFindImage.getCafeImages().get(0).getId(), newMockMultipartFile);
-        CafeImagesResponse actual = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
+        cafeService.updateCafeImage(member.getId(), mapId, oldFindImage.getCafeImages().get(0).getId(),
+                newMockMultipartFile);
+        CafeImagesResponse actual = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
-                () -> assertThat(actual.getCafeImages().get(0).getId()).isNotEqualTo(oldFindImage.getCafeImages().get(0).getId()),
+                () -> assertThat(actual.getCafeImages().get(0).getId())
+                        .isNotEqualTo(oldFindImage.getCafeImages().get(0).getId()),
                 () -> assertThat(cafeImages.get(0).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(cafeImages).hasSize(1)
         );
@@ -1020,10 +1032,11 @@ class CafeServiceTest {
         memberRepository.save(member);
         String mapId = cafe.getMapId();
         FileInputStream newFileInputStream = new FileInputStream("src/test/resources/images/" + newImage);
-        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
+        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg",
+                newFileInputStream);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
-        assertThatThrownBy(() -> cafeService.updateCafeImage(member.getEmail(), mapId, 9999L,
+        assertThatThrownBy(() -> cafeService.updateCafeImage(member.getId(), mapId, 9999L,
                 newMockMultipartFile)).isInstanceOf(NotFoundCafeImageException.class);
     }
 
@@ -1039,21 +1052,24 @@ class CafeServiceTest {
         String mapId = cafe.getMapId();
         FileInputStream oldFileInputStream = new FileInputStream("src/test/resources/images/" + oldImage);
         FileInputStream newFileInputStream = new FileInputStream("src/test/resources/images/" + newImage);
-        MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg", oldFileInputStream);
-        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
+        MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg",
+                oldFileInputStream);
+        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg",
+                newFileInputStream);
         when(awsS3Uploader.uploadImage(oldMockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
-        CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
-        cafeService.updateCafeImage(member.getEmail(), mapId, oldFindImage.getCafeImages().get(0).getId(), newMockMultipartFile);
-        cafeService.saveCafeImage(member.getEmail(), mapId, List.of(oldMockMultipartFile));
-        FindCafeResponse actual = cafeService.findCafeByMapId(member.getEmail(), mapId);
-        CafeImagesResponse given = cafeService.findCafeImages(member.getEmail(), mapId, 0, 10);
+        cafeService.updateCafeImage(member.getId(), mapId, oldFindImage.getCafeImages().get(0).getId(),
+                newMockMultipartFile);
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), mapId);
+        CafeImagesResponse given = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
 
         assertAll(
                 () -> assertThat(actual.getCafeImages()).hasSize(5),
@@ -1075,11 +1091,12 @@ class CafeServiceTest {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/test_img.jpg");
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg", fileInputStream);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg",
+                "jpg", fileInputStream);
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
-        cafeService.saveCafeImage(member.getEmail(), cafe.getMapId(), List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member.getId(), cafe.getMapId(), List.of(mockMultipartFile));
 
-        memberService.delete(member.getEmail());
+        memberService.delete(member.getId());
         List<CafeImage> actual = cafeImageRepository.findAll();
 
         assertAll(
