@@ -999,10 +999,10 @@ class CafeServiceTest {
         String mapId = cafe.getMapId();
         FileInputStream oldFileInputStream = new FileInputStream("src/test/resources/images/" + oldImage);
         FileInputStream newFileInputStream = new FileInputStream("src/test/resources/images/" + newImage);
-        MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg",
-                oldFileInputStream);
-        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg",
-                newFileInputStream);
+        MockMultipartFile oldMockMultipartFile =
+                new MockMultipartFile("test_img", oldImage, "jpg", oldFileInputStream);
+        MockMultipartFile newMockMultipartFile =
+                new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(oldMockMultipartFile)).thenReturn("test_img.jpg");
         cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
         CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
@@ -1010,13 +1010,14 @@ class CafeServiceTest {
 
         cafeService.updateCafeImage(member.getId(), mapId, oldFindImage.getCafeImages().get(0).getId(),
                 newMockMultipartFile);
+
         CafeImagesResponse actual = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
-
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
+                // 수정 이미지의 url 자체만 변경되고 id는 동일할 것
                 () -> assertThat(actual.getCafeImages().get(0).getId())
-                        .isNotEqualTo(oldFindImage.getCafeImages().get(0).getId()),
+                        .isEqualTo(oldFindImage.getCafeImages().get(0).getId()),
                 () -> assertThat(cafeImages.get(0).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(cafeImages).hasSize(1)
         );
@@ -1052,10 +1053,10 @@ class CafeServiceTest {
         String mapId = cafe.getMapId();
         FileInputStream oldFileInputStream = new FileInputStream("src/test/resources/images/" + oldImage);
         FileInputStream newFileInputStream = new FileInputStream("src/test/resources/images/" + newImage);
-        MockMultipartFile oldMockMultipartFile = new MockMultipartFile("test_img", oldImage, "jpg",
-                oldFileInputStream);
-        MockMultipartFile newMockMultipartFile = new MockMultipartFile("test_img2", newImage, "jpg",
-                newFileInputStream);
+        MockMultipartFile oldMockMultipartFile =
+                new MockMultipartFile("test_img", oldImage, "jpg", oldFileInputStream);
+        MockMultipartFile newMockMultipartFile =
+                new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(oldMockMultipartFile)).thenReturn("test_img.jpg");
         cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
         cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
@@ -1065,8 +1066,9 @@ class CafeServiceTest {
         CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
-        cafeService.updateCafeImage(member.getId(), mapId, oldFindImage.getCafeImages().get(0).getId(),
-                newMockMultipartFile);
+        cafeService.updateCafeImage(
+                member.getId(), mapId, oldFindImage.getCafeImages().get(0).getId(), newMockMultipartFile
+        );
         cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), mapId);
         CafeImagesResponse given = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
@@ -1078,7 +1080,7 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(2).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(3).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
-                () -> assertThat(actual.getCafeImages().get(4).getImageUrl()).endsWith("test_img2.jpg"),
+                () -> assertThat(actual.getCafeImages().get(0).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
         );
     }
