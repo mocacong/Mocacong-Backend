@@ -22,7 +22,7 @@
 ### 사용 기술스택
 - `Language`: Java 11, JUnit 5
 - `Framework`: Spring Boot 2.7.9
-- `Database`: H2, Amazon RDS for MySQL, Amazon Elasticache
+- `Database`: H2, Amazon RDS for MySQL, Amazon Elasticache for Redis
 - `ORM`: JPA (Spring Data JPA)
 - `Deploy`: Github Actions, Docker CI/CD
 - `Logging`: Logback, AWS Cloudwatch, AWS Lambda, Slack API
