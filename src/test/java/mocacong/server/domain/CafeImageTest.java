@@ -50,4 +50,16 @@ class CafeImageTest {
 
         assertThat(cafeImage.getMember()).isNull();
     }
+
+    @Test
+    @DisplayName("특정 카페 이미지 url을 수정한다")
+    void updateCafeImageUrl() {
+        String expected = "test_update_url";
+        Cafe cafe = new Cafe("123454321", "케이카페");
+        CafeImage cafeImage = new CafeImage("test_url", true, cafe, member);
+
+        cafeImage.updateImgUrl(expected);
+
+        assertThat(cafeImage.getImgUrl()).isEqualTo(expected);
+    }
 }
