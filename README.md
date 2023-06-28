@@ -3,12 +3,11 @@
 코딩하기 좋은 카페만 모아놓은 지도는 없을까? 고민했다면 모카콩!  
 
 <p align="center">
-  <img width="33%" height="600" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/b8510091-a49a-439d-b067-eb92afe282ab">
-  <img width="33%" height="600" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/ed9d723f-8161-4de4-9dae-3cfc2eea43b1"></p>
-
-<p align="center">
-  <img width="33%" height="600" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/614c6e44-9199-4042-9f29-b90f659dc613"> 
-  <img width="33%" height="600" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/a81d4fbd-a4a4-4ebb-bc63-c8e0e815e2cb"></p>
+  <img width="20%" height="400" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/b8510091-a49a-439d-b067-eb92afe282ab">
+  <img width="20%" height="400" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/ed9d723f-8161-4de4-9dae-3cfc2eea43b1">
+  <img width="20%" height="400" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/614c6e44-9199-4042-9f29-b90f659dc613"> 
+  <img width="20%" height="400" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/a81d4fbd-a4a4-4ebb-bc63-c8e0e815e2cb">
+</p>
 
 
 - - - 
