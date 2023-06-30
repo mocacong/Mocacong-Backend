@@ -157,6 +157,7 @@ public class CafeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(memberId, PageRequest.of(page, count));
+        // TODO : cafe.getStudyType에서 myStudyType으로 변경
         List<MyReviewCafeResponse> responses = myReviewCafes
                 .getContent()
                 .stream()
