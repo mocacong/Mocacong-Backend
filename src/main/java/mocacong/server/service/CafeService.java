@@ -157,13 +157,17 @@ public class CafeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(memberId, PageRequest.of(page, count));
-        // TODO : cafe.getStudyType에서 myStudyType으로 변경
+
+        // TODO : cafe.getStudyType에서 myStudyType으로 변
+        // 리뷰가 작성된 카페의 studyType을 가져와야함
+
         List<MyReviewCafeResponse> responses = myReviewCafes
                 .getContent()
                 .stream()
                 .map(cafe -> {
                     int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
-                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), score);
+                    String studyType = cafeRepository.findStudyTypeByCafeIdAndMemberId(cafe.getId(), member.getId());
+                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), studyType, score);
                 })
                 .collect(Collectors.toList());
         return new MyReviewCafesResponse(myReviewCafes.isLast(), responses);

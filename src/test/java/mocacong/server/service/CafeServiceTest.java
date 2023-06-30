@@ -405,15 +405,16 @@ class CafeServiceTest {
                 new CafeReviewRequest(2, "group", "느려요", "없어요",
                         "깨끗해요", "없어요", null, "보통이에요"));
 
+        System.out.println("---------------------------------------------------------------------------------");
         MyReviewCafesResponse actual = cafeService.findMyReviewCafes(member1.getId(), 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(1),
-                () -> assertThat(actual.getCafes().get(0).getStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getCafes().get(0).getStudyType()).isEqualTo("SOLO"),
                 () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("케이카페"),
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(5),
-                () -> assertThat(actual.getCafes().get(1).getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getCafes().get(1).getStudyType()).isEqualTo("GROUP"),
                 () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("메리카페"),
                 () -> assertThat(actual.getCafes()).hasSize(2)
         );

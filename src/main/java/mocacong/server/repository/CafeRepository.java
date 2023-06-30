@@ -32,4 +32,10 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
             "join r.member m " +
             "where m.id = :id")
     Slice<Cafe> findByMyReviewCafes(Long id, Pageable pageRequest);
+
+    @Query("select r.cafeDetail.studyType from Review r " +
+            "join r.cafe c " +
+            "join r.member m " +
+            "where c.id = :cafeId and m.id = :memberId")
+    String findStudyTypeByCafeIdAndMemberId(Long cafeId, Long memberId);
 }
