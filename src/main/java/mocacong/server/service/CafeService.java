@@ -156,15 +156,10 @@ public class CafeService {
     public MyReviewCafesResponse findMyReviewCafes(Long memberId, Integer page, int count) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
-        Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(memberId, PageRequest.of(page, count));
-        List<MyReviewCafeResponse> responses = myReviewCafes
-                .getContent()
-                .stream()
-                .map(cafe -> {
-                    int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
-                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), score);
-                })
-                .collect(Collectors.toList());
+
+        Slice<MyReviewCafeResponse> myReviewCafes =
+                cafeRepository.findMyReviewCafesById(member.getId(), PageRequest.of(page, count));
+        List<MyReviewCafeResponse> responses = myReviewCafes.getContent();
         return new MyReviewCafesResponse(myReviewCafes.isLast(), responses);
     }
 

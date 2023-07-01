@@ -3,6 +3,7 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.cafedetail.StudyType;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
@@ -342,7 +343,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest2.getPassword());
         CafeReviewRequest request1 = new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "편해요");
-        CafeReviewRequest request2 = new CafeReviewRequest(2, "solo", "빵빵해요", "여유로워요",
+        CafeReviewRequest request2 = new CafeReviewRequest(2, "group", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "편해요");
         CafeReviewRequest request3 = new CafeReviewRequest(1, "group", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "편해요");
@@ -362,7 +363,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(4),
                 () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("메리네 카페"),
+                () -> assertThat(actual.getCafes().get(0).getStudyType()).isEqualTo("solo"),
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(2),
+                () -> assertThat(actual.getCafes().get(1).getStudyType()).isEqualTo("group"),
                 () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("케이네 카페")
         );
     }
