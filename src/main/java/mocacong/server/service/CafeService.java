@@ -157,7 +157,8 @@ public class CafeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
-        Slice<MyReviewCafeResponse> myReviewCafes = cafeRepository.findMyReviewCafesById(member.getId(), PageRequest.of(page, count));
+        Slice<MyReviewCafeResponse> myReviewCafes =
+                cafeRepository.findMyReviewCafesById(member.getId(), PageRequest.of(page, count));
         List<MyReviewCafeResponse> responses = myReviewCafes.getContent();
         return new MyReviewCafesResponse(myReviewCafes.isLast(), responses);
     }

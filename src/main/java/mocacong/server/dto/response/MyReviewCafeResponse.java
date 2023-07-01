@@ -5,12 +5,18 @@ import mocacong.server.domain.cafedetail.StudyType;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @ToString
 public class MyReviewCafeResponse {
 
     private String mapId;
     private String name;
-    private StudyType studyType;
+    private String studyType;
     private int myScore;
+
+    public MyReviewCafeResponse(String mapId, String name, StudyType studyType, int myScore) {
+        this.mapId = mapId;
+        this.name = name;
+        this.studyType = studyType.getValue();
+        this.myScore = myScore;
+    }
 }
