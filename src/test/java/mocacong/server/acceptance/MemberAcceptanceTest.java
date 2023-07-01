@@ -3,6 +3,7 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import static mocacong.server.acceptance.AcceptanceFixtures.*;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.cafedetail.StudyType;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
@@ -362,9 +363,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(4),
                 () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("메리네 카페"),
-                () -> assertThat(actual.getCafes().get(0).getStudyType()).isEqualTo("SOLO"),
+                () -> assertThat(actual.getCafes().get(0).getStudyType()).isEqualTo(StudyType.SOLO),
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(2),
-                () -> assertThat(actual.getCafes().get(1).getStudyType()).isEqualTo("GROUP"),
+                () -> assertThat(actual.getCafes().get(1).getStudyType()).isEqualTo(StudyType.GROUP),
                 () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("케이네 카페")
         );
     }
