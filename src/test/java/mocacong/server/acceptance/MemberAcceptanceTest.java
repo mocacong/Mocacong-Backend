@@ -363,9 +363,9 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         assertAll(
                 () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(4),
                 () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("메리네 카페"),
-                () -> assertThat(actual.getCafes().get(0).getStudyType()).isEqualTo("solo"),
+                () -> assertThat(actual.getCafes().get(0).getMyStudyType()).isEqualTo("solo"),
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(2),
-                () -> assertThat(actual.getCafes().get(1).getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getCafes().get(1).getMyStudyType()).isEqualTo("group"),
                 () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("케이네 카페")
         );
     }

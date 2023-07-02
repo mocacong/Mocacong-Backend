@@ -10,13 +10,13 @@ public class MyReviewCafeResponse {
 
     private String mapId;
     private String name;
-    private String studyType;
+    private String myStudyType;
     private int myScore;
 
-    public MyReviewCafeResponse(String mapId, String name, StudyType studyType, int myScore) {
+    public MyReviewCafeResponse(String mapId, String name, StudyType myStudyType, int myScore) {
         this.mapId = mapId;
         this.name = name;
-        this.studyType = studyType.getValue();
+        this.myStudyType = myStudyType.getValue();
         this.myScore = myScore;
     }
 }
