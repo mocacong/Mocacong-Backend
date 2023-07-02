@@ -110,7 +110,7 @@ class CafeRepositoryTest {
                 () -> assertThat(actual.getNumber()).isEqualTo(1),
                 () -> assertThat(actual.isLast()).isTrue(),
                 () -> assertThat(actual)
-                        .extracting("studyType")
+                        .extracting("myStudyType")
                         .containsExactly("both"),
                 () -> assertThat(actual)
                         .extracting("name")
