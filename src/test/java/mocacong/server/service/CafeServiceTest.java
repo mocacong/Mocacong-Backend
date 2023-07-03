@@ -10,6 +10,7 @@ import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
+import mocacong.server.exception.badrequest.ExceedCageImagesTotalCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
@@ -871,7 +872,7 @@ class CafeServiceTest {
                 member.getId(),
                 mapId,
                 List.of(mockMultipartFile1)
-        )).isInstanceOf(ExceedCafeImagesCountsException.class);
+        )).isInstanceOf(ExceedCageImagesTotalCountsException.class);
     }
 
 
