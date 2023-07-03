@@ -835,6 +835,46 @@ class CafeServiceTest {
         );
     }
 
+
+    @Test
+    @DisplayName("사용자가 카페 이미지를 총 3개 이상 저장하면 예외가 발생한다.")
+    void saveCafeImagesOver3() throws IOException {
+        String expected = "test_img.jpg";
+        Cafe cafe = new Cafe("2143154352323", "베어카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("rlawjddn103@naver.com", "a1b2c3d4", "베어", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
+        MockMultipartFile mockMultipartFile1 =
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img.jpg"));
+        MockMultipartFile mockMultipartFile2 =
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img2.jpg"));
+        MockMultipartFile mockMultipartFile3 =
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img.jpg"));
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
+        when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
+
+
+        cafeService.saveCafeImage(
+                member.getId(),
+                mapId,
+                List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3)
+        );
+
+        assertThatThrownBy(() -> cafeService.saveCafeImage(
+                member.getId(),
+                mapId,
+                List.of(mockMultipartFile1)
+        )).isInstanceOf(ExceedCafeImagesCountsException.class);
+    }
+
+
     @Test
     @DisplayName("사용자가 카페 이미지를 조회한다")
     void findCafeImages() throws IOException {

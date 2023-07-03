@@ -37,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class CafeService {
 
     public static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
+    public static final int CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
@@ -310,6 +311,8 @@ public class CafeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
+
+
         for (MultipartFile cafeImage : cafeImages) {
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
@@ -322,6 +325,8 @@ public class CafeService {
             throw new ExceedCafeImagesCountsException();
         }
     }
+
+
 
     @Transactional(readOnly = true)
     public CafeImagesResponse findCafeImages(Long memberId, String mapId, Integer page, int count) {
