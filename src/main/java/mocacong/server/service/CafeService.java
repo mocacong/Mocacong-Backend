@@ -327,12 +327,12 @@ public class CafeService {
         }
     }
 
-    private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> cafeImages) {
-        List<CafeImage> ownedCafeImages = cafe.getCafeImages().stream()
+    private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> requestCafeImages) {
+        List<CafeImage> currentOwnedCafeImages = cafe.getCafeImages()
+                .stream()
                 .filter(cafeImage -> cafeImage.isOwned(member))
                 .collect(Collectors.toList());
-
-        if (ownedCafeImages.size() + cafeImages.size() > CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS) {
+        if (currentOwnedCafeImages.size() + requestCafeImages.size() > CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS) {
             throw new ExceedCageImagesTotalCountsException();
         }
     }
