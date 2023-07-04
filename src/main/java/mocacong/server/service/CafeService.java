@@ -37,8 +37,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class CafeService {
 
-    public static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
-    public static final int CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS = 3;
+    private static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
+    private static final int CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
