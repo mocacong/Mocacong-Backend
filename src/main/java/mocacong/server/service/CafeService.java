@@ -11,7 +11,6 @@ import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.badrequest.DuplicateCafeException;
-import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
 import mocacong.server.exception.badrequest.ExceedCageImagesTotalCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
@@ -306,7 +305,6 @@ public class CafeService {
 
     @Transactional
     public void saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
-        validateCafeImagesCounts(cafeImages);
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findById(memberId)
@@ -318,12 +316,6 @@ public class CafeService {
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
             cafeImageRepository.save(uploadedCafeImage);
-        }
-    }
-
-    private void validateCafeImagesCounts(List<MultipartFile> cafeImages) {
-        if (cafeImages.size() > CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS) {
-            throw new ExceedCafeImagesCountsException();
         }
     }
 
