@@ -1089,7 +1089,7 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("카페 이미지를 수정한 후 조회할 때 isTrue인 이미지를 우선하여 먼저 등록된 이미지들부터 보여준다.")
+    @DisplayName("카페 이미지를 수정한 후 조회할 때 isTrue인 이미지를 우선하여 먼저 등록된 이미지들부터 5개까지 보여준다.")
     void updateCafeImageAndShowLimitImages() throws IOException {
         String oldImage = "test_img.jpg";
         String newImage = "test_img2.jpg";
