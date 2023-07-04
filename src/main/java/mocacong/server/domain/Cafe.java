@@ -35,7 +35,7 @@ public class Cafe extends BaseTime {
     @Embedded
     private CafeDetail cafeDetail;
 
-    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.EAGER)
     private List<CafeImage> cafeImages;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
