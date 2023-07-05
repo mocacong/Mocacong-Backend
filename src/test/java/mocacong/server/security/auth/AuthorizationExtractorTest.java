@@ -1,6 +1,6 @@
 package mocacong.server.security.auth;
 
-import mocacong.server.exception.unauthorized.InvalidBearerException;
+import mocacong.server.exception.badrequest.BlankTokenException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -17,6 +17,6 @@ class AuthorizationExtractorTest {
         request.addHeader("Authorization", token);
 
         assertThatThrownBy(() -> AuthorizationExtractor.extractAccessToken(request))
-                .isInstanceOf(InvalidBearerException.class);
+                .isInstanceOf(BlankTokenException.class);
     }
 }
