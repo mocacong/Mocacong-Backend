@@ -20,13 +20,15 @@ public class AuthorizationExtractor {
             String value = headers.nextElement();
             if (value.toLowerCase().startsWith(AUTHENTICATION_TYPE.toLowerCase())) {
                 String[] parts = value.split(" ");
-                if (parts.length > 1) {
-                    return value.split(" ")[TOKEN_INDEX];
-                } else {
-                    throw new BlankTokenException();
-                }
+                validateParts(parts);
             }
         }
         throw new InvalidBearerException();
+    }
+
+    private static void validateParts(String[] parts) {
+        if (parts.length <= 1) {
+            throw new BlankTokenException();
+        }
     }
 }

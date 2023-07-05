@@ -1,14 +1,11 @@
 package mocacong.server.security.auth;
 
-import mocacong.server.exception.badrequest.BlankTokenException;
-import mocacong.server.exception.unauthorized.TokenExpiredException;
+import mocacong.server.exception.unauthorized.InvalidBearerException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class AuthorizationExtractorTest {
 
@@ -20,6 +17,6 @@ class AuthorizationExtractorTest {
         request.addHeader("Authorization", token);
 
         assertThatThrownBy(() -> AuthorizationExtractor.extractAccessToken(request))
-                .isInstanceOf(BlankTokenException.class);
+                .isInstanceOf(InvalidBearerException.class);
     }
 }
