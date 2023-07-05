@@ -21,6 +21,7 @@ public class AuthorizationExtractor {
             if (value.toLowerCase().startsWith(AUTHENTICATION_TYPE.toLowerCase())) {
                 String[] parts = value.split(" ");
                 validateParts(parts);
+                return parts[TOKEN_INDEX];
             }
         }
         throw new InvalidBearerException();
