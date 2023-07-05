@@ -19,7 +19,7 @@ public class AuthorizationExtractor {
         while (headers.hasMoreElements()) {
             String value = headers.nextElement();
             if (value.toLowerCase().startsWith(AUTHENTICATION_TYPE.toLowerCase())) {
-                String parts[] = value.split(" ");
+                String[] parts = value.split(" ");
                 if (parts.length > 1) {
                     return value.split(" ")[TOKEN_INDEX];
                 } else {
