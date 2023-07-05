@@ -865,7 +865,6 @@ class CafeServiceTest {
         when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
         when(awsS3Uploader.uploadImage(mockMultipartFile3)).thenReturn("test_img.jpg");
 
-
         cafeService.saveCafeImage(
                 member.getId(),
                 mapId,
