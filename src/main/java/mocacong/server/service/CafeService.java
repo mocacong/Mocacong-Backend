@@ -11,7 +11,7 @@ import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.badrequest.DuplicateCafeException;
-import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
+import mocacong.server.exception.badrequest.ExceedCageImagesTotalCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -36,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class CafeService {
 
-    public static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
+    private static final int CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
@@ -304,11 +304,12 @@ public class CafeService {
 
     @Transactional
     public void saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
-        validateCafeImagesCounts(cafeImages);
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
+
+        validateOwnedCafeImagesCounts(cafe, member, cafeImages);
 
         for (MultipartFile cafeImage : cafeImages) {
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
@@ -317,9 +318,13 @@ public class CafeService {
         }
     }
 
-    private void validateCafeImagesCounts(List<MultipartFile> cafeImages) {
-        if (cafeImages.size() > CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS) {
-            throw new ExceedCafeImagesCountsException();
+    private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> requestCafeImages) {
+        List<CafeImage> currentOwnedCafeImages = cafe.getCafeImages()
+                .stream()
+                .filter(cafeImage -> cafeImage.isOwned(member))
+                .collect(Collectors.toList());
+        if (currentOwnedCafeImages.size() + requestCafeImages.size() > CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS) {
+            throw new ExceedCageImagesTotalCountsException();
         }
     }
 

@@ -1,15 +1,11 @@
 package mocacong.server.service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
 import mocacong.server.domain.*;
-import mocacong.server.domain.cafedetail.StudyType;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.badrequest.DuplicateCafeException;
-import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
+import mocacong.server.exception.badrequest.ExceedCageImagesTotalCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
@@ -21,13 +17,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
-import java.io.InputStream;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @ServiceTest
 class CafeServiceTest {
@@ -335,7 +335,11 @@ class CafeServiceTest {
     void findCafeAndShowLimitImages() throws IOException {
         String expected = "test_img.jpg";
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
+        Member member2 = new Member("rlawjddn103@naver.com", "encodePassword", "베어");
+
         memberRepository.save(member);
+        memberRepository.save(member2);
+
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
         String mapId = cafe.getMapId();
@@ -346,9 +350,9 @@ class CafeServiceTest {
         cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
         cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
         cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(mockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(mockMultipartFile));
 
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), mapId);
         CafeImagesResponse actual2 = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
@@ -762,7 +766,7 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("카페 이미지를 한 번에 여러 개 저장할 수 있다")
+    @DisplayName("카페 이미지를 한 번에 3개까지 저장할 수 있다")
     void saveCafeImagesPerRequest() throws IOException {
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
@@ -773,14 +777,17 @@ class CafeServiceTest {
                 new MockMultipartFile("test_img", "test_img.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img.jpg"));
         MockMultipartFile mockMultipartFile2 =
                 new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
-
+        MockMultipartFile mockMultipartFile3 =
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg", new FileInputStream("src/test/resources/images/test_img2.jpg"));
         when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
         when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
-        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile1, mockMultipartFile2));
+        when(awsS3Uploader.uploadImage(mockMultipartFile3)).thenReturn("test_img2.jpg");
+
+        cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3));
 
         Cafe actual = cafeRepository.findByMapId(mapId)
                 .orElseThrow();
-        assertThat(actual.getCafeImages()).hasSize(2);
+        assertThat(actual.getCafeImages()).hasSize(3);
     }
 
     @Test
@@ -808,7 +815,7 @@ class CafeServiceTest {
                 member.getId(),
                 mapId,
                 List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3, mockMultipartFile4)
-        )).isInstanceOf(ExceedCafeImagesCountsException.class);
+        )).isInstanceOf(ExceedCageImagesTotalCountsException.class);
     }
 
     @Test
@@ -834,6 +841,43 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(1).getImgUrl()).isEqualTo(expected)
         );
     }
+
+
+    @Test
+    @DisplayName("사용자가 카페 이미지를 총 3개 보다 많이 저장하면 예외가 발생한다.")
+    void saveCafeImagesOver3() throws IOException {
+        Cafe cafe = new Cafe("2143154352323", "베어카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("rlawjddn103@naver.com", "a1b2c3d4", "베어", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        MockMultipartFile mockMultipartFile1 =
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img.jpg"));
+        MockMultipartFile mockMultipartFile2 =
+                new MockMultipartFile("test_img2", "test_img2.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img2.jpg"));
+        MockMultipartFile mockMultipartFile3 =
+                new MockMultipartFile("test_img", "test_img.jpg", "jpg",
+                        new FileInputStream("src/test/resources/images/test_img.jpg"));
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile1)).thenReturn("test_img.jpg");
+        when(awsS3Uploader.uploadImage(mockMultipartFile2)).thenReturn("test_img2.jpg");
+        when(awsS3Uploader.uploadImage(mockMultipartFile3)).thenReturn("test_img.jpg");
+
+        cafeService.saveCafeImage(
+                member.getId(),
+                mapId,
+                List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3)
+        );
+
+        assertThatThrownBy(() -> cafeService.saveCafeImage(
+                member.getId(),
+                mapId,
+                List.of(mockMultipartFile1)
+        )).isInstanceOf(ExceedCageImagesTotalCountsException.class);
+    }
+
 
     @Test
     @DisplayName("사용자가 카페 이미지를 조회한다")
@@ -905,14 +949,13 @@ class CafeServiceTest {
         cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
         cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
         cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
-        cafeService.saveCafeImage(member1.getId(), mapId, List.of(mockMultipartFile));
         CafeImagesResponse actual = cafeService.findCafeImages(member2.getId(), mapId, 0, 10);
 
         List<CafeImageResponse> cafeImages = actual.getCafeImages();
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
-                () -> assertThat(cafeImages).hasSize(4),
+                () -> assertThat(cafeImages).hasSize(3),
                 () -> assertThat(cafeImages.get(0).getIsMe()).isFalse(),
                 () -> assertThat(cafeImages.get(1).getIsMe()).isFalse()
         );
@@ -1045,12 +1088,16 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("카페 이미지를 수정한 후 조회할 때 isTrue인 이미지를 5개까지만 보여준다")
+    @DisplayName("카페 이미지를 수정한 후 조회할 때 isTrue인 이미지를 우선하여 먼저 등록된 이미지들부터 5개까지 보여준다.")
     void updateCafeImageAndShowLimitImages() throws IOException {
         String oldImage = "test_img.jpg";
         String newImage = "test_img2.jpg";
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
+        Member member2 = new Member("rlawjddn103@naver.com", "encodePassword", "베어");
+
         memberRepository.save(member);
+        memberRepository.save(member2);
+
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);
         String mapId = cafe.getMapId();
@@ -1061,18 +1108,19 @@ class CafeServiceTest {
         MockMultipartFile newMockMultipartFile =
                 new MockMultipartFile("test_img2", newImage, "jpg", newFileInputStream);
         when(awsS3Uploader.uploadImage(oldMockMultipartFile)).thenReturn("test_img.jpg");
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(oldMockMultipartFile));
         cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
         cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
         cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
-        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
-        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+
         CafeImagesResponse oldFindImage = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
         when(awsS3Uploader.uploadImage(newMockMultipartFile)).thenReturn("test_img2.jpg");
 
         cafeService.updateCafeImage(
                 member.getId(), mapId, oldFindImage.getCafeImages().get(0).getId(), newMockMultipartFile
         );
-        cafeService.saveCafeImage(member.getId(), mapId, List.of(oldMockMultipartFile));
+        cafeService.saveCafeImage(member2.getId(), mapId, List.of(oldMockMultipartFile));
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), mapId);
         CafeImagesResponse given = cafeService.findCafeImages(member.getId(), mapId, 0, 10);
 
@@ -1081,8 +1129,8 @@ class CafeServiceTest {
                 () -> assertThat(actual.getCafeImages().get(0).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(1).getIsMe()).isEqualTo(true),
                 () -> assertThat(actual.getCafeImages().get(2).getIsMe()).isEqualTo(true),
-                () -> assertThat(actual.getCafeImages().get(3).getIsMe()).isEqualTo(true),
-                () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(true),
+                () -> assertThat(actual.getCafeImages().get(3).getIsMe()).isEqualTo(false),
+                () -> assertThat(actual.getCafeImages().get(4).getIsMe()).isEqualTo(false),
                 () -> assertThat(actual.getCafeImages().get(0).getImageUrl()).endsWith("test_img2.jpg"),
                 () -> assertThat(given.getCafeImages()).hasSize(6)
         );
