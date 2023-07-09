@@ -16,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.FileInputStream;
@@ -639,7 +640,7 @@ class CafeServiceTest {
 
         assertThatThrownBy(() -> cafeService.updateCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewUpdateRequest(5, "solo", "빵빵해요", "여유로워요",
-                "깨끗해요", "충분해요", "조용해요", "불편해요")))
+                        "깨끗해요", "충분해요", "조용해요", "불편해요")))
                 .isInstanceOf(NotFoundReviewException.class);
     }
 
@@ -758,10 +759,12 @@ class CafeServiceTest {
         when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
         cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
 
-        Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        List<CafeImage> actual = cafeImageRepository
+                .findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), PageRequest.of(0, 5))
+                .getContent();
         assertAll(
-                () -> assertThat(actual.getCafeImages()).hasSize(1),
-                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected)
+                () -> assertThat(actual).hasSize(1),
+                () -> assertThat(actual.get(0).getImgUrl()).isEqualTo(expected)
         );
     }
 
@@ -785,9 +788,10 @@ class CafeServiceTest {
 
         cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile1, mockMultipartFile2, mockMultipartFile3));
 
-        Cafe actual = cafeRepository.findByMapId(mapId)
-                .orElseThrow();
-        assertThat(actual.getCafeImages()).hasSize(3);
+        List<CafeImage> actual = cafeImageRepository
+                .findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), PageRequest.of(0, 5))
+                .getContent();
+        assertThat(actual).hasSize(3);
     }
 
     @Test
@@ -834,11 +838,14 @@ class CafeServiceTest {
         cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
         cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
 
-        Cafe actual = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
+        List<CafeImage> actual = cafeImageRepository
+                .findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), PageRequest.of(0, 5))
+                .getContent();
+
         assertAll(
-                () -> assertThat(actual.getCafeImages()).hasSize(2),
-                () -> assertThat(actual.getCafeImages().get(0).getImgUrl()).isEqualTo(expected),
-                () -> assertThat(actual.getCafeImages().get(1).getImgUrl()).isEqualTo(expected)
+                () -> assertThat(actual).hasSize(2),
+                () -> assertThat(actual.get(0).getImgUrl()).isEqualTo(expected),
+                () -> assertThat(actual.get(1).getImgUrl()).isEqualTo(expected)
         );
     }
 
