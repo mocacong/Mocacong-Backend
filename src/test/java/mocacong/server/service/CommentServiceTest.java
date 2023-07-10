@@ -104,7 +104,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("특정 카페에 달린 댓글 목록의 첫 페이지를 조회할 시에 총 댓글 개수를 함께 반환한다.")
+    @DisplayName("특정 카페에 달린 댓글 목록의 첫 페이지를 조회할 시에만 총 댓글 개수를 함께 반환한다.")
     void findCommentsWithCount() {
         String email = "rlawjddn103@naver.com";
         String mapId = "2143154352323";
