@@ -17,13 +17,11 @@ import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +52,11 @@ public class CommentService {
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Comment> comments = commentRepository.findAllByCafeId(cafe.getId(), PageRequest.of(page, count));
         List<CommentResponse> responses = findCommentResponses(member, comments);
+
+        if (page == 0) {
+            Long totalCounts = commentRepository.countAllByCafeId(cafe.getId());
+            return new CommentsResponse(comments.isLast(), responses, totalCounts);
+        }
         return new CommentsResponse(comments.isLast(), responses);
     }
 
