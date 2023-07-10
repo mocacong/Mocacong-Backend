@@ -17,11 +17,13 @@ import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
