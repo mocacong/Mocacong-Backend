@@ -55,7 +55,7 @@ public class CommentService {
 
         if (page == 0) {
             Long totalCounts = commentRepository.countAllByCafeId(cafe.getId());
-            return new CommentsResponse(comments.isLast(), responses, totalCounts);
+            return new CommentsResponse(comments.isLast(), totalCounts, responses);
         }
         return new CommentsResponse(comments.isLast(), responses);
     }

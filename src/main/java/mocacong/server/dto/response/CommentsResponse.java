@@ -12,9 +12,9 @@ import lombok.*;
 public class CommentsResponse {
 
     private Boolean isEnd;
-    private List<CommentResponse> comments;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long count;
+    private List<CommentResponse> comments;
 
     public CommentsResponse(Boolean isEnd, List<CommentResponse> comments) {
         this.isEnd = isEnd;
