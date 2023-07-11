@@ -15,7 +15,9 @@ public class TokenResponse {
 
     private Status status;
 
-    public static TokenResponse from(final String token, Status status) {
-        return new TokenResponse(token, status);
+    private int userReportCount;
+
+    public static TokenResponse from(final String token, Status status, int userReportCount) {
+        return new TokenResponse(token, status, userReportCount);
     }
 }
