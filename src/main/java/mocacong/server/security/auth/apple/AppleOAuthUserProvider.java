@@ -1,12 +1,15 @@
 package mocacong.server.security.auth.apple;
 
 import io.jsonwebtoken.Claims;
-import java.security.PublicKey;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.exception.unauthorized.InvalidTokenException;
+import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.security.PublicKey;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -16,6 +19,9 @@ public class AppleOAuthUserProvider {
     private final AppleClient appleClient;
     private final PublicKeyGenerator publicKeyGenerator;
     private final AppleClaimsValidator appleClaimsValidator;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     public OAuthPlatformMemberResponse getApplePlatformMember(String identityToken) {
         Map<String, String> headers = appleJwtParser.parseHeaders(identityToken);

@@ -2,7 +2,9 @@ package mocacong.server.security.auth.kakao;
 
 import feign.FeignException;
 import mocacong.server.exception.unauthorized.InvalidTokenException;
+import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,9 @@ public class KakaoOAuthUserProvider {
     private final String kakaoClientId;
     private final String kakaoClientSecret;
     private final String redirectUri;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     public KakaoOAuthUserProvider(
             KakaoAccessTokenClient kakaoAccessTokenClient,

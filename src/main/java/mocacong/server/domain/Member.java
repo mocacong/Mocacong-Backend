@@ -87,7 +87,15 @@ public class Member extends BaseTime {
         this.status = Status.ACTIVE;
     }
 
+    public Member(String email, Platform platform, String platformId, Status status) {
+        this.email = email;
+        this.platform = platform;
+        this.platformId = platformId;
+        this.status = status;
+    }
+
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage, Platform platform, String platformId, Status status) {
+        validateNickname(nickname);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -99,6 +107,7 @@ public class Member extends BaseTime {
 
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage,
                   Platform platform, String platformId, Status status, int reportCount) {
+        validateNickname(nickname);
         this.email = email;
         this.password = password;
         this.nickname = nickname;
