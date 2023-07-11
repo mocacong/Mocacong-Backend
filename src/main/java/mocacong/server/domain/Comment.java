@@ -69,7 +69,7 @@ public class Comment extends BaseTime {
         this.member = null;
     }
 
-    public void incrementReportCount(Member reporter) {
+    public void incrementCommentReport(Member reporter) {
         if (!hasAlreadyReported(reporter)) {
             this.reports.add(new CommentReport(this, reporter));
         }

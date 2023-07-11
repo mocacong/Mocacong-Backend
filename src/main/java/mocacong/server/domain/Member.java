@@ -62,7 +62,6 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.platformId = platformId;
         this.status = Status.ACTIVE;
-        this.reportCount = 0;
     }
 
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage) {
@@ -73,13 +72,12 @@ public class Member extends BaseTime {
                 memberProfileImage,
                 Platform.MOCACONG,
                 null,
-                Status.ACTIVE,
-                0
+                Status.ACTIVE
         );
     }
 
     public Member(String email, String password, String nickname) {
-        this(email, password, nickname, null, Platform.MOCACONG, null, Status.ACTIVE, 0);
+        this(email, password, nickname, null, Platform.MOCACONG, null, Status.ACTIVE);
     }
 
     public Member(String email, Platform platform, String platformId) {
@@ -87,7 +85,6 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.platformId = platformId;
         this.status = Status.ACTIVE;
-        this.reportCount = 0;
     }
 
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage, Platform platform, String platformId, Status status) {
@@ -98,10 +95,10 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.platformId = platformId;
         this.status = status;
-        this.reportCount = 0;
     }
 
-    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage, Platform platform, String platformId, Status status, int reportCount) {
+    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage,
+                  Platform platform, String platformId, Status status, int reportCount) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -158,7 +155,7 @@ public class Member extends BaseTime {
         this.status = status;
     }
 
-    public void incrementReportCount() {
+    public void incrementMemberReportCount() {
         this.reportCount += 1;
         if (this.reportCount >= 11) {
             changeStatus(Status.INACTIVE);

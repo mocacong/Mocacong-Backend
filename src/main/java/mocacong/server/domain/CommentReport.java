@@ -8,7 +8,7 @@ public class CommentReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "report_id")
+    @Column(name = "comment_report_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

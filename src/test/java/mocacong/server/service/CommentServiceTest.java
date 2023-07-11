@@ -3,22 +3,30 @@ package mocacong.server.service;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
+import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
+import mocacong.server.exception.badrequest.DuplicateReportCommentException;
 import mocacong.server.exception.badrequest.InvalidCommentDeleteException;
+import mocacong.server.exception.badrequest.InvalidCommentReportException;
 import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @ServiceTest
 class CommentServiceTest {
@@ -233,5 +241,92 @@ class CommentServiceTest {
 
         assertThatThrownBy(() -> commentService.delete(member2.getId(), mapId, response.getId()))
                 .isInstanceOf(InvalidCommentDeleteException.class);
+    }
+
+    @Test
+    @DisplayName("타 사용자가 작성한 댓글을 신고한다")
+    void reportComment() {
+        String email1 = "kth990303@naver.com";
+        String email2 = "dlawotn3@naver.com";
+        String mapId = "2143154352323";
+        Member member1 = new Member(email1, "encodePassword", "케이");
+        Member member2 = new Member(email2, "encodePassword", "메리");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
+
+        CommentReportResponse response = commentService.report(member2.getId(), mapId, saveResponse.getId());
+
+        assertAll(
+                () -> assertThat(response.getReportCount()).isEqualTo(1),
+                () -> assertThat(response.getReporterNickname()).isEqualTo(member2.getNickname()),
+                () -> assertThat(response.getId()).isEqualTo(saveResponse.getId())
+        );
+    }
+
+    @Test
+    @DisplayName("본인이 작성한 댓글에 대해 신고를 시도할 시 예외를 반환한다")
+    void reportMyComment() {
+        String email = "kth990303@naver.com";
+        String mapId = "2143154352323";
+        Member member = new Member(email, "encodePassword", "케이");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        CommentSaveResponse saveResponse = commentService.save(member.getId(), mapId, "아~ 소설보고 싶다");
+
+        assertThatThrownBy(() -> commentService.report(member.getId(), mapId, saveResponse.getId()))
+                .isInstanceOf(InvalidCommentReportException.class);
+    }
+
+    @Test
+    @DisplayName("이미 신고한 댓글에 대해 신고를 시도할 시 예외를 반환한다")
+    void reportDuplicateComment() {
+        String email1 = "kth990303@naver.com";
+        String email2 = "dlawotn3@naver.com";
+        String mapId = "2143154352323";
+        Member member1 = new Member(email1, "encodePassword", "케이");
+        Member member2 = new Member(email2, "encodePassword", "메리");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
+
+        commentService.report(member2.getId(), mapId, saveResponse.getId());
+
+        assertThatThrownBy(() -> commentService.report(member2.getId(), mapId, saveResponse.getId()))
+                .isInstanceOf(DuplicateReportCommentException.class);
+    }
+
+    @Test
+    @DisplayName("10번 이상 신고된 댓글은 삭제되며 해당 작성자의 신고 횟수가 1씩 증가한다")
+    void deleteAndReport10timesReportedComment() {
+        String mapId = "2143154352323";
+        List<Member> members = new ArrayList<>();
+        for (int i = 1; i <= 11; i++) {
+            Member member = new Member("dlawotn" + i + "@naver.com", "encodePassword", "메리" + (char) ('A' + i));
+            members.add(member);
+            memberRepository.save(member);
+        }
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        CommentSaveResponse saveResponse = commentService.save(members.get(0).getId(), mapId, "아~ 소설보고 싶다");
+
+        for (int i = 1; i <= 9; i++) {
+            commentService.report(members.get(i).getId(), mapId, saveResponse.getId());
+        }
+        CommentReportResponse reportResponse = commentService.report(members.get(10).getId(), mapId, saveResponse.getId());
+        CommentsResponse actual = commentService.findAll(members.get(0).getId(), mapId, 0, 3);
+        Optional<Member> commenter = memberRepository.findById(1L);
+
+        assertAll(
+                () -> assertThat(reportResponse.getReportCount()).isEqualTo(10),
+                () -> assertThat(actual.getIsEnd()).isTrue(),
+                () -> assertThat(actual.getComments()).hasSize(0),
+                () -> assertThat(commenter.get().getReportCount()).isEqualTo(1)
+        );
     }
 }

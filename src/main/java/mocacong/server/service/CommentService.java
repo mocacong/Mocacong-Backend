@@ -134,13 +134,13 @@ public class CommentService {
             throw new DuplicateReportCommentException();
         }
 
-        comment.incrementReportCount(member);
+        comment.incrementCommentReport(member);
 
         if (comment.getReports().size() >= 10) {
             Member commenter = comment.getMember();
-            commenter.incrementReportCount();
+            commenter.incrementMemberReportCount();
             commentRepository.delete(comment);
-            return new CommentReportResponse(commentId, member.getNickname(), 11);
+            return new CommentReportResponse(commentId, member.getNickname(), 10);
         }
 
         return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());

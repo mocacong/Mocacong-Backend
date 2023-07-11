@@ -1,10 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
@@ -16,8 +11,8 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
-import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.service.event.DeleteMemberEvent;
+import mocacong.server.service.event.DeleteNotUsedImagesEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
