@@ -104,6 +104,34 @@ class CommentServiceTest {
     }
 
     @Test
+    @DisplayName("특정 카페에 달린 댓글 목록의 첫 페이지를 조회할 시에만 총 댓글 개수를 함께 반환한다.")
+    void findCommentsWithCount() {
+        String email = "rlawjddn103@naver.com";
+        String mapId = "2143154352323";
+        Member member = new Member(email, "encodePassword", "베어");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe(mapId, "베어카페");
+        cafeRepository.save(cafe);
+        commentRepository.save(new Comment(cafe, member, "댓글1"));
+        commentRepository.save(new Comment(cafe, member, "댓글2"));
+        commentRepository.save(new Comment(cafe, member, "댓글3"));
+        commentRepository.save(new Comment(cafe, member, "댓글4"));
+
+        CommentsResponse actualPageOne = commentService.findAll(member.getId(), mapId, 0, 3);
+        CommentsResponse actualPageTwo = commentService.findAll(member.getId(), mapId, 1, 3);
+
+        assertAll(
+                () -> assertThat(actualPageOne.getIsEnd()).isFalse(),
+                () -> assertThat(actualPageOne.getComments()).hasSize(3),
+                () -> assertThat(actualPageOne.getComments())
+                        .extracting("content")
+                        .containsExactly("댓글1", "댓글2", "댓글3"),
+                () -> assertThat(actualPageOne.getCount()).isEqualTo(4),
+                () -> assertThat(actualPageTwo.getCount()).isEqualTo(null)
+        );
+    }
+
+    @Test
     @DisplayName("특정 카페에 달린 댓글 목록 중 내가 작성한 댓글만을 조회한다")
     void findOnlyMyComments() {
         String email = "kth990303@naver.com";
