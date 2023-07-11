@@ -332,7 +332,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("11번 이상 신고된 회원은 Status가 INACTIVE로 변하며 로그인을 못한다")
+    @DisplayName("11번 이상 신고된 회원은 Status가 INACTIVE로 전환된다")
     void setInactiveCause10timesReportedComment() {
         List<Member> members = new ArrayList<>();
         for (int i = 1; i <= 12; i++) {
