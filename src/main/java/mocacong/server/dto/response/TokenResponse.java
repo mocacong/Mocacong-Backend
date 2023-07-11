@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import mocacong.server.domain.Status;
 
 @Getter
 @NoArgsConstructor
@@ -12,7 +13,9 @@ import lombok.ToString;
 public class TokenResponse {
     private String token;
 
-    public static TokenResponse from(final String token) {
-        return new TokenResponse(token);
+    private Status status;
+
+    public static TokenResponse from(final String token, Status status) {
+        return new TokenResponse(token, status);
     }
 }

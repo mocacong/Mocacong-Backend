@@ -10,15 +10,16 @@ import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
 
 @ServiceTest
 class AuthServiceTest {

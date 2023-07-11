@@ -37,7 +37,9 @@ public class AuthService {
         validateStatus(findMember);
 
         String token = issueToken(findMember);
-        return TokenResponse.from(token);
+        Status status = findMember.getStatus();
+
+        return TokenResponse.from(token, status);
     }
 
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
