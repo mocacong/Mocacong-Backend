@@ -2,6 +2,7 @@ package mocacong.server.service;
 
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.Status;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
@@ -35,7 +36,7 @@ class AuthServiceTest {
     private AppleOAuthUserProvider appleOAuthUserProvider;
 
     @Test
-    @DisplayName("회원 로그인 요청이 옳다면 토큰을 발급한다")
+    @DisplayName("회원 로그인 요청이 옳다면 토큰을 발급하고 상태는 ACTIVE로 반환한다")
     void login() {
         String email = "kth990303@naver.com";
         String password = "a1b2c3d4";
@@ -46,7 +47,10 @@ class AuthServiceTest {
 
         TokenResponse tokenResponse = authService.login(loginRequest);
 
-        assertNotNull(tokenResponse.getToken());
+        assertAll(
+                () -> assertNotNull(tokenResponse.getToken()),
+                () -> assertThat(tokenResponse.getStatus()).isEqualTo(Status.ACTIVE)
+        );
     }
 
     @Test
@@ -78,7 +82,8 @@ class AuthServiceTest {
                 () -> assertThat(actual.getToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
-                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
+                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId),
+                () -> assertThat(actual.getStatus()).isEqualTo(Status.ACTIVE)
         );
     }
 
@@ -105,7 +110,8 @@ class AuthServiceTest {
                 () -> assertThat(actual.getToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isTrue(),
-                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
+                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId),
+                () -> assertThat(actual.getStatus()).isEqualTo(Status.ACTIVE)
         );
     }
 
@@ -125,7 +131,8 @@ class AuthServiceTest {
                 () -> assertThat(actual.getToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
-                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
+                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId),
+                () -> assertThat(actual.getStatus()).isEqualTo(Status.ACTIVE)
         );
     }
 
@@ -146,7 +153,8 @@ class AuthServiceTest {
                 () -> assertThat(actual.getToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(email),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
-                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
+                () -> assertThat(actual.getPlatformId()).isEqualTo(platformId),
+                () -> assertThat(actual.getStatus()).isEqualTo(Status.ACTIVE)
         );
     }
 

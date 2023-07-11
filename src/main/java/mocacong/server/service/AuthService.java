@@ -20,6 +20,8 @@ import mocacong.server.security.auth.kakao.KakaoOAuthUserProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -45,6 +47,7 @@ public class AuthService {
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
         OAuthPlatformMemberResponse applePlatformMember =
                 appleOAuthUserProvider.getApplePlatformMember(request.getToken());
+        validateOAuthStatus(applePlatformMember);
         return generateOAuthTokenResponse(
                 Platform.APPLE,
                 applePlatformMember.getEmail(),
@@ -55,6 +58,7 @@ public class AuthService {
     public OAuthTokenResponse kakaoOAuthLogin(KakaoLoginRequest request) {
         OAuthPlatformMemberResponse kakaoPlatformMember =
                 kakaoOAuthUserProvider.getKakaoPlatformMember(request.getCode());
+        validateOAuthStatus(kakaoPlatformMember);
         return generateOAuthTokenResponse(
                 Platform.KAKAO,
                 kakaoPlatformMember.getEmail(),
@@ -70,15 +74,17 @@ public class AuthService {
                     String token = issueToken(findMember);
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
                     if (!findMember.isRegisteredOAuthMember()) {
-                        return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId);
+                        return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId,
+                                Status.ACTIVE);
                     }
-                    return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId);
+                    return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId,
+                            Status.ACTIVE);
                 })
                 .orElseGet(() -> {
                     Member oauthMember = new Member(email, platform, platformId);
                     Member savedMember = memberRepository.save(oauthMember);
                     String token = issueToken(savedMember);
-                    return new OAuthTokenResponse(token, email, false, platformId);
+                    return new OAuthTokenResponse(token, email, false, platformId, Status.ACTIVE);
                 });
     }
 
@@ -94,6 +100,14 @@ public class AuthService {
 
     private void validateStatus(final Member findMember) {
         if (findMember.getStatus() == Status.INACTIVE) {
+            throw new InactiveMemberException();
+        }
+    }
+
+    private void validateOAuthStatus(final OAuthPlatformMemberResponse memberResponse) {
+        Optional<Member> findMember = memberRepository.findByEmailAndPlatform(memberResponse.getEmail(),
+                Platform.valueOf(memberResponse.getPlatformId()));
+        if (findMember.get().getStatus() == Status.INACTIVE) {
             throw new InactiveMemberException();
         }
     }
