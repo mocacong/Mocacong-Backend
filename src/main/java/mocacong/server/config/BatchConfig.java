@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +26,6 @@ public class BatchConfig {
     private final CafeService cafeService;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
-    private final EntityManager em;
 
     @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
     public void deleteNotUsedImages() {
