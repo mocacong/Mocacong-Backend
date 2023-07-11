@@ -30,17 +30,11 @@ public class CommentLikeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
-        validateDuplicateFavorite(member.getId(), comment.getId());
-
         try {
             CommentLike commentLike = new CommentLike(member, comment);
             return new CommentLikeSaveResponse(commentLikeRepository.save(commentLike).getId());
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyExistsCommentLike();
         }
-    }
-
-    private void validateDuplicateFavorite(Long memberId, Long commentId) {
-
     }
 }

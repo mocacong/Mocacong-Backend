@@ -5,6 +5,7 @@ import mocacong.server.domain.Comment;
 import mocacong.server.domain.CommentLike;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentLikeSaveResponse;
+import mocacong.server.exception.badrequest.AlreadyExistsCommentLike;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.exception.notfound.NotFoundCommentLikeException;
 import mocacong.server.repository.CafeRepository;
@@ -54,6 +55,24 @@ class CommentLikeServiceTest {
         assertEquals(savedCommentLike.getCommentLikeId(), actual.getId());
         assertEquals(comment.getId(), actual.getComment().getId());
         assertEquals(member.getId(), actual.getMember().getId());
+    }
+
+    @Test
+    @DisplayName("이미 좋아요한 댓글에 좋아요를 또 할 수 없다.")
+    void saveDuplicateCommentLike() {
+        String email = "rlawjddn103@naver.com";
+        String mapId = "2143154352323";
+        String commentContent = "코딩하고 싶어지는 카페에요.";
+        Member member = new Member(email, "encodePassword", "베어");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe(mapId, "베어카페");
+        cafeRepository.save(cafe);
+        Comment comment = new Comment(cafe, member, commentContent);
+        commentRepository.save(comment);
+
+        commentLikeService.save(member.getId(), comment.getId());
+
+        assertThrows(AlreadyExistsCommentLike.class,() -> commentLikeService.save(member.getId(), comment.getId()));
     }
 }
 
