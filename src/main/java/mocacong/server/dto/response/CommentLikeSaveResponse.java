@@ -9,4 +9,3 @@ import lombok.*;
 public class CommentLikeSaveResponse {
     private Long commentLikeId;
 }
-
