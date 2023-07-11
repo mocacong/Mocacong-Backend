@@ -162,6 +162,13 @@ public class Member extends BaseTime {
 
     public void changeStatus(Status status) {
         this.status = status;
+        if (status == Status.ACTIVE) {
+            resetMemberReportCount();
+        }
+    }
+
+    public void resetMemberReportCount() {
+        this.reportCount = 0;
     }
 
     public void incrementMemberReportCount() {
