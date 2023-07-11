@@ -1,9 +1,13 @@
 package mocacong.server.domain;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "comment_report")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentReport {
 
     @Id
@@ -18,9 +22,6 @@ public class CommentReport {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member reporter;
-
-    public CommentReport() {
-    }
 
     public CommentReport(Comment comment, Member reporter) {
         this.comment = comment;
