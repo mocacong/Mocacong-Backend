@@ -3,6 +3,7 @@ package mocacong.server.service;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
+import mocacong.server.domain.Status;
 import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
@@ -303,7 +304,7 @@ class CommentServiceTest {
 
     @Test
     @DisplayName("10번 이상 신고된 댓글은 삭제되며 해당 작성자의 신고 횟수가 1씩 증가한다")
-    void deleteAndReport10timesReportedComment() {
+    void deleteCauseReport10timesReportedComment() {
         String mapId = "2143154352323";
         List<Member> members = new ArrayList<>();
         for (int i = 1; i <= 11; i++) {
@@ -327,6 +328,36 @@ class CommentServiceTest {
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getComments()).hasSize(0),
                 () -> assertThat(commenter.get().getReportCount()).isEqualTo(1)
+        );
+    }
+
+    @Test
+    @DisplayName("11번 이상 신고된 회원은 Status가 INACTIVE로 변하며 로그인을 못한다")
+    void setInactiveCause10timesReportedComment() {
+        List<Member> members = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            Member member = new Member("dlawotn" + i + "@naver.com", "encodePassword",
+                    "메리" + (char) ('A' + i));
+            members.add(member);
+            memberRepository.save(member);
+        }
+        for (int i = 1; i <= 11; i++) {
+            String mapId = "abc" + (char) ('A' + i);
+            cafeRepository.save(new Cafe(mapId, "메리 카페"));
+            CommentSaveResponse saveResponse = commentService.save(members.get(0).getId(), mapId,
+                    "아~ 소설보고 싶다");
+            for (int j = 1; j <= 10; j ++) {
+                commentService.report(members.get(j).getId(), mapId, saveResponse.getId());
+            }
+        }
+        CommentsResponse actual = commentService.findAll(members.get(1).getId(), "abc" + (char) ('A' + 1),
+                0, 3);
+        Optional<Member> commenter = memberRepository.findById(1L);
+
+        assertAll(
+                () -> assertThat(actual.getIsEnd()).isTrue(),
+                () -> assertThat(actual.getComments()).hasSize(0),
+                () -> assertThat(commenter.get().getStatus()).isEqualTo(Status.INACTIVE)
         );
     }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 public class Comment extends BaseTime {
 
     private static final int MAXIMUM_COMMENT_LENGTH = 200;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
