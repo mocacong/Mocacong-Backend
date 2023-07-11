@@ -161,7 +161,7 @@ public class Member extends BaseTime {
     public void incrementReportCount() {
         this.reportCount += 1;
         if (this.reportCount >= 11) {
-            this.status = Status.INACTIVE;
+            changeStatus(Status.INACTIVE);
         }
     }
 }
