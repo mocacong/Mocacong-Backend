@@ -1,10 +1,11 @@
 package mocacong.server.domain;
 
-import javax.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.ExceedCommentLengthException;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "comment")
@@ -29,11 +30,15 @@ public class Comment extends BaseTime {
     @Column(name = "content", nullable = false, length = MAXIMUM_COMMENT_LENGTH)
     private String content;
 
+    @Column(name = "report_count", nullable = false)
+    private int reportCount;
+
     public Comment(Cafe cafe, Member member, String content) {
         this.cafe = cafe;
         this.member = member;
         validateCommentLength(content);
         this.content = content;
+        this.reportCount = 0;
     }
 
     private void validateCommentLength(String content) {
@@ -61,5 +66,9 @@ public class Comment extends BaseTime {
 
     public void removeMember() {
         this.member = null;
+    }
+
+    public void incrementReportCount() {
+        reportCount++;
     }
 }
