@@ -2,9 +2,11 @@ package mocacong.server.repository;
 
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -12,6 +14,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByPlatformAndPlatformId(Platform platform, String platformId);
 
     Optional<Member> findByEmailAndPlatform(String email, Platform platform);
+
+    Optional<List<Member>> findByStatus(Status status);
 
     Boolean existsByEmailAndPlatform(String email, Platform platform);
 

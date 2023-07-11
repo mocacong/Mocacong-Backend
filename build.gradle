@@ -36,6 +36,7 @@ dependencies {
     implementation 'com.slack.api:slack-api-client:1.29.0'
     implementation platform("org.springframework.cloud:spring-cloud-dependencies:2021.0.5")
     implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
