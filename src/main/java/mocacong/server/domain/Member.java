@@ -47,6 +47,9 @@ public class Member extends BaseTime {
     @Column(name = "status")
     private Status status;
 
+    @Column(name = "report_count")
+    private int reportCount;
+
     public Member(
             String email, String password, String nickname, MemberProfileImage memberProfileImage,
             Platform platform, String platformId
@@ -59,6 +62,7 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.platformId = platformId;
         this.status = Status.ACTIVE;
+        this.reportCount = 0;
     }
 
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage) {
@@ -69,12 +73,13 @@ public class Member extends BaseTime {
                 memberProfileImage,
                 Platform.MOCACONG,
                 null,
-                Status.ACTIVE
+                Status.ACTIVE,
+                0
         );
     }
 
     public Member(String email, String password, String nickname) {
-        this(email, password, nickname, null, Platform.MOCACONG, null, Status.ACTIVE);
+        this(email, password, nickname, null, Platform.MOCACONG, null, Status.ACTIVE, 0);
     }
 
     public Member(String email, Platform platform, String platformId) {
@@ -82,6 +87,7 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.platformId = platformId;
         this.status = Status.ACTIVE;
+        this.reportCount = 0;
     }
 
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage, Platform platform, String platformId, Status status) {
@@ -92,6 +98,18 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.platformId = platformId;
         this.status = status;
+        this.reportCount = 0;
+    }
+
+    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage, Platform platform, String platformId, Status status, int reportCount) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.memberProfileImage = memberProfileImage;
+        this.platform = platform;
+        this.platformId = platformId;
+        this.status = status;
+        this.reportCount = reportCount;
     }
 
     public void registerOAuthMember(String email, String nickname) {
@@ -138,5 +156,12 @@ public class Member extends BaseTime {
 
     public void changeStatus(Status status) {
         this.status = status;
+    }
+
+    public void incrementReportCount() {
+        this.reportCount += 1;
+        if (this.reportCount >= 11) {
+            this.status = Status.INACTIVE;
+        }
     }
 }
