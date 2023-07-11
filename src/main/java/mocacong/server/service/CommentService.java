@@ -136,7 +136,7 @@ public class CommentService {
 
         comment.incrementReportCount(member);
 
-        if (comment.getReports().size() >= 11) {
+        if (comment.getReports().size() >= 10) {
             commentRepository.delete(comment);
             return new CommentReportResponse(commentId, member.getNickname(), 11);
         }

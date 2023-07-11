@@ -43,6 +43,10 @@ public class Member extends BaseTime {
     @Column(name = "platform_id")
     private String platformId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status;
+
     public Member(
             String email, String password, String nickname, MemberProfileImage memberProfileImage,
             Platform platform, String platformId
@@ -54,6 +58,7 @@ public class Member extends BaseTime {
         this.memberProfileImage = memberProfileImage;
         this.platform = platform;
         this.platformId = platformId;
+        this.status = Status.ACTIVE;
     }
 
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage) {
@@ -63,18 +68,30 @@ public class Member extends BaseTime {
                 nickname,
                 memberProfileImage,
                 Platform.MOCACONG,
-                null
+                null,
+                Status.ACTIVE
         );
     }
 
     public Member(String email, String password, String nickname) {
-        this(email, password, nickname, null, Platform.MOCACONG, null);
+        this(email, password, nickname, null, Platform.MOCACONG, null, Status.ACTIVE);
     }
 
     public Member(String email, Platform platform, String platformId) {
         this.email = email;
         this.platform = platform;
         this.platformId = platformId;
+        this.status = Status.ACTIVE;
+    }
+
+    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage, Platform platform, String platformId, Status status) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.memberProfileImage = memberProfileImage;
+        this.platform = platform;
+        this.platformId = platformId;
+        this.status = status;
     }
 
     public void registerOAuthMember(String email, String nickname) {
@@ -117,5 +134,9 @@ public class Member extends BaseTime {
 
     public boolean isRegisteredOAuthMember() {
         return nickname != null;
+    }
+
+    public void changeStatus(Status status) {
+        this.status = status;
     }
 }
