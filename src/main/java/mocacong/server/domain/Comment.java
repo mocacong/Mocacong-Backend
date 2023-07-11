@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import mocacong.server.exception.badrequest.ExceedCommentLengthException;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "comment")
@@ -30,15 +32,14 @@ public class Comment extends BaseTime {
     @Column(name = "content", nullable = false, length = MAXIMUM_COMMENT_LENGTH)
     private String content;
 
-    @Column(name = "report_count", nullable = false)
-    private int reportCount;
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentReport> reports = new ArrayList<>();
 
     public Comment(Cafe cafe, Member member, String content) {
         this.cafe = cafe;
         this.member = member;
         validateCommentLength(content);
         this.content = content;
-        this.reportCount = 0;
     }
 
     private void validateCommentLength(String content) {
@@ -68,7 +69,14 @@ public class Comment extends BaseTime {
         this.member = null;
     }
 
-    public void incrementReportCount() {
-        reportCount++;
+    public void incrementReportCount(Member reporter) {
+        if (!hasAlreadyReported(reporter)) {
+            this.reports.add(new CommentReport(this, reporter));
+        }
+    }
+
+    private boolean hasAlreadyReported(Member member) {
+        return this.reports.stream()
+                .anyMatch(report -> report.getReporter().equals(member));
     }
 }

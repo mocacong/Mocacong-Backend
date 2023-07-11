@@ -89,7 +89,7 @@ public class CommentController {
 
     @Operation(summary = "카페 코멘트 신고")
     @SecurityRequirement(name = "JWT")
-    @PostMapping
+    @PostMapping("/{commentId}/report")
     public ResponseEntity<CommentReportResponse> reportComment(
             @LoginUserId Long memberId,
             @PathVariable String mapId,

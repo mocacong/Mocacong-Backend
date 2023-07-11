@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
+import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.dto.response.CommentResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
+import mocacong.server.exception.badrequest.DuplicateReportCommentException;
 import mocacong.server.exception.badrequest.InvalidCommentDeleteException;
+import mocacong.server.exception.badrequest.InvalidCommentReportException;
 import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
@@ -111,6 +114,34 @@ public class CommentService {
             throw new InvalidCommentDeleteException();
         }
         commentRepository.delete(comment);
+    }
+
+    public CommentReportResponse report(Long memberId, String mapId, Long commentId) {
+        Cafe cafe = cafeRepository.findByMapId(mapId)
+                .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
+        Comment comment = cafe.getComments().stream()
+                .filter(c -> c.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(NotFoundCommentException::new);
+
+        if (comment.isWrittenByMember(member)) {
+            throw new InvalidCommentReportException();
+        }
+
+        if (hasAlreadyReported(comment, member)) {
+            throw new DuplicateReportCommentException();
+        }
+
+        comment.incrementReportCount(member);
+
+        return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
+    }
+
+    private boolean hasAlreadyReported(Comment comment, Member member) {
+        return comment.getReports().stream()
+                .anyMatch(report -> report.getReporter().equals(member));
     }
 
     @EventListener
