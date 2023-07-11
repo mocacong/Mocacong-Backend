@@ -3,6 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.Status;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.KakaoLoginRequest;
@@ -10,6 +11,7 @@ import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.exception.unauthorized.InactiveMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
@@ -32,6 +34,7 @@ public class AuthService {
         Member findMember = memberRepository.findByEmailAndPlatform(request.getEmail(), Platform.MOCACONG)
                 .orElseThrow(NotFoundMemberException::new);
         validatePassword(findMember, request.getPassword());
+        validateStatus(findMember);
 
         String token = issueToken(findMember);
         return TokenResponse.from(token);
@@ -84,6 +87,12 @@ public class AuthService {
     private void validatePassword(final Member findMember, final String password) {
         if (!passwordEncoder.matches(password, findMember.getPassword())) {
             throw new PasswordMismatchException();
+        }
+    }
+
+    private void validateStatus(final Member findMember) {
+        if (findMember.getStatus() == Status.INACTIVE) {
+            throw new InactiveMemberException();
         }
     }
 }
