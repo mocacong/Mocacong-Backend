@@ -8,10 +8,7 @@ import mocacong.server.dto.response.CommentLikeSaveResponse;
 import mocacong.server.security.auth.LoginUserId;
 import mocacong.server.service.CommentLikeService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "CommentsLike", description = "댓글 좋아요")
 @RestController
@@ -29,5 +26,16 @@ public class CommentLikeController {
     ) {
         CommentLikeSaveResponse response = commentLikeService.save(memberId, commentId);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "댓글 좋아요 삭제")
+    @SecurityRequirement(name = "JWT")
+    @DeleteMapping
+    public ResponseEntity<Void> deleteCommentLike(
+            @LoginUserId Long memberId,
+            @PathVariable Long commentId
+    ) {
+        commentLikeService.delete(memberId, commentId);
+        return ResponseEntity.ok().build();
     }
 }

@@ -31,4 +31,8 @@ public class CommentLike {
         this.member = member;
         this.comment = comment;
     }
+
+    public void removeMember() {
+        this.member = null;
+    }
 }
