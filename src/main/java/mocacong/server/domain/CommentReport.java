@@ -31,4 +31,8 @@ public class CommentReport {
     public Member getReporter() {
         return reporter;
     }
+
+    public void removeReporter() {
+        this.reporter = null;
+    }
 }

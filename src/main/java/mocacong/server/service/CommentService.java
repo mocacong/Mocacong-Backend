@@ -3,6 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
+import mocacong.server.domain.CommentReport;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.dto.response.CommentResponse;
@@ -16,6 +17,7 @@ import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CafeRepository;
+import mocacong.server.repository.CommentReportRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteMemberEvent;
@@ -36,6 +38,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final CafeRepository cafeRepository;
     private final CommentRepository commentRepository;
+    private final CommentReportRepository commentReportRepository;
 
     public CommentSaveResponse save(Long memberId, String mapId, String content) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -156,5 +159,12 @@ public class CommentService {
         Member member = event.getMember();
         commentRepository.findAllByMemberId(member.getId())
                 .forEach(Comment::removeMember);
+    }
+
+    @EventListener
+    public void updateCommentReportWhenMemberDelete(DeleteMemberEvent event) {
+        Member member = event.getMember();
+        commentReportRepository.findAllByReporter(member)
+                .forEach(CommentReport::removeReporter);
     }
 }
