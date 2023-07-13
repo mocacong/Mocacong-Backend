@@ -34,6 +34,8 @@ class CommentServiceTest {
 
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private MemberService memberService;
 
     @Autowired
     private CommentRepository commentRepository;
@@ -358,6 +360,30 @@ class CommentServiceTest {
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getComments()).hasSize(0),
                 () -> assertThat(commenter.get().getStatus()).isEqualTo(Status.INACTIVE)
+        );
+    }
+
+    @Test
+    @DisplayName("탈퇴한 회원이 작성한 코멘트를 신고한다")
+    void reportCommentPostedDeletedMember() {
+        String email1 = "kth990303@naver.com";
+        String email2 = "dlawotn3@naver.com";
+        String mapId = "2143154352323";
+        Member member1 = new Member(email1, "encodePassword", "케이");
+        Member member2 = new Member(email2, "encodePassword", "메리");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
+        memberService.delete(member1.getId());
+
+        CommentReportResponse response = commentService.report(member2.getId(), mapId, saveResponse.getId());
+
+        assertAll(
+                () -> assertThat(response.getReportCount()).isEqualTo(1),
+                () -> assertThat(response.getReporterNickname()).isEqualTo(member2.getNickname()),
+                () -> assertThat(response.getId()).isEqualTo(saveResponse.getId())
         );
     }
 }
