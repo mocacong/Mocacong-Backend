@@ -3,7 +3,6 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.CommentLike;
-import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentLikeSaveResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCommentLike;
@@ -39,9 +38,8 @@ public class CommentLikeService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
-        if (comment.isWrittenByMember(member)) {
-            throw new InvalidCommentLikeException();
-        }
+        validateDuplicateCommentLike(memberId, commentId);
+        validateIsNotOwnComment(comment, member);
 
         try {
             CommentLike commentLike = new CommentLike(member, comment);
@@ -49,6 +47,18 @@ public class CommentLikeService {
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyExistsCommentLike();
         }
+    }
+
+    private void validateIsNotOwnComment(Comment comment, Member member) {
+        if (comment.isWrittenByMember(member)) {
+            throw new InvalidCommentLikeException();
+        }
+    }
+
+    private void validateDuplicateCommentLike(Long memberId, Long commentId) {
+        commentLikeRepository.findCommentLikeIdByCommentIdAndMemberId(memberId, commentId).ifPresent(cl -> {
+            throw new AlreadyExistsCommentLike();
+        });
     }
 
     @Transactional
