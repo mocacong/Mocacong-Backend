@@ -33,12 +33,10 @@ public class BatchConfig {
         cafeService.deleteNotUsedCafeImages();
     }
 
-    //@Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정에 실행
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정에 실행
     @Transactional
     public void activateInactivateMembers() {
-        //LocalDate thresholdDate = LocalDate.now().minusDays(60); // 현재 날짜로부터 60일 전의 날짜를 계산
-        LocalDate thresholdDate = LocalDate.now();
+        LocalDate thresholdDate = LocalDate.now().minusDays(60); // 현재 날짜로부터 60일 전의 날짜를 계산
         Optional<List<Member>> inactiveMembersOptional = memberRepository.findByStatus(Status.INACTIVE);
 
         if (inactiveMembersOptional.isPresent()) {
