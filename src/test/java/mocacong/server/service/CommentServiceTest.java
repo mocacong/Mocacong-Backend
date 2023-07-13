@@ -270,7 +270,7 @@ class CommentServiceTest {
 
     @Test
     @DisplayName("댓글 좋아요가 있는 댓글을 삭제할 수 있다.")
-    void deleteNotExistCommentLike() {
+    void deleteExistCommentLike() {
         String email = "rlawjddn103@naver.com";
         String mapId = "2143154352323";
         String commentContent = "코딩하고 싶어지는 카페에요.";
