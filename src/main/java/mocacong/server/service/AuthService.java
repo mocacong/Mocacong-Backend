@@ -37,10 +37,9 @@ public class AuthService {
         validateStatus(findMember);
 
         String token = issueToken(findMember);
-        Status status = findMember.getStatus();
         int userReportCount = findMember.getReportCount();
 
-        return TokenResponse.from(token, status, userReportCount);
+        return TokenResponse.from(token, userReportCount);
     }
 
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
@@ -69,22 +68,21 @@ public class AuthService {
                     Member findMember = memberRepository.findById(memberId)
                             .orElseThrow(NotFoundMemberException::new);
                     validateStatus(findMember);
-                    Status status = findMember.getStatus();
                     int userReportCount = findMember.getReportCount();
                     String token = issueToken(findMember);
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
                     if (!findMember.isRegisteredOAuthMember()) {
                         return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId,
-                                status, userReportCount);
+                                userReportCount);
                     }
                     return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId,
-                            status, userReportCount);
+                            userReportCount);
                 })
                 .orElseGet(() -> {
                     Member oauthMember = new Member(email, platform, platformId, Status.ACTIVE);
                     Member savedMember = memberRepository.save(oauthMember);
                     String token = issueToken(savedMember);
-                    return new OAuthTokenResponse(token, email, false, platformId, savedMember.getStatus(),
+                    return new OAuthTokenResponse(token, email, false, platformId,
                             savedMember.getReportCount());
                 });
     }

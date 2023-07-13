@@ -49,8 +49,8 @@ class AuthServiceTest {
         TokenResponse tokenResponse = authService.login(loginRequest);
 
         assertAll(
+                () -> assertThat(member.getStatus()).isEqualTo(Status.ACTIVE),
                 () -> assertNotNull(tokenResponse.getToken()),
-                () -> assertThat(tokenResponse.getStatus()).isEqualTo(Status.ACTIVE),
                 () -> assertThat(tokenResponse.getUserReportCount()).isEqualTo(0)
         );
     }

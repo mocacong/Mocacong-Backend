@@ -47,7 +47,7 @@ public class CommentService {
                 .orElseThrow(NotFoundMemberException::new);
         Comment comment = new Comment(cafe, member, content);
 
-        return new CommentSaveResponse(commentRepository.save(comment).getId());
+        return new CommentSaveResponse(commentRepository.save(comment).getId(), member.getReportCount());
     }
 
     @Transactional(readOnly = true)

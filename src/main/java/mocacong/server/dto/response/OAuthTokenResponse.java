@@ -1,7 +1,6 @@
 package mocacong.server.dto.response;
 
 import lombok.*;
-import mocacong.server.domain.Status;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -13,6 +12,5 @@ public class OAuthTokenResponse {
     private String email;
     private Boolean isRegistered;
     private String platformId;
-    private Status status;
     private int userReportCount;
 }

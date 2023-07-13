@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -31,6 +27,11 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -193,7 +194,7 @@ public class CafeService {
         em.flush();
         cafe.updateCafeDetails();
 
-        return CafeReviewResponse.of(cafe.findAverageScore(), cafe);
+        return CafeReviewResponse.of(cafe.findAverageScore(), cafe, member);
     }
 
     private void checkAlreadySaveCafeReview(Cafe cafe, Member member) {
@@ -303,7 +304,7 @@ public class CafeService {
     }
 
     @Transactional
-    public void saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
+    public CafeImageSaveResponse saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findById(memberId)
@@ -316,6 +317,8 @@ public class CafeService {
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
             cafeImageRepository.save(uploadedCafeImage);
         }
+
+        return new CafeImageSaveResponse(member.getReportCount());
     }
 
     private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> requestCafeImages) {
