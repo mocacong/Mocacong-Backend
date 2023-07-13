@@ -3,7 +3,7 @@ package mocacong.server.domain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mocacong.server.exception.badrequest.InvalidPlatformException;
+import mocacong.server.exception.badrequest.InvalidReportReasonException;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -27,6 +27,6 @@ public enum ReportReason {
         return Arrays.stream(values())
                 .filter(it -> Objects.equals(it.value, value))
                 .findFirst()
-                .orElseThrow(InvalidPlatformException::new);
+                .orElseThrow(InvalidReportReasonException::new);
     }
 }

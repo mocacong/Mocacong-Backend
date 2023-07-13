@@ -1,25 +1,15 @@
 package mocacong.server.dto.request;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.*;
+
+import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 @ToString
-public class CafeReviewRequest {
-
-    @NotNull(message = "3009:공백일 수 없습니다.")
-    private Integer myScore;
+public class CommentReportRequest {
 
     @NotBlank(message = "3009:공백일 수 없습니다.")
-    private String myStudyType;
-
-    private String myWifi;
-    private String myParking;
-    private String myToilet;
-    private String myPower;
-    private String mySound;
-    private String myDesk;
+    private String myReportReason;
 }

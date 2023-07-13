@@ -1,5 +1,6 @@
 package mocacong.server.service;
 
+import groovy.util.logging.Slf4j;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
@@ -7,10 +8,7 @@ import mocacong.server.domain.Status;
 import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
-import mocacong.server.exception.badrequest.DuplicateReportCommentException;
-import mocacong.server.exception.badrequest.InvalidCommentDeleteException;
-import mocacong.server.exception.badrequest.InvalidCommentReportException;
-import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
+import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.repository.CafeRepository;
@@ -29,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+@Slf4j
 @ServiceTest
 class CommentServiceTest {
 
@@ -252,21 +251,18 @@ class CommentServiceTest {
         String email1 = "kth990303@naver.com";
         String email2 = "dlawotn3@naver.com";
         String mapId = "2143154352323";
+        String reportReason = "insult";
         Member member1 = new Member(email1, "encodePassword", "케이");
         Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
+        commentService.save(member1.getId(), mapId, "이 카페 완전 돈 아깝;;");
 
-        CommentReportResponse response = commentService.report(member2.getId(), mapId, saveResponse.getId());
+        CommentReportResponse response = commentService.report(member2.getId(), mapId, 1L, reportReason);
 
-        assertAll(
-                () -> assertThat(response.getReportCount()).isEqualTo(1),
-                () -> assertThat(response.getReporterNickname()).isEqualTo(member2.getNickname()),
-                () -> assertThat(response.getId()).isEqualTo(saveResponse.getId())
-        );
+        assertThat(response.getCommentReportCount()).isEqualTo(1);
     }
 
     @Test
@@ -278,10 +274,28 @@ class CommentServiceTest {
         memberRepository.save(member);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse saveResponse = commentService.save(member.getId(), mapId, "아~ 소설보고 싶다");
+        CommentSaveResponse saveResponse = commentService.save(member.getId(), mapId, "굳이 이런데 가야하나 ㅋ");
 
-        assertThatThrownBy(() -> commentService.report(member.getId(), mapId, saveResponse.getId()))
+        assertThatThrownBy(() -> commentService.report(member.getId(), mapId, saveResponse.getId(),
+                "insult"))
                 .isInstanceOf(InvalidCommentReportException.class);
+    }
+
+    @Test
+    @DisplayName("잘못된 신고 사유로 신고를 시도할 시 예외를 반환한다")
+    void reportByInvalidReportReason() {
+        String mapId = "2143154352323";
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
+        Member member2 = new Member("dlawotn3@naver.com", "encodePassword", "메리");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe(mapId, "케이카페");
+        cafeRepository.save(cafe);
+        commentService.save(member1.getId(), mapId, "이 카페 완전 돈 아깝;;");
+
+        assertThatThrownBy(() -> commentService.report(member2.getId(), mapId, 1L,
+                "invalidReportReason"))
+                .isInstanceOf(InvalidReportReasonException.class);
     }
 
     @Test
@@ -298,18 +312,19 @@ class CommentServiceTest {
         cafeRepository.save(cafe);
         CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
 
-        commentService.report(member2.getId(), mapId, saveResponse.getId());
+        commentService.report(member2.getId(), mapId, saveResponse.getId(), "inappropriate_content");
 
-        assertThatThrownBy(() -> commentService.report(member2.getId(), mapId, saveResponse.getId()))
+        assertThatThrownBy(() -> commentService.report(member2.getId(), mapId, saveResponse.getId(),
+                "inappropriate_content"))
                 .isInstanceOf(DuplicateReportCommentException.class);
     }
 
     @Test
-    @DisplayName("10번 이상 신고된 댓글은 삭제되며 해당 작성자의 신고 횟수가 1씩 증가한다")
-    void deleteCauseReport10timesReportedComment() {
+    @DisplayName("5번 이상 신고된 댓글은 삭제되며 해당 작성자의 신고 횟수가 1씩 증가한다")
+    void deleteCauseReport5timesReportedComment() {
         String mapId = "2143154352323";
         List<Member> members = new ArrayList<>();
-        for (int i = 1; i <= 11; i++) {
+        for (int i = 1; i <= 6; i++) {
             Member member = new Member("dlawotn" + i + "@naver.com", "encodePassword", "메리" + (char) ('A' + i));
             members.add(member);
             memberRepository.save(member);
@@ -318,26 +333,28 @@ class CommentServiceTest {
         cafeRepository.save(cafe);
         CommentSaveResponse saveResponse = commentService.save(members.get(0).getId(), mapId, "아~ 소설보고 싶다");
 
-        for (int i = 1; i <= 9; i++) {
-            commentService.report(members.get(i).getId(), mapId, saveResponse.getId());
+        for (int i = 1; i <= 4; i++) {
+            commentService.report(members.get(i).getId(), mapId, saveResponse.getId(),
+                    "inappropriate_content");
         }
-        CommentReportResponse reportResponse = commentService.report(members.get(10).getId(), mapId, saveResponse.getId());
-        CommentsResponse actual = commentService.findAll(members.get(0).getId(), mapId, 0, 3);
+        CommentReportResponse reportResponse = commentService.report(members.get(5).getId(), mapId, saveResponse.getId(),
+                "inappropriate_content");
+        CommentsResponse findResponse = commentService.findAll(members.get(0).getId(), mapId, 0, 3);
         Optional<Member> commenter = memberRepository.findById(1L);
 
         assertAll(
-                () -> assertThat(reportResponse.getReportCount()).isEqualTo(10),
-                () -> assertThat(actual.getIsEnd()).isTrue(),
-                () -> assertThat(actual.getComments()).hasSize(0),
+                () -> assertThat(findResponse.getIsEnd()).isTrue(),
+                () -> assertThat(findResponse.getComments()).hasSize(0),
+                () -> assertThat(reportResponse.getCommentReportCount()).isEqualTo(5),
                 () -> assertThat(commenter.get().getReportCount()).isEqualTo(1)
         );
     }
 
     @Test
     @DisplayName("11번 이상 신고된 회원은 Status가 INACTIVE로 전환된다")
-    void setInactiveCause10timesReportedComment() {
+    void setInactiveCause11timesReportedComment() {
         List<Member> members = new ArrayList<>();
-        for (int i = 1; i <= 12; i++) {
+        for (int i = 1; i <= 6; i++) {
             Member member = new Member("dlawotn" + i + "@naver.com", "encodePassword",
                     "메리" + (char) ('A' + i));
             members.add(member);
@@ -348,8 +365,9 @@ class CommentServiceTest {
             cafeRepository.save(new Cafe(mapId, "메리 카페"));
             CommentSaveResponse saveResponse = commentService.save(members.get(0).getId(), mapId,
                     "아~ 소설보고 싶다");
-            for (int j = 1; j <= 10; j ++) {
-                commentService.report(members.get(j).getId(), mapId, saveResponse.getId());
+            for (int j = 1; j <= 5; j ++) {
+                commentService.report(members.get(j).getId(), mapId, saveResponse.getId(),
+                        "inappropriate_content");
             }
         }
         CommentsResponse actual = commentService.findAll(members.get(1).getId(), "abc" + (char) ('A' + 1),
@@ -359,6 +377,7 @@ class CommentServiceTest {
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getComments()).hasSize(0),
+                () -> assertThat(commenter.get().getReportCount()).isEqualTo(11),
                 () -> assertThat(commenter.get().getStatus()).isEqualTo(Status.INACTIVE)
         );
     }
@@ -375,15 +394,12 @@ class CommentServiceTest {
         memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "케이카페");
         cafeRepository.save(cafe);
-        CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
+        Comment comment = new Comment(cafe, member1, "이 카페 완전 돈 아깝;;");
+        commentRepository.save(comment);
         memberService.delete(member1.getId());
 
-        CommentReportResponse response = commentService.report(member2.getId(), mapId, saveResponse.getId());
+        CommentReportResponse response = commentService.report(member2.getId(), mapId, comment.getId(), "inappropriate_content");
 
-        assertAll(
-                () -> assertThat(response.getReportCount()).isEqualTo(1),
-                () -> assertThat(response.getReporterNickname()).isEqualTo(member2.getNickname()),
-                () -> assertThat(response.getId()).isEqualTo(saveResponse.getId())
-        );
+        assertThat(response.getCommentReportCount()).isEqualTo(1);
     }
 }

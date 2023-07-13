@@ -1,6 +1,7 @@
 package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.CommentReport;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -120,46 +122,36 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public CommentReportResponse report(Long memberId, String mapId, Long commentId) {
+    public CommentReportResponse report(Long memberId, String mapId, Long commentId, String reportReason) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
         Comment comment = cafe.getComments().stream()
                 .filter(c -> c.getId().equals(commentId))
                 .findFirst()
                 .orElseThrow(NotFoundCommentException::new);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(NotFoundMemberException::new);
-
-        if (comment.getMember() == null) { // 코멘트를 작성한 회원이 탈퇴한 경우
-            try {
-                if (comment.getReportsCount() >= 1) {
-                    commentRepository.delete(comment);
-                    return new CommentReportResponse(commentId, member.getNickname(), 5);
-                }
-                comment.incrementCommentReport(member);
-                return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
-            } catch (DataIntegrityViolationException e) {
-                throw new DuplicateReportCommentException();
-            }
-        }
-
-        if (comment.isWrittenByMember(member)) {
-            throw new InvalidCommentReportException();
-        }
 
         try {
-            comment.incrementCommentReport(member);
+            comment.incrementCommentReport(member, reportReason);
 
-            if (comment.getReportsCount() >= 1) {
-                Member commenter = comment.getMember();
-                commenter.incrementMemberReportCount();
+            // 코멘트를 작성한 회원이 탈퇴한 경우
+            if (comment.getMember() == null && comment.getReportsCount() >= 5) {
                 commentRepository.delete(comment);
-                return new CommentReportResponse(commentId, member.getNickname(), 5);
+            } else {
+                Member commenter = comment.getMember();
+                if (comment.isWrittenByMember(member)) {
+                    throw new InvalidCommentReportException();
+                }
+                if (comment.getReportsCount() >= 5) {
+                    commenter.incrementMemberReportCount();
+                    commentRepository.delete(comment);
+                }
             }
-            return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCommentException();
         }
+        return new CommentReportResponse(comment.getReportsCount(), member.getReportCount());
     }
 
     @EventListener
