@@ -36,7 +36,7 @@ public class CommentLikeConcurrentServiceTest {
 
     @Test
     @DisplayName("회원이 한 댓글을 동시에 여러 번 좋아요 등록 시도해도 한 번만 등록된다")
-    void saveFavoriteWithConcurrent() throws InterruptedException {
+    void saveCommentLikeWithConcurrent() throws InterruptedException {
         String mapId = "2143154352323";
         String commentContent = "코딩하고 싶어지는 카페에요.";
         Member member1 = new Member("rlawjddn103@naver.com", "encodePassword", "베어");
