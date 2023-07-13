@@ -90,7 +90,7 @@ public class CommentLikeService {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener
-    public void deleteCommentsWhenCommentDeleted(DeleteCommentEvent event) {
+    public void deleteCommentLikesWhenCommentDeleted(DeleteCommentEvent event) {
         commentLikeRepository.deleteAllByCommentIdIsNull();
     }
 }
