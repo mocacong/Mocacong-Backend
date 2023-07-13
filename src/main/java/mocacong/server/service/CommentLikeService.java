@@ -7,6 +7,7 @@ import mocacong.server.domain.Favorite;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentLikeSaveResponse;
 import mocacong.server.exception.badrequest.AlreadyExistsCommentLike;
+import mocacong.server.exception.badrequest.InvalidCommentLikeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.exception.notfound.NotFoundCommentLikeException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -37,6 +38,10 @@ public class CommentLikeService {
                 .orElseThrow(NotFoundCommentException::new);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
+
+        if (comment.isWrittenByMember(member)) {
+            throw new InvalidCommentLikeException();
+        }
 
         try {
             CommentLike commentLike = new CommentLike(member, comment);

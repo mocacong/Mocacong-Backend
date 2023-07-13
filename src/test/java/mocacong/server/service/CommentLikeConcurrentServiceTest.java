@@ -37,14 +37,15 @@ public class CommentLikeConcurrentServiceTest {
     @Test
     @DisplayName("회원이 한 댓글을 동시에 여러 번 좋아요 등록 시도해도 한 번만 등록된다")
     void saveFavoriteWithConcurrent() throws InterruptedException {
-        String email = "rlawjddn103@naver.com";
         String mapId = "2143154352323";
         String commentContent = "코딩하고 싶어지는 카페에요.";
-        Member member = new Member(email, "encodePassword", "베어");
-        memberRepository.save(member);
+        Member member1 = new Member("rlawjddn103@naver.com", "encodePassword", "베어");
+        memberRepository.save(member1);
+        Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이");
+        memberRepository.save(member2);
         Cafe cafe = new Cafe(mapId, "베어카페");
         cafeRepository.save(cafe);
-        Comment comment = new Comment(cafe, member, commentContent);
+        Comment comment = new Comment(cafe, member2, commentContent);
         commentRepository.save(comment);
 
         ExecutorService executorService = Executors.newFixedThreadPool(3);
@@ -54,7 +55,7 @@ public class CommentLikeConcurrentServiceTest {
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
-                    commentLikeService.save(member.getId(), comment.getId());
+                    commentLikeService.save(member1.getId(), comment.getId());
                 } catch (AlreadyExistsCommentLike e) {
                     exceptions.add(e); // 중복 예외를 리스트에 추가
                 }

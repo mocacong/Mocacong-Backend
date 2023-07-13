@@ -18,16 +18,21 @@ public class CommentLikeAcceptanceTest extends AcceptanceTest{
         String mapId = "12332312";
         String comment = "코딩하고 싶어지는 카페에요.";
         카페_등록(new CafeRegisterRequest(mapId, "정우네 카페"));
-        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
-        회원_가입(signUpRequest);
+
+        MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
+        회원_가입(signUpRequest1);
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
+        회원_가입(signUpRequest2);
+
         CommentSaveRequest commentRequest = new CommentSaveRequest(comment);
 
-        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
-        long commentId = 카페_코멘트_작성(token, mapId, commentRequest).body().jsonPath().getLong("id");
+        String token1 = 로그인_토큰_발급(signUpRequest1.getEmail(), signUpRequest1.getPassword());
+        String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest2.getPassword());
+        long commentId = 카페_코멘트_작성(token1, mapId, commentRequest).body().jsonPath().getLong("id");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .auth().oauth2(token)
+                .auth().oauth2(token2)
                 .when().post("/comments/" + commentId + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
@@ -39,23 +44,28 @@ public class CommentLikeAcceptanceTest extends AcceptanceTest{
         String mapId = "12332312";
         String comment = "코딩하고 싶어지는 카페에요.";
         카페_등록(new CafeRegisterRequest(mapId, "정우네 카페"));
-        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
-        회원_가입(signUpRequest);
+
+        MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
+        회원_가입(signUpRequest1);
+        MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
+        회원_가입(signUpRequest2);
+
         CommentSaveRequest commentRequest = new CommentSaveRequest(comment);
 
-        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
-        long commentId = 카페_코멘트_작성(token, mapId, commentRequest).body().jsonPath().getLong("id");
+        String token1 = 로그인_토큰_발급(signUpRequest1.getEmail(), signUpRequest1.getPassword());
+        String token2 = 로그인_토큰_발급(signUpRequest2.getEmail(), signUpRequest2.getPassword());
+        long commentId = 카페_코멘트_작성(token1, mapId, commentRequest).body().jsonPath().getLong("id");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .auth().oauth2(token)
+                .auth().oauth2(token2)
                 .when().post("/comments/" + commentId + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .auth().oauth2(token)
+                .auth().oauth2(token2)
                 .when().delete("/comments/" + commentId + "/like")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
