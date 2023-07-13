@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "comment_report")
+@Table(name = "comment_report", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "comment_id", "member_id" })
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommentReport {
 
