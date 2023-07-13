@@ -22,6 +22,7 @@ import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -130,37 +131,35 @@ public class CommentService {
                 .orElseThrow(NotFoundMemberException::new);
 
         if (comment.getMember() == null) { // 코멘트를 작성한 회원이 탈퇴한 경우
-            if (comment.getReports().size() >= 1) {
-                commentRepository.delete(comment);
-                return new CommentReportResponse(commentId, member.getNickname(), 5);
+            try {
+                if (comment.getReportsCount() >= 1) {
+                    commentRepository.delete(comment);
+                    return new CommentReportResponse(commentId, member.getNickname(), 5);
+                }
+                comment.incrementCommentReport(member);
+                return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
+            } catch (DataIntegrityViolationException e) {
+                throw new DuplicateReportCommentException();
             }
-            comment.incrementCommentReport(member);
-            return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
         }
 
         if (comment.isWrittenByMember(member)) {
             throw new InvalidCommentReportException();
         }
 
-        if (hasAlreadyReported(comment, member)) {
+        try {
+            comment.incrementCommentReport(member);
+
+            if (comment.getReportsCount() >= 1) {
+                Member commenter = comment.getMember();
+                commenter.incrementMemberReportCount();
+                commentRepository.delete(comment);
+                return new CommentReportResponse(commentId, member.getNickname(), 5);
+            }
+            return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
+        } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCommentException();
         }
-
-        comment.incrementCommentReport(member);
-
-        if (comment.getReports().size() >= 1) {
-            Member commenter = comment.getMember();
-            commenter.incrementMemberReportCount();
-            commentRepository.delete(comment);
-            return new CommentReportResponse(commentId, member.getNickname(), 5);
-        }
-
-        return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
-    }
-
-    private boolean hasAlreadyReported(Comment comment, Member member) {
-        return comment.getReports().stream()
-                .anyMatch(report -> report.getReporter().equals(member));
     }
 
     @EventListener

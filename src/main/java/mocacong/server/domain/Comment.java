@@ -76,6 +76,10 @@ public class Comment extends BaseTime {
         }
     }
 
+    public int getReportsCount() {
+        return reports.size();
+    }
+
     private boolean hasAlreadyReported(Member member) {
         return this.reports.stream()
                 .anyMatch(report -> report.getReporter().equals(member));
