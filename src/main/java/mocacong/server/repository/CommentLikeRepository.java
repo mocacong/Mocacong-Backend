@@ -2,6 +2,7 @@ package mocacong.server.repository;
 
 import mocacong.server.domain.CommentLike;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -16,4 +17,10 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike,Long> {
     Optional<Long> findCommentLikeIdByCommentIdAndMemberId(Long memberId, Long commentId);
 
     List<CommentLike> findAllByMemberId(Long memberId);
+
+    List<CommentLike> findAllByCommentId(Long commentId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from CommentLike cl where cl.comment.id IS null")
+    void deleteAllByCommentIdIsNull();
 }

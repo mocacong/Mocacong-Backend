@@ -93,7 +93,7 @@ class CommentLikeServiceTest {
     }
 
     @Test
-    @DisplayName("회원이 존재하지 않는 댓글을 삭제할 시 오류를 반환한다.")
+    @DisplayName("회원이 존재하지 않는 댓글 좋아요를 삭제할 시 오류를 반환한다.")
     void deleteNotExistCommentLike() {
         String email = "rlawjddn103@naver.com";
         String mapId = "2143154352323";
