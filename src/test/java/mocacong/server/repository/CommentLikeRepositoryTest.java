@@ -24,7 +24,7 @@ class CommentLikeRepositoryTest {
 
     @Test
     @DisplayName("comment id, 멤버 id로 댓글 좋아요 id를 조회한다")
-    void findByCafeIdAndMemberId() {
+    void findByCommentIdAndMemberId() {
         Cafe savedCafe = cafeRepository.save(new Cafe("1", "베어카페"));
         Member savedMember = memberRepository.save(new Member("rlawjddn103@naver.com", "abcd1234", "베어"));
         Comment savedComment = commentRepository.save(new Comment(savedCafe, savedMember, "코딩하기 좋은 카페네요."));
@@ -41,9 +41,9 @@ class CommentLikeRepositoryTest {
 
     @Test
     @DisplayName("comment id가 null인 즐겨찾기들을 모두 삭제한다")
-    void deleteAllByMemberIdIsNull() {
+    void deleteAllByCommentIdIsNull() {
         Member savedMember = memberRepository.save(new Member("rlawjddn103@naver.com", "abcd1234", "베어"));
-        CommentLike savedCommentLike = commentLikeRepository.save(new CommentLike(savedMember, null));
+        commentLikeRepository.save(new CommentLike(savedMember, null));
 
         commentLikeRepository.deleteAllByCommentIdIsNull();
 
