@@ -76,13 +76,13 @@ public class CommentLikeService {
     }
 
     @EventListener
-    public void deleteAllWhenMemberDelete(DeleteMemberEvent event) {
+    public void deleteAllWhenMemberDeleted(DeleteMemberEvent event) {
         Member member = event.getMember();
         commentLikeRepository.findAllByMemberId(member.getId()).forEach(CommentLike::removeMember);
     }
 
     @EventListener
-    public void deleteAllWhenCommentDelete(DeleteCommentEvent event) {
+    public void deleteAllWhenCommentDeleted(DeleteCommentEvent event) {
         Comment comment = event.getComment();
         commentLikeRepository.findAllByCommentId(comment.getId()).forEach(CommentLike::removeComment);
     }
@@ -90,7 +90,7 @@ public class CommentLikeService {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener
-    public void deleteFavoritesWhenMemberDeleted(DeleteCommentEvent event) {
+    public void deleteCommentsWhenCommentDeleted(DeleteCommentEvent event) {
         commentLikeRepository.deleteAllByCommentIdIsNull();
     }
 }
