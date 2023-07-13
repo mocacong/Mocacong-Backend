@@ -122,12 +122,21 @@ public class CommentService {
     public CommentReportResponse report(Long memberId, String mapId, Long commentId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(NotFoundMemberException::new);
         Comment comment = cafe.getComments().stream()
                 .filter(c -> c.getId().equals(commentId))
                 .findFirst()
                 .orElseThrow(NotFoundCommentException::new);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
+
+        if (comment.getMember() == null) { // 코멘트를 작성한 회원이 탈퇴한 경우
+            if (comment.getReports().size() >= 1) {
+                commentRepository.delete(comment);
+                return new CommentReportResponse(commentId, member.getNickname(), 5);
+            }
+            comment.incrementCommentReport(member);
+            return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
+        }
 
         if (comment.isWrittenByMember(member)) {
             throw new InvalidCommentReportException();
@@ -139,11 +148,11 @@ public class CommentService {
 
         comment.incrementCommentReport(member);
 
-        if (comment.getReports().size() >= 10) {
+        if (comment.getReports().size() >= 1) {
             Member commenter = comment.getMember();
             commenter.incrementMemberReportCount();
             commentRepository.delete(comment);
-            return new CommentReportResponse(commentId, member.getNickname(), 10);
+            return new CommentReportResponse(commentId, member.getNickname(), 5);
         }
 
         return new CommentReportResponse(comment.getId(), member.getNickname(), comment.getReports().size());
