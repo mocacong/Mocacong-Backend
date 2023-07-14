@@ -15,7 +15,9 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.service.event.DeleteCommentEvent;
 import mocacong.server.service.event.DeleteMemberEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -33,6 +35,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
     private final CafeRepository cafeRepository;
     private final CommentRepository commentRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public CommentSaveResponse save(Long memberId, String mapId, String content) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
@@ -115,6 +118,7 @@ public class CommentService {
         if (!comment.isWrittenByMember(member)) {
             throw new InvalidCommentDeleteException();
         }
+        applicationEventPublisher.publishEvent(new DeleteCommentEvent(comment));
         commentRepository.delete(comment);
     }
 
