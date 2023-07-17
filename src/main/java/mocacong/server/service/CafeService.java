@@ -1,5 +1,6 @@
 package mocacong.server.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -303,19 +304,20 @@ public class CafeService {
     }
 
     @Transactional
-    public void saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
+    public CafeImagesSaveResponse saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         validateOwnedCafeImagesCounts(cafe, member, cafeImages);
-
+        List<CafeImageSaveResponse> cafeImageSaveResponses = new ArrayList<>();
         for (MultipartFile cafeImage : cafeImages) {
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
-            cafeImageRepository.save(uploadedCafeImage);
+            cafeImageSaveResponses.add(new CafeImageSaveResponse(cafeImageRepository.save(uploadedCafeImage).getId()));
         }
+        return new CafeImagesSaveResponse(cafeImageSaveResponses);
     }
 
     private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> requestCafeImages) {

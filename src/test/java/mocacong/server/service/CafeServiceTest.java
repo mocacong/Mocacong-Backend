@@ -6,7 +6,6 @@ import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.badrequest.ExceedCageImagesTotalCountsException;
-import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
@@ -765,6 +764,27 @@ class CafeServiceTest {
         assertAll(
                 () -> assertThat(actual).hasSize(1),
                 () -> assertThat(actual.get(0).getImgUrl()).isEqualTo(expected)
+        );
+    }
+
+    @Test
+    @DisplayName("카페 이미지를 저장한 후 Response를 반환한다.")
+    void saveCafeImageWithResponse() throws IOException {
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
+        memberRepository.save(member);
+        String mapId = cafe.getMapId();
+        FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + "test_img.jpg");
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg", "jpg",
+                fileInputStream);
+
+        when(awsS3Uploader.uploadImage(mockMultipartFile)).thenReturn("test_img.jpg");
+        CafeImagesSaveResponse cafeImagesSaveResponse = cafeService.saveCafeImage(member.getId(), mapId, List.of(mockMultipartFile));
+
+        assertAll(
+                () -> assertThat(cafeImagesSaveResponse.getCafeImagesIds()).hasSize(1),
+                () -> assertThat(cafeImagesSaveResponse.getCafeImagesIds().get(0).getId()).isEqualTo(1L)
         );
     }
 
