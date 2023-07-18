@@ -39,14 +39,14 @@ public class ReportService {
             comment.incrementCommentReport(member, reportReason);
 
             // 코멘트를 작성한 회원이 탈퇴한 경우
-            if (comment.getMember() == null && comment.getReportsCount() >= 2) {
+            if (comment.getMember() == null && comment.getReportsCount() >= 5) {
                 commentRepository.delete(comment);
             } else {
                 Member commenter = comment.getMember();
                 if (comment.isWrittenByMember(member)) {
                     throw new InvalidCommentReportException();
                 }
-                if (comment.getReportsCount() >= 2) {
+                if (comment.getReportsCount() >= 5) {
                     commenter.incrementMemberReportCount();
                     commentRepository.delete(comment);
                 }
