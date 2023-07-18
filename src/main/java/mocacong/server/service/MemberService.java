@@ -24,7 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -209,7 +212,9 @@ public class MemberService {
 
     @Transactional
     public void setActiveAfter60days() {
-        LocalDate thresholdDate = LocalDate.now().minusDays(60);
+        LocalDate thresholdLocalDate = LocalDate.now().minusDays(60);
+        Instant instant = thresholdLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Date thresholdDate = Date.from(instant);
         memberRepository.bulkUpdateStatus(Status.ACTIVE, Status.INACTIVE, thresholdDate);
     }
 

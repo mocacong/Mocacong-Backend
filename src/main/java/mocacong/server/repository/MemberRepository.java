@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,5 +31,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("UPDATE Member m SET m.status = :newStatus WHERE m.status = :oldStatus AND " +
             "m.modifiedTime <= :thresholdDateTime")
     void bulkUpdateStatus(@Param("newStatus") Status newStatus, @Param("oldStatus") Status oldStatus,
-                          @Param("thresholdDateTime") LocalDate thresholdDateTime);
+                          @Param("thresholdDateTime") Date thresholdDateTime);
 }
