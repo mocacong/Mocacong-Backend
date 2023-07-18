@@ -75,9 +75,8 @@ public class Comment extends BaseTime {
         if (!hasAlreadyReported(reporter)) {
             ReportReason reason = ReportReason.from(reportReason);
             this.reports.add(new CommentReport(this, reporter, reason));
-        } else {
-            throw new DuplicateReportCommentException();
         }
+        throw new DuplicateReportCommentException();
     }
 
     public int getReportsCount() {
