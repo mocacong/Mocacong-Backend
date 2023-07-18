@@ -21,9 +21,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @ServiceTest
-public class CommentConcurrentServiceTest {
+public class ReportConcurrentServiceTest {
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private ReportService reportService;
     @Autowired
     private CafeRepository cafeRepository;
     @Autowired
@@ -50,7 +52,7 @@ public class CommentConcurrentServiceTest {
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
-                    CommentReportResponse response = commentService.report(member2.getId(), mapId, saveResponse.getId(),
+                    CommentReportResponse response = reportService.reportComment(member2.getId(), saveResponse.getId(),
                             "insult");
                     responses.add(response);
                 } catch (Exception e) {

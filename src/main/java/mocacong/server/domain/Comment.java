@@ -35,7 +35,7 @@ public class Comment extends BaseTime {
     private String content;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommentReport> reports = new ArrayList<>();
+    private List<Report> reports = new ArrayList<>();
 
     public Comment(Cafe cafe, Member member, String content) {
         this.cafe = cafe;
@@ -72,11 +72,11 @@ public class Comment extends BaseTime {
     }
 
     public void incrementCommentReport(Member reporter, String reportReason) {
-        if (!hasAlreadyReported(reporter)) {
-            ReportReason reason = ReportReason.from(reportReason);
-            this.reports.add(new CommentReport(this, reporter, reason));
+        if (hasAlreadyReported(reporter)) {
+            throw new DuplicateReportCommentException();
         }
-        throw new DuplicateReportCommentException();
+        ReportReason reason = ReportReason.from(reportReason);
+        this.reports.add(new Report(this, reporter, reason));
     }
 
     public int getReportsCount() {

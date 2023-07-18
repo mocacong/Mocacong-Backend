@@ -4,10 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.dto.request.CommentReportRequest;
 import mocacong.server.dto.request.CommentSaveRequest;
 import mocacong.server.dto.request.CommentUpdateRequest;
-import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
 import mocacong.server.security.auth.LoginUserId;
@@ -86,18 +84,5 @@ public class CommentController {
     ) {
         commentService.delete(memberId, mapId, commentId);
         return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "카페 코멘트 신고")
-    @SecurityRequirement(name = "JWT")
-    @PostMapping("/{commentId}/report")
-    public ResponseEntity<CommentReportResponse> reportComment(
-            @LoginUserId Long memberId,
-            @PathVariable String mapId,
-            @PathVariable Long commentId,
-            @RequestBody @Valid CommentReportRequest request
-    ) {
-        CommentReportResponse response = commentService.report(memberId, mapId, commentId, request.getMyReportReason());
-        return ResponseEntity.ok(response);
     }
 }

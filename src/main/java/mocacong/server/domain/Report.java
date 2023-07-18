@@ -6,15 +6,15 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "comment_report", uniqueConstraints = {
+@Table(name = "report", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "comment_id", "member_id" })
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommentReport {
+public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_report_id")
+    @Column(name = "report_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +29,7 @@ public class CommentReport {
     @Column(name = "report_reason")
     private ReportReason reportReason;
 
-    public CommentReport(Comment comment, Member reporter, ReportReason reportReason) {
+    public Report(Comment comment, Member reporter, ReportReason reportReason) {
         this.comment = comment;
         this.reporter = reporter;
         this.reportReason = reportReason;
