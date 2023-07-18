@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.Status;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -203,6 +205,12 @@ public class MemberService {
                 .map(MemberProfileImage::getId)
                 .collect(Collectors.toList());
         memberProfileImageRepository.deleteAllByIdInBatch(ids);
+    }
+
+    @Transactional
+    public void setActiveAfter60days() {
+        LocalDate thresholdDate = LocalDate.now().minusDays(60);
+        memberRepository.bulkUpdateStatus(Status.ACTIVE, Status.INACTIVE, thresholdDate);
     }
 
     public PasswordVerifyResponse verifyPassword(Long memberId, PasswordVerifyRequest request) {

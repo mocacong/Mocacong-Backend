@@ -10,9 +10,9 @@ import mocacong.server.exception.badrequest.DuplicateReportCommentException;
 import mocacong.server.exception.badrequest.InvalidCommentReportException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
-import mocacong.server.repository.CommentReportRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.repository.ReportRepository;
 import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,7 +27,7 @@ public class ReportService {
 
     private final MemberRepository memberRepository;
     private final CommentRepository commentRepository;
-    private final CommentReportRepository commentReportRepository;
+    private final ReportRepository reportRepository;
 
     public CommentReportResponse reportComment(Long memberId, Long commentId, String reportReason) {
         Member member = memberRepository.findById(memberId)
@@ -39,14 +39,14 @@ public class ReportService {
             comment.incrementCommentReport(member, reportReason);
 
             // 코멘트를 작성한 회원이 탈퇴한 경우
-            if (comment.getMember() == null && comment.getReportsCount() >= 5) {
+            if (comment.getMember() == null && comment.getReportsCount() >= 2) {
                 commentRepository.delete(comment);
             } else {
                 Member commenter = comment.getMember();
                 if (comment.isWrittenByMember(member)) {
                     throw new InvalidCommentReportException();
                 }
-                if (comment.getReportsCount() >= 5) {
+                if (comment.getReportsCount() >= 2) {
                     commenter.incrementMemberReportCount();
                     commentRepository.delete(comment);
                 }
@@ -60,7 +60,7 @@ public class ReportService {
     @EventListener
     public void updateCommentReportWhenMemberDelete(DeleteMemberEvent event) {
         Member member = event.getMember();
-        commentReportRepository.findAllByReporter(member)
+        reportRepository.findAllByReporter(member)
                 .forEach(Report::removeReporter);
     }
 }
