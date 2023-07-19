@@ -13,6 +13,7 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.ReportRepository;
+import mocacong.server.service.event.DeleteCommentEvent;
 import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -61,6 +62,13 @@ public class ReportService {
     public void updateCommentReportWhenMemberDelete(DeleteMemberEvent event) {
         Member member = event.getMember();
         reportRepository.findAllByReporter(member)
+                .forEach(Report::removeReporter);
+    }
+
+    @EventListener
+    public void deleteCommentWhenDeleteReportedComment(DeleteCommentEvent event) {
+        Comment comment = event.getComment();
+        comment.getReports()
                 .forEach(Report::removeReporter);
     }
 }
