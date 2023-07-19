@@ -83,6 +83,18 @@ public class Comment extends BaseTime {
         return reports.size();
     }
 
+    public boolean isDeletedMember() {
+        return member == null;
+    }
+
+    public boolean isReportThresholdExceeded() {
+        return getReportsCount() >= 5;
+    }
+
+    public boolean isDeletedCommenter() {
+        return isDeletedMember() && isReportThresholdExceeded();
+    }
+
     private boolean hasAlreadyReported(Member member) {
         return this.reports.stream()
                 .anyMatch(report -> report.getReporter().equals(member));
