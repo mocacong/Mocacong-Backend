@@ -50,10 +50,8 @@ public class Member extends BaseTime {
     @Column(name = "report_count")
     private int reportCount;
 
-    public Member(
-            String email, String password, String nickname, MemberProfileImage memberProfileImage,
-            Platform platform, String platformId
-    ) {
+    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage,
+                  Platform platform, String platformId) {
         validateNickname(nickname);
         this.email = email;
         this.password = password;
@@ -64,16 +62,20 @@ public class Member extends BaseTime {
         this.status = Status.ACTIVE;
     }
 
+    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage,
+                  Platform platform, String platformId, Status status) {
+        validateNickname(nickname);
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.memberProfileImage = memberProfileImage;
+        this.platform = platform;
+        this.platformId = platformId;
+        this.status = status;
+    }
+
     public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage) {
-        this(
-                email,
-                password,
-                nickname,
-                memberProfileImage,
-                Platform.MOCACONG,
-                null,
-                Status.ACTIVE
-        );
+        this(email, password, nickname, memberProfileImage, Platform.MOCACONG, null, Status.ACTIVE);
     }
 
     public Member(String email, String password, String nickname) {
@@ -92,30 +94,6 @@ public class Member extends BaseTime {
         this.platform = platform;
         this.platformId = platformId;
         this.status = status;
-    }
-
-    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage, Platform platform, String platformId, Status status) {
-        validateNickname(nickname);
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-        this.memberProfileImage = memberProfileImage;
-        this.platform = platform;
-        this.platformId = platformId;
-        this.status = status;
-    }
-
-    public Member(String email, String password, String nickname, MemberProfileImage memberProfileImage,
-                  Platform platform, String platformId, Status status, int reportCount) {
-        validateNickname(nickname);
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-        this.memberProfileImage = memberProfileImage;
-        this.platform = platform;
-        this.platformId = platformId;
-        this.status = status;
-        this.reportCount = reportCount;
     }
 
     public void registerOAuthMember(String email, String nickname) {
