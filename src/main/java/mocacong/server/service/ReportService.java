@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Report;
+import mocacong.server.domain.ReportReason;
 import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.exception.badrequest.DuplicateReportCommentException;
 import mocacong.server.exception.badrequest.InvalidCommentReportException;
@@ -31,20 +32,20 @@ public class ReportService {
     private final ReportRepository reportRepository;
 
     public CommentReportResponse reportComment(Long memberId, Long commentId, String reportReason) {
-        Member member = memberRepository.findById(memberId)
+        Member reporter = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(NotFoundCommentException::new);
 
         try {
-            comment.incrementCommentReport(member, reportReason);
+            createCommentReport(comment, reporter, reportReason);
 
             // 코멘트를 작성한 회원이 탈퇴한 경우
             if (comment.isDeletedCommenter()) {
                 commentRepository.delete(comment);
             } else {
                 Member commenter = comment.getMember();
-                if (comment.isWrittenByMember(member)) {
+                if (comment.isWrittenByMember(reporter)) {
                     throw new InvalidCommentReportException();
                 }
                 if (comment.isReportThresholdExceeded()) {
@@ -55,7 +56,15 @@ public class ReportService {
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCommentException();
         }
-        return new CommentReportResponse(comment.getReportsCount(), member.getReportCount());
+        return new CommentReportResponse(comment.getReportsCount(), reporter.getReportCount());
+    }
+
+    private void createCommentReport(Comment comment, Member reporter, String reportReason) {
+        if (comment.hasAlreadyReported(reporter)) {
+            throw new DuplicateReportCommentException();
+        }
+        ReportReason reason = ReportReason.from(reportReason);
+        comment.getReports().add(new Report(comment, reporter, reason));
     }
 
     @EventListener

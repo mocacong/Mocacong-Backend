@@ -3,7 +3,6 @@ package mocacong.server.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mocacong.server.exception.badrequest.DuplicateReportCommentException;
 import mocacong.server.exception.badrequest.ExceedCommentLengthException;
 
 import javax.persistence.*;
@@ -71,14 +70,6 @@ public class Comment extends BaseTime {
         this.member = null;
     }
 
-    public void incrementCommentReport(Member reporter, String reportReason) {
-        if (hasAlreadyReported(reporter)) {
-            throw new DuplicateReportCommentException();
-        }
-        ReportReason reason = ReportReason.from(reportReason);
-        this.reports.add(new Report(this, reporter, reason));
-    }
-
     public int getReportsCount() {
         return reports.size();
     }
@@ -95,7 +86,7 @@ public class Comment extends BaseTime {
         return isDeletedMember() && isReportThresholdExceeded();
     }
 
-    private boolean hasAlreadyReported(Member member) {
+    public boolean hasAlreadyReported(Member member) {
         return this.reports.stream()
                 .anyMatch(report -> report.getReporter().equals(member));
     }
