@@ -28,8 +28,6 @@ class CommentServiceTest {
 
     @Autowired
     private CommentService commentService;
-    @Autowired
-    private MemberService memberService;
 
     @Autowired
     private CommentRepository commentRepository;
