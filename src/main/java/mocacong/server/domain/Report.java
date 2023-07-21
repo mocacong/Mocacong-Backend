@@ -12,6 +12,8 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report {
 
+    private static final int MAXIMUM_COMMENT_LENGTH = 200;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "report_id")
@@ -29,7 +31,7 @@ public class Report {
     @Column(name = "report_reason")
     private ReportReason reportReason;
 
-    @Column(name = "original_content", length = 200)
+    @Column(name = "original_content", length = MAXIMUM_COMMENT_LENGTH)
     private String originalContent;
 
     public Report(Comment comment, Member reporter, ReportReason reportReason) {
