@@ -29,10 +29,14 @@ public class Report {
     @Column(name = "report_reason")
     private ReportReason reportReason;
 
+    @Column(name = "original_content", length = 200)
+    private String originalContent;
+
     public Report(Comment comment, Member reporter, ReportReason reportReason) {
         this.comment = comment;
         this.reporter = reporter;
         this.reportReason = reportReason;
+        this.originalContent = comment.getContent();
     }
 
     public Member getReporter() {

@@ -116,12 +116,13 @@ public class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("5번 이상 신고된 댓글은 삭제되며 해당 작성자의 신고 횟수가 1씩 증가한다")
-    void deleteCauseReport5timesReportedComment() {
+    @DisplayName("5번 이상 신고된 댓글은 마스킹되며 해당 작성자의 신고 횟수가 1씩 증가한다")
+    void maskCauseReport5timesReportedComment() {
         String mapId = "2143154352323";
         List<Member> members = new ArrayList<>();
         for (int i = 1; i <= 6; i++) {
-            Member member = new Member("dlawotn" + i + "@naver.com", "encodePassword", "메리" + (char) ('A' + i));
+            Member member = new Member("dlawotn" + i + "@naver.com", "encodePassword", "메리"
+                    + (char) ('A' + i));
             members.add(member);
             memberRepository.save(member);
         }
@@ -135,13 +136,15 @@ public class ReportServiceTest {
         }
         CommentReportResponse reportResponse = reportService.reportComment(members.get(5).getId(), saveResponse.getId(),
                 "inappropriate_content");
-        CommentsResponse findResponse = commentService.findAll(members.get(0).getId(), mapId, 0, 3);
+        Optional<Comment> reportedComment = commentRepository.findById(1L);
         Optional<Member> commenter = memberRepository.findById(1L);
 
         assertAll(
-                () -> assertThat(findResponse.getIsEnd()).isTrue(),
-                () -> assertThat(findResponse.getComments()).hasSize(0),
                 () -> assertThat(reportResponse.getCommentReportCount()).isEqualTo(5),
+                () -> assertThat(reportedComment.get().getContent())
+                        .isEqualTo("해당 댓글은 신고가 되어 내용을 볼 수 없습니다."),
+                () -> assertThat(reportedComment.get().getWriterImgUrl()).isNull(),
+                () -> assertThat(reportedComment.get().getWriterNickname()).isNull(),
                 () -> assertThat(commenter.get().getReportCount()).isEqualTo(1)
         );
     }
@@ -166,13 +169,13 @@ public class ReportServiceTest {
                         "inappropriate_content");
             }
         }
-        CommentsResponse actual = commentService.findAll(members.get(1).getId(), "abc" + (char) ('A' + 1),
-                0, 3);
+        CommentsResponse reportedComment = commentService.findAll(members.get(1).getId(),
+                "abc" + (char) ('A' + 1), 0, 3);
         Optional<Member> commenter = memberRepository.findById(1L);
 
         assertAll(
-                () -> assertThat(actual.getIsEnd()).isTrue(),
-                () -> assertThat(actual.getComments()).hasSize(0),
+                () -> assertThat(reportedComment.getComments().get(0).getContent())
+                        .isEqualTo("해당 댓글은 신고가 되어 내용을 볼 수 없습니다."),
                 () -> assertThat(commenter.get().getReportCount()).isEqualTo(11),
                 () -> assertThat(commenter.get().getStatus()).isEqualTo(Status.INACTIVE)
         );
