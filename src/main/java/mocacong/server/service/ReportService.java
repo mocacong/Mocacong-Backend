@@ -7,7 +7,6 @@ import mocacong.server.domain.Member;
 import mocacong.server.domain.Report;
 import mocacong.server.domain.ReportReason;
 import mocacong.server.dto.response.CommentReportResponse;
-import mocacong.server.exception.badrequest.AdminProcessedCommentException;
 import mocacong.server.exception.badrequest.DuplicateReportCommentException;
 import mocacong.server.exception.badrequest.InvalidCommentReportException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
@@ -41,15 +40,12 @@ public class ReportService {
             createCommentReport(comment, reporter, reportReason);
 
             // 코멘트를 작성한 회원이 탈퇴한 경우
-            if (comment.isDeletedCommenter()) {
+            if (comment.isDeletedCommenter() && comment.isReportThresholdExceeded()) {
                 maskReportedComment(comment);
             } else {
                 Member commenter = comment.getMember();
                 if (comment.isWrittenByMember(reporter)) {
                     throw new InvalidCommentReportException();
-                }
-                if (comment.isReportMaximumCount()) {
-                    throw new AdminProcessedCommentException();
                 }
                 if (comment.isReportThresholdExceeded()) {
                     commenter.incrementMemberReportCount();

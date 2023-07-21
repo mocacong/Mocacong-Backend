@@ -84,10 +84,6 @@ public class Comment extends BaseTime {
         return getReportsCount() >= REPORT_COMMENT_THRESHOLD_COUNT;
     }
 
-    public boolean isReportMaximumCount() {
-        return getReportsCount() > REPORT_COMMENT_THRESHOLD_COUNT;
-    }
-
     public boolean isDeletedCommenter() {
         return isDeletedMember() && isReportThresholdExceeded();
     }
