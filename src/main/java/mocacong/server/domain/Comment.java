@@ -16,6 +16,7 @@ import java.util.List;
 public class Comment extends BaseTime {
 
     private static final int MAXIMUM_COMMENT_LENGTH = 200;
+    private static final int REPORT_COMMENT_THRESHOLD_COUNT = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,7 +80,11 @@ public class Comment extends BaseTime {
     }
 
     public boolean isReportThresholdExceeded() {
-        return getReportsCount() >= 5;
+        return getReportsCount() >= REPORT_COMMENT_THRESHOLD_COUNT;
+    }
+
+    public boolean isReportMaximumCount() {
+        return getReportsCount() > REPORT_COMMENT_THRESHOLD_COUNT;
     }
 
     public boolean isDeletedCommenter() {
@@ -89,5 +94,13 @@ public class Comment extends BaseTime {
     public boolean hasAlreadyReported(Member member) {
         return this.reports.stream()
                 .anyMatch(report -> report.getReporter().equals(member));
+    }
+
+    public void maskComment() {
+        this.content = "해당 댓글은 신고가 되어 내용을 볼 수 없습니다.";
+    }
+
+    public void maskAuthor() {
+        this.member = null;
     }
 }
