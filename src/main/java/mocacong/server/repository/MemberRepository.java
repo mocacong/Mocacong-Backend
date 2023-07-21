@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -17,8 +16,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByPlatformAndPlatformId(Platform platform, String platformId);
 
     Optional<Member> findByEmailAndPlatform(String email, Platform platform);
-
-    Optional<List<Member>> findByStatus(Status status);
 
     Boolean existsByEmailAndPlatform(String email, Platform platform);
 
