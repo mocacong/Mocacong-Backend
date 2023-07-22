@@ -142,7 +142,7 @@ public class ReportServiceTest {
         assertAll(
                 () -> assertThat(reportResponse.getCommentReportCount()).isEqualTo(5),
                 () -> assertThat(reportedComment.get().getContent())
-                        .isEqualTo("해당 댓글은 신고가 되어 내용을 볼 수 없습니다."),
+                        .isEqualTo("삭제된 댓글입니다"),
                 () -> assertThat(reportedComment.get().getWriterImgUrl()).isNull(),
                 () -> assertThat(reportedComment.get().getWriterNickname()).isNull(),
                 () -> assertThat(commenter.get().getReportCount()).isEqualTo(1)
@@ -175,7 +175,7 @@ public class ReportServiceTest {
 
         assertAll(
                 () -> assertThat(reportedComment.getComments().get(0).getContent())
-                        .isEqualTo("해당 댓글은 신고가 되어 내용을 볼 수 없습니다."),
+                        .isEqualTo("삭제된 댓글입니다"),
                 () -> assertThat(commenter.get().getReportCount()).isEqualTo(11),
                 () -> assertThat(commenter.get().getStatus()).isEqualTo(Status.INACTIVE)
         );

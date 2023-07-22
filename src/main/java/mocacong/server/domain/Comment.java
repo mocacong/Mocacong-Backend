@@ -17,7 +17,7 @@ public class Comment extends BaseTime {
 
     private static final int MAXIMUM_COMMENT_LENGTH = 200;
     private static final int REPORT_COMMENT_THRESHOLD_COUNT = 5;
-    private static final String MASK_COMMENT_CONTENT = "해당 댓글은 신고가 되어 내용을 볼 수 없습니다.";
+    private static final String MASK_COMMENT_CONTENT = "삭제된 댓글입니다";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
