@@ -57,6 +57,11 @@ public class CommentService {
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Comment> comments = commentRepository.findAllByCafeId(cafe.getId(), PageRequest.of(page, count));
         List<CommentResponse> responses = findCommentResponses(member, comments);
+
+        if (page == 0) {
+            Long totalCounts = commentRepository.countAllByCafeId(cafe.getId());
+            return new CommentsResponse(comments.isLast(), totalCounts, responses);
+        }
         return new CommentsResponse(comments.isLast(), responses);
     }
 
@@ -116,6 +121,7 @@ public class CommentService {
         if (!comment.isWrittenByMember(member)) {
             throw new InvalidCommentDeleteException();
         }
+        applicationEventPublisher.publishEvent(new DeleteCommentEvent(comment));
         commentRepository.delete(comment);
     }
 

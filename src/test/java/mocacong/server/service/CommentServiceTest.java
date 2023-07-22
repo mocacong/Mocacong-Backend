@@ -3,6 +3,7 @@ package mocacong.server.service;
 import groovy.util.logging.Slf4j;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
+import mocacong.server.domain.CommentLike;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.response.CommentSaveResponse;
 import mocacong.server.dto.response.CommentsResponse;
@@ -10,17 +11,19 @@ import mocacong.server.exception.badrequest.InvalidCommentDeleteException;
 import mocacong.server.exception.badrequest.InvalidCommentUpdateException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCommentException;
+import mocacong.server.exception.notfound.NotFoundCommentLikeException;
 import mocacong.server.repository.CafeRepository;
+import mocacong.server.repository.CommentLikeRepository;
 import mocacong.server.repository.CommentRepository;
 import mocacong.server.repository.MemberRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @Slf4j
 @ServiceTest
@@ -35,6 +38,8 @@ class CommentServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private CafeRepository cafeRepository;
+    @Autowired
+    private CommentLikeRepository commentLikeRepository;
 
     @Test
     @DisplayName("특정 카페에 댓글을 작성할 수 있다")
@@ -103,6 +108,34 @@ class CommentServiceTest {
                 () -> assertThat(actual.getComments())
                         .extracting("content")
                         .containsExactly("댓글1", "댓글2", "댓글3")
+        );
+    }
+
+    @Test
+    @DisplayName("특정 카페에 달린 댓글 목록의 첫 페이지를 조회할 시에만 총 댓글 개수를 함께 반환한다.")
+    void findCommentsWithCount() {
+        String email = "rlawjddn103@naver.com";
+        String mapId = "2143154352323";
+        Member member = new Member(email, "encodePassword", "베어");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe(mapId, "베어카페");
+        cafeRepository.save(cafe);
+        commentRepository.save(new Comment(cafe, member, "댓글1"));
+        commentRepository.save(new Comment(cafe, member, "댓글2"));
+        commentRepository.save(new Comment(cafe, member, "댓글3"));
+        commentRepository.save(new Comment(cafe, member, "댓글4"));
+
+        CommentsResponse actualPageOne = commentService.findAll(member.getId(), mapId, 0, 3);
+        CommentsResponse actualPageTwo = commentService.findAll(member.getId(), mapId, 1, 3);
+
+        assertAll(
+                () -> assertThat(actualPageOne.getIsEnd()).isFalse(),
+                () -> assertThat(actualPageOne.getComments()).hasSize(3),
+                () -> assertThat(actualPageOne.getComments())
+                        .extracting("content")
+                        .containsExactly("댓글1", "댓글2", "댓글3"),
+                () -> assertThat(actualPageOne.getCount()).isEqualTo(4),
+                () -> assertThat(actualPageTwo.getCount()).isEqualTo(null)
         );
     }
 
@@ -236,5 +269,25 @@ class CommentServiceTest {
 
         assertThatThrownBy(() -> commentService.delete(member2.getId(), mapId, response.getId()))
                 .isInstanceOf(InvalidCommentDeleteException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 좋아요가 있는 댓글을 삭제할 수 있다.")
+    void deleteExistCommentLike() {
+        String email = "rlawjddn103@naver.com";
+        String mapId = "2143154352323";
+        String commentContent = "코딩하고 싶어지는 카페에요.";
+        Member member = new Member(email, "encodePassword", "베어");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe(mapId, "베어카페");
+        cafeRepository.save(cafe);
+        Comment savedComment = commentRepository.save(new Comment(cafe, member, commentContent));
+        commentLikeRepository.save(new CommentLike(member, savedComment));
+
+        commentService.delete(member.getId(), mapId, savedComment.getId());
+
+        CommentsResponse actual = commentService.findAll(member.getId(), mapId, 0, 3);
+
+        assertThat(actual.getComments()).hasSize(0);
     }
 }

@@ -68,6 +68,52 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
+    @DisplayName("카페 코멘트 첫번째 목록을 조회한다")
+    void findCommentsFirstPage() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "베어네 카페"));
+
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        카페_코멘트_작성(token, mapId, new CommentSaveRequest("댓글"));
+
+        CommentsResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/cafes/" + mapId + "/comments?page=0&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CommentsResponse.class);
+
+        assertThat(response.getCount()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("카페 코멘트 첫번째 목록을 제외한 페이지를 조회한다")
+    void findCommentsNotFirstPage() {
+        String mapId = "12332312";
+        카페_등록(new CafeRegisterRequest(mapId, "베어네 카페"));
+
+        MemberSignUpRequest signUpRequest = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
+        회원_가입(signUpRequest);
+        String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
+        카페_코멘트_작성(token, mapId, new CommentSaveRequest("댓글"));
+
+        CommentsResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(token)
+                .when().get("/cafes/" + mapId + "/comments?page=1&count=20")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CommentsResponse.class);
+
+        assertThat(response.getCount()).isEqualTo(null);
+    }
+
+    @Test
     @DisplayName("카페 코멘트 목록 중 내가 작성한 코멘트만을 조회한다")
     void findOnlyMyComments() {
         String mapId = "12332312";

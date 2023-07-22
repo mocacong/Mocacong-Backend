@@ -113,13 +113,13 @@ public class CafeController {
     @Operation(summary = "카페 이미지 업로드")
     @SecurityRequirement(name = "JWT")
     @PostMapping(value = "/{mapId}/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CafeImageSaveResponse> saveCafeImage(
+    public ResponseEntity<CafeImagesSaveResponse> saveCafeImage(
             @LoginUserId Long memberId,
             @PathVariable String mapId,
             @RequestParam(value = "files") List<MultipartFile> multipartFiles
     ) {
-        CafeImageSaveResponse responseBody = cafeService.saveCafeImage(memberId, mapId, multipartFiles);
-        return ResponseEntity.ok(responseBody);
+        CafeImagesSaveResponse response = cafeService.saveCafeImage(memberId, mapId, multipartFiles);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "카페 이미지 조회")
