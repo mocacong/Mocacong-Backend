@@ -23,11 +23,11 @@ public class CafeReviewRequest {
 
     private String myToilet;
 
-    @NotNull(message = "3009:공백일 수 없습니다.")
+    @NotNull(message = "3011:콘센트 필드는 공백일 수 없습니다.")
     private String myPower;
 
     private String mySound;
 
-    @NotNull(message = "3009:공백일 수 없습니다.")
+    @NotNull(message = "3012:데스크 필드는 공백일 수 없습니다.")
     private String myDesk;
 }
