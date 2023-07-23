@@ -145,6 +145,7 @@ public class ReportServiceTest {
                         .isEqualTo("삭제된 댓글입니다"),
                 () -> assertThat(reportedComment.get().getWriterImgUrl()).isNull(),
                 () -> assertThat(reportedComment.get().getWriterNickname()).isNull(),
+                () -> assertThat(reportedComment.get().isMasked()).isTrue(),
                 () -> assertThat(commenter.get().getReportCount()).isEqualTo(1)
         );
     }
