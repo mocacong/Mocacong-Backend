@@ -100,4 +100,8 @@ public class Comment extends BaseTime {
     public void maskAuthor() {
         this.member = null;
     }
+
+    public void addReport(Report report) {
+        reports.add(report);
+    }
 }

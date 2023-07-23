@@ -63,7 +63,7 @@ public class ReportService {
             throw new DuplicateReportCommentException();
         }
         ReportReason reason = ReportReason.from(reportReason);
-        comment.getReports().add(new Report(comment, reporter, reason));
+        comment.addReport(new Report(comment, reporter, reason));
     }
 
     @EventListener
