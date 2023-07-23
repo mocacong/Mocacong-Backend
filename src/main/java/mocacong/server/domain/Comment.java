@@ -38,11 +38,15 @@ public class Comment extends BaseTime {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports = new ArrayList<>();
 
+    @Column(name = "is_masked")
+    private boolean isMasked;
+
     public Comment(Cafe cafe, Member member, String content) {
         this.cafe = cafe;
         this.member = member;
         validateCommentLength(content);
         this.content = content;
+        this.isMasked = false;
     }
 
     private void validateCommentLength(String content) {
@@ -103,5 +107,9 @@ public class Comment extends BaseTime {
 
     public void addReport(Report report) {
         reports.add(report);
+    }
+
+    public void updateIsMasked(boolean isMasked) {
+        this.isMasked= isMasked;
     }
 }

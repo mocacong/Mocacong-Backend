@@ -42,6 +42,7 @@ public class ReportService {
             // 코멘트를 작성한 회원이 탈퇴한 경우
             if (comment.isDeletedCommenter() && comment.isReportThresholdExceeded()) {
                 maskReportedComment(comment);
+                comment.updateIsMasked(true);
             } else {
                 Member commenter = comment.getMember();
                 if (comment.isWrittenByMember(reporter)) {
@@ -50,6 +51,7 @@ public class ReportService {
                 if (comment.isReportThresholdExceeded()) {
                     commenter.incrementMemberReportCount();
                     maskReportedComment(comment);
+                    comment.updateIsMasked(true);
                 }
             }
         } catch (DataIntegrityViolationException e) {
