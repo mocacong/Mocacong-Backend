@@ -33,6 +33,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class CafeService {
@@ -194,7 +199,7 @@ public class CafeService {
         em.flush();
         cafe.updateCafeDetails();
 
-        return CafeReviewResponse.of(cafe.findAverageScore(), cafe);
+        return CafeReviewResponse.of(cafe.findAverageScore(), cafe, member);
     }
 
     private void checkAlreadySaveCafeReview(Cafe cafe, Member member) {
@@ -315,7 +320,8 @@ public class CafeService {
         for (MultipartFile cafeImage : cafeImages) {
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
-            cafeImageSaveResponses.add(new CafeImageSaveResponse(cafeImageRepository.save(uploadedCafeImage).getId()));
+            cafeImageSaveResponses.add(new CafeImageSaveResponse(cafeImageRepository.save(uploadedCafeImage).getId(),
+                    member.getReportCount()));
         }
         return new CafeImagesSaveResponse(cafeImageSaveResponses);
     }

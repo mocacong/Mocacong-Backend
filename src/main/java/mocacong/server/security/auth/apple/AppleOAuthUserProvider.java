@@ -1,12 +1,13 @@
 package mocacong.server.security.auth.apple;
 
 import io.jsonwebtoken.Claims;
-import java.security.PublicKey;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.exception.unauthorized.InvalidTokenException;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import org.springframework.stereotype.Component;
+
+import java.security.PublicKey;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor

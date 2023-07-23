@@ -12,7 +12,9 @@ import lombok.ToString;
 public class TokenResponse {
     private String token;
 
-    public static TokenResponse from(final String token) {
-        return new TokenResponse(token);
+    private int userReportCount;
+
+    public static TokenResponse from(final String token, int userReportCount) {
+        return new TokenResponse(token, userReportCount);
     }
 }

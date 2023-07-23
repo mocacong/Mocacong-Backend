@@ -1,6 +1,7 @@
 package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.Member;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -44,7 +46,7 @@ public class CommentService {
                 .orElseThrow(NotFoundMemberException::new);
         Comment comment = new Comment(cafe, member, content);
 
-        return new CommentSaveResponse(commentRepository.save(comment).getId());
+        return new CommentSaveResponse(commentRepository.save(comment).getId(), member.getReportCount());
     }
 
     @Transactional(readOnly = true)
@@ -114,6 +116,7 @@ public class CommentService {
                 .filter(c -> c.getId().equals(commentId))
                 .findFirst()
                 .orElseThrow(NotFoundCommentException::new);
+        applicationEventPublisher.publishEvent(new DeleteCommentEvent(comment));
 
         if (!comment.isWrittenByMember(member)) {
             throw new InvalidCommentDeleteException();

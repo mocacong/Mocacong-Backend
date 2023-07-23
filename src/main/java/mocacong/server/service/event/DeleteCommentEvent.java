@@ -7,5 +7,6 @@ import mocacong.server.domain.Comment;
 @Getter
 @RequiredArgsConstructor
 public class DeleteCommentEvent {
+
     private final Comment comment;
 }

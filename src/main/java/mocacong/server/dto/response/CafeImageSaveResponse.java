@@ -7,5 +7,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class CafeImageSaveResponse {
+
     private Long id;
+
+    private int userReportCount;
 }

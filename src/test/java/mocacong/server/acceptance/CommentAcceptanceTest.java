@@ -3,23 +3,19 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
-import static mocacong.server.acceptance.AcceptanceFixtures.*;
-import mocacong.server.dto.request.CafeRegisterRequest;
-import mocacong.server.dto.request.CommentSaveRequest;
-import mocacong.server.dto.request.CommentUpdateRequest;
-import mocacong.server.dto.request.MemberSignUpRequest;
-import mocacong.server.dto.response.CommentResponse;
-import mocacong.server.dto.response.CommentSaveResponse;
-import mocacong.server.dto.response.CommentsResponse;
-import mocacong.server.dto.response.FindCafeResponse;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import mocacong.server.dto.request.*;
+import mocacong.server.dto.response.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
+import java.util.List;
+
+import static mocacong.server.acceptance.AcceptanceFixtures.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CommentAcceptanceTest extends AcceptanceTest {
 

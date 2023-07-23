@@ -1,5 +1,6 @@
 package mocacong.server.service;
 
+import groovy.util.logging.Slf4j;
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
 import mocacong.server.domain.CommentLike;
@@ -23,6 +24,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+@Slf4j
 @ServiceTest
 class CommentServiceTest {
 
