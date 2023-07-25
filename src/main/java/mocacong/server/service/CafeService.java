@@ -380,8 +380,7 @@ public class CafeService {
 
     @Transactional
     public void deleteNotUsedCafeImages() {
-        //TODO: isMasked == false 조건 추가
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalse();
+        List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalseAndIsMaskedFalse();
         List<String> imgUrls = cafeImages.stream()
                 .map(CafeImage::getImgUrl)
                 .collect(Collectors.toList());
