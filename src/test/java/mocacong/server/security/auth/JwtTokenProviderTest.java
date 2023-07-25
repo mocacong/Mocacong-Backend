@@ -50,7 +50,8 @@ class JwtTokenProviderTest {
     @Test
     void getPayloadByExpiredToken() {
         long expirationMillis = 1L;
-        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider("secret-key", expirationMillis);
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider("secret-key",
+                "refresh-secret-key", expirationMillis);
         Long expiredPayload = 1L;
 
         String expiredToken = jwtTokenProvider.createAccessToken(expiredPayload);
@@ -71,12 +72,14 @@ class JwtTokenProviderTest {
         String correctSecretKey = "correct-secret-key";
         String wrongSecretKey = "wrong-secret-key";
 
-        JwtTokenProvider tokenProvider = new JwtTokenProvider(correctSecretKey, 3600000L);
+        JwtTokenProvider tokenProvider = new JwtTokenProvider(correctSecretKey, "refresh-secret-key",
+                3600000L);
         String token = tokenProvider.createAccessToken(payload);
 
         assertThatExceptionOfType(InvalidTokenException.class)
                 .isThrownBy(() -> {
-                    JwtTokenProvider wrongTokenProvider = new JwtTokenProvider(wrongSecretKey, 3600000L);
+                    JwtTokenProvider wrongTokenProvider = new JwtTokenProvider(wrongSecretKey, "refresh-secret-key",
+                            3600000L);
                     wrongTokenProvider.getPayload(token);
                 });
     }
