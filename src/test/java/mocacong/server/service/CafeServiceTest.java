@@ -1209,4 +1209,30 @@ class CafeServiceTest {
                         .containsExactlyInAnyOrder("test_img.jpg")
         );
     }
+
+    @Test
+    @DisplayName("신고되어 마스킹된 카페 이미지들은 배치 작업으로 삭제하지 않는다")
+    void notDeleteReportedCafeImages() {
+        List<String> reportedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member);
+        cafeImageRepository.save(cafeImage1);
+        CafeImage cafeImage2 = new CafeImage("test_img2.jpg", false, cafe, member);
+        cafeImage2.updateIsMasked(true);
+        cafeImageRepository.save(cafeImage2);
+        CafeImage cafeImage3 = new CafeImage("test_img3.jpg", false, cafe, member);
+        cafeImage3.updateIsMasked(true);
+        cafeImageRepository.save(cafeImage3);
+
+        doNothing().when(awsS3Uploader).deleteImages(new DeleteNotUsedImagesEvent(reportedImgUrls));
+        cafeService.deleteNotUsedCafeImages();
+
+        List<CafeImage> actual = cafeImageRepository.findAll();
+        assertAll(
+                () -> assertThat(actual).hasSize(3)
+        );
+    }
 }
