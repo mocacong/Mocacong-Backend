@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CafeImage extends BaseTime {
 
-    private static final int REPORT_CAFE_IMAGE_THRESHOLD_COUNT = 3;
+    private static final int REPORT_CAFE_IMAGE_THRESHOLD_COUNT = 2;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

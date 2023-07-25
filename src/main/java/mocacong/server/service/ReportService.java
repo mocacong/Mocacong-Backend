@@ -71,16 +71,16 @@ public class ReportService {
         comment.addReport(new Report(comment, reporter, reason));
     }
 
+    private void maskReportedComment(Comment comment) {
+        comment.maskComment();
+        comment.maskAuthor();
+    }
+
     @EventListener
     public void updateCommentReportWhenMemberDelete(DeleteMemberEvent event) {
         Member member = event.getMember();
         reportRepository.findAllByReporter(member)
                 .forEach(Report::removeReporter);
-    }
-
-    private void maskReportedComment(Comment comment) {
-        comment.maskComment();
-        comment.maskAuthor();
     }
 
     public CafeImageReportResponse reportCafeImage(Long memberId, Long cafeImageId, String reportReason) {
@@ -118,5 +118,12 @@ public class ReportService {
         }
         ReportReason reason = ReportReason.from(reportReason);
         cafeImage.addReport(new Report(cafeImage, reporter, reason));
+    }
+
+    @EventListener
+    public void updateCafeImageReportWhenMemberDelete(DeleteMemberEvent event) {
+        Member member = event.getMember();
+        reportRepository.findAllByReporter(member)
+                .forEach(Report::removeReporter);
     }
 }
