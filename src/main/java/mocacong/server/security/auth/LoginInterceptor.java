@@ -36,7 +36,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         String accessToken = AuthorizationExtractor.extractAccessToken(request);
         try {
             // Access Token이 유효한 경우
-            jwtTokenProvider.validateToken(accessToken);
+            jwtTokenProvider.validateAccessToken(accessToken);
             return true;
         } catch (ExpiredJwtException e) {
             // Access Token이 만료된 경우
@@ -44,7 +44,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                     .orElseThrow(TokenExpiredException::new);
 
             String refreshToken = foundTokenInfo.getRefreshToken();
-            jwtTokenProvider.validateToken(refreshToken);
+            jwtTokenProvider.validateRefreshToken(refreshToken);
 
             Long memberId = Long.valueOf(foundTokenInfo.getId());
             memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);

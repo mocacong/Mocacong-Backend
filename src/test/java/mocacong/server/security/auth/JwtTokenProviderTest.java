@@ -42,7 +42,7 @@ class JwtTokenProviderTest {
     void getPayloadByInvalidToken() {
         String invalidToken = "invalid-token";
 
-        assertThatThrownBy(() -> jwtTokenProvider.validateToken(invalidToken))
+        assertThatThrownBy(() -> jwtTokenProvider.validateAccessToken(invalidToken))
                 .isInstanceOf(InvalidTokenException.class);
     }
 

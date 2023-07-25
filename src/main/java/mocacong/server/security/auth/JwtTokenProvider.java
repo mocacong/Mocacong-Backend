@@ -13,7 +13,8 @@ public class JwtTokenProvider {
     private final String secretKey;
     private final String refreshSecretKey;
     private final long validityInMilliseconds;
-    private final JwtParser jwtParser;
+    private final JwtParser accessTokenJwtParser;
+    private final JwtParser refreshTokenJwtParser;
 
     public JwtTokenProvider(@Value("${security.jwt.token.secret-key}") String secretKey,
                             @Value("${security.jwt.token.refresh-secret-key}") String refreshSecretKey,
@@ -21,7 +22,8 @@ public class JwtTokenProvider {
         this.secretKey = secretKey;
         this.refreshSecretKey = refreshSecretKey;
         this.validityInMilliseconds = validityInMilliseconds;
-        this.jwtParser = Jwts.parser().setSigningKey(secretKey);
+        this.accessTokenJwtParser = Jwts.parser().setSigningKey(secretKey);
+        this.refreshTokenJwtParser = Jwts.parser().setSigningKey(refreshSecretKey);
     }
 
     public String createAccessToken(Long memberId) {
@@ -50,9 +52,19 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void validateToken(String token) {
+    public void validateAccessToken(String token) {
         try {
-            jwtParser.parseClaimsJws(token);
+            accessTokenJwtParser.parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            throw new TokenExpiredException();
+        } catch (JwtException e) {
+            throw new InvalidTokenException();
+        }
+    }
+
+    public void validateRefreshToken(String token) {
+        try {
+            refreshTokenJwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
         } catch (JwtException e) {
