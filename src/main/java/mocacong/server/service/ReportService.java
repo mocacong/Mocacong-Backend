@@ -47,13 +47,8 @@ public class ReportService {
                 maskReportedComment(comment);
             } else {
                 Member commenter = comment.getMember();
-                if (comment.isWrittenByMember(reporter)) {
-                    throw new InvalidCommentReportException();
-                }
-                if (comment.isReportThresholdExceeded()) {
-                    commenter.incrementMemberReportCount();
-                    maskReportedComment(comment);
-                }
+                validateCommentReporter(reporter, comment);
+                validateCommentReportThreshold(commenter, comment);
             }
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCommentException();
@@ -73,6 +68,19 @@ public class ReportService {
         comment.maskComment();
         comment.maskAuthor();
         comment.updateIsMasked(true);
+    }
+
+    private void validateCommentReporter(Member reporter, Comment comment) {
+        if (comment.isWrittenByMember(reporter)) {
+            throw new InvalidCommentReportException();
+        }
+    }
+
+    private void validateCommentReportThreshold(Member commenter, Comment comment) {
+        if (comment.isReportThresholdExceeded()) {
+            commenter.incrementMemberReportCount();
+            maskReportedComment(comment);
+        }
     }
 
     @EventListener
@@ -95,13 +103,8 @@ public class ReportService {
                 cafeImage.maskCafeImage();
             } else {
                 Member author = cafeImage.getMember();
-                if (cafeImage.isSavedByMember(reporter)) {
-                    throw new InvalidCafeImageReportException();
-                }
-                if (cafeImage.isReportThresholdExceeded()) {
-                    author.incrementMemberReportCount();
-                    cafeImage.maskCafeImage();
-                }
+                validateCafeImageReporter(reporter, cafeImage);
+                validateCafeImageReportThreshold(author, cafeImage);
             }
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCafeImageException();
@@ -115,6 +118,19 @@ public class ReportService {
         }
         ReportReason reason = ReportReason.from(reportReason);
         cafeImage.addReport(new Report(cafeImage, reporter, reason));
+    }
+
+    private void validateCafeImageReporter(Member reporter, CafeImage cafeImage) {
+        if (cafeImage.isSavedByMember(reporter)) {
+            throw new InvalidCafeImageReportException();
+        }
+    }
+
+    private void validateCafeImageReportThreshold(Member author, CafeImage cafeImage) {
+        if (cafeImage.isReportThresholdExceeded()) {
+            author.incrementMemberReportCount();
+            cafeImage.maskCafeImage();
+        }
     }
 
     @EventListener
