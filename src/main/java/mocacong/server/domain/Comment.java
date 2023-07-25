@@ -38,6 +38,9 @@ public class Comment extends BaseTime {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports = new ArrayList<>();
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentLike> commentLikes = new ArrayList<>();
+
     @Column(name = "is_masked")
     private boolean isMasked;
 
@@ -112,4 +115,9 @@ public class Comment extends BaseTime {
     public void updateIsMasked(boolean isMasked) {
         this.isMasked= isMasked;
     }
+
+    public int getLikeCounts() {
+        return commentLikes.size();
+    }
+
 }

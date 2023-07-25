@@ -12,5 +12,6 @@ public class CommentResponse {
     private String imgUrl;
     private String nickname;
     private String content;
+    private int likeCount;
     private Boolean isMe;
 }

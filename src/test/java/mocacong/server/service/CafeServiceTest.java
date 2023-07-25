@@ -48,6 +48,8 @@ class CafeServiceTest {
     private FavoriteRepository favoriteRepository;
     @Autowired
     private CafeImageRepository cafeImageRepository;
+    @Autowired
+    private CommentLikeRepository commentLikeRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
@@ -164,6 +166,51 @@ class CafeServiceTest {
                 () -> assertThat(actual.getComments())
                         .extracting("nickname")
                         .containsExactlyInAnyOrder("케이", "메리", "케이")
+        );
+    }
+
+    @Test
+    @DisplayName("코멘트에 좋아요가 있는 카페를 조회한다")
+    void findCafeWithCommentLike() {
+        Member member1 = new Member("kth990303@naver.com", "encodePassword", "케이");
+        memberRepository.save(member1);
+        Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
+        memberRepository.save(member2);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
+                new CafeReviewRequest(1, "group", "느려요", "없어요",
+                        "불편해요", "없어요", "북적북적해요", "불편해요"));
+        cafeService.saveCafeReview(member2.getId(), cafe.getMapId(),
+                new CafeReviewRequest(2, "both", "느려요", "없어요",
+                        "깨끗해요", "없어요", null, "보통이에요"));
+        Comment comment1 = new Comment(cafe, member1, "이 카페 조금 아쉬운 점이 많아요 ㅠㅠ");
+        commentRepository.save(comment1);
+        Comment comment2 = new Comment(cafe, member2, "와이파이가 왜케 느릴까요...");
+        commentRepository.save(comment2);
+        Comment comment3 = new Comment(cafe, member1, "다시 와봐도 똑같네요. 리뷰 수정할까 하다가 그대로 남겨요..");
+        commentRepository.save(comment3);
+        CommentLike commentLike1 = new CommentLike(member1, comment2);
+        commentLikeRepository.save(commentLike1);
+        CommentLike commentLike2 = new CommentLike(member2, comment1);
+        commentLikeRepository.save(commentLike2);
+
+        FindCafeResponse actual = cafeService.findCafeByMapId(member1.getId(), cafe.getMapId());
+
+        assertAll(
+                () -> assertThat(actual.getFavorite()).isFalse(),
+                () -> assertThat(actual.getFavoriteId()).isNull(),
+                () -> assertThat(actual.getScore()).isEqualTo(1.5),
+                () -> assertThat(actual.getMyScore()).isEqualTo(1),
+                () -> assertThat(actual.getStudyType()).isEqualTo("group"),
+                () -> assertThat(actual.getReviewsCount()).isEqualTo(2),
+                () -> assertThat(actual.getCommentsCount()).isEqualTo(3),
+                () -> assertThat(actual.getComments())
+                        .extracting("nickname")
+                        .containsExactlyInAnyOrder("케이", "메리", "케이"),
+                () -> assertThat(actual.getComments())
+                        .extracting("likeCount")
+                        .containsExactlyInAnyOrder(1, 1, 0)
         );
     }
 
