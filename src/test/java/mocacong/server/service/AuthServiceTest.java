@@ -50,7 +50,8 @@ class AuthServiceTest {
 
         assertAll(
                 () -> assertThat(member.getStatus()).isEqualTo(Status.ACTIVE),
-                () -> assertNotNull(tokenResponse.getToken()),
+                () -> assertNotNull(tokenResponse.getAccessToken()),
+                () -> assertNotNull(tokenResponse.getRefreshToken()),
                 () -> assertThat(tokenResponse.getUserReportCount()).isEqualTo(0)
         );
     }
