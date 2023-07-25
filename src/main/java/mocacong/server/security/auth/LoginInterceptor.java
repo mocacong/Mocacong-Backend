@@ -64,7 +64,6 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
     }
 
-
     private boolean isSwaggerRequest(HttpServletRequest request) {
         String uri = request.getRequestURI();
         return uri.contains("swagger") || uri.contains("api-docs") || uri.contains("webjars");
