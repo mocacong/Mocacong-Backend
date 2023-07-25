@@ -77,20 +77,23 @@ public class AuthService {
                             .orElseThrow(NotFoundMemberException::new);
                     validateStatus(findMember);
                     int userReportCount = findMember.getReportCount();
-                    String token = issueAccessToken(findMember);
+                    String accessToken = issueAccessToken(findMember);
+                    String refreshToken = issueRefreshToken();
+
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
                     if (!findMember.isRegisteredOAuthMember()) {
-                        return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId,
-                                userReportCount);
+                        return new OAuthTokenResponse(accessToken, refreshToken, findMember.getEmail(),
+                                false, platformId, userReportCount);
                     }
-                    return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId,
-                            userReportCount);
+                    return new OAuthTokenResponse(accessToken, refreshToken, findMember.getEmail(),
+                            true, platformId, userReportCount);
                 })
                 .orElseGet(() -> {
                     Member oauthMember = new Member(email, platform, platformId, Status.ACTIVE);
                     Member savedMember = memberRepository.save(oauthMember);
-                    String token = issueAccessToken(savedMember);
-                    return new OAuthTokenResponse(token, email, false, platformId,
+                    String accessToken = issueAccessToken(savedMember);
+                    String refreshToken = issueRefreshToken();
+                    return new OAuthTokenResponse(accessToken, refreshToken, email, false, platformId,
                             savedMember.getReportCount());
                 });
     }
