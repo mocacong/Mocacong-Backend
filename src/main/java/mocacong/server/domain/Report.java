@@ -11,7 +11,7 @@ import javax.persistence.*;
         @UniqueConstraint(columnNames = { "cafe_image_id", "member_id" })
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Report {
+public class Report extends BaseTime {
 
     private static final int MAXIMUM_COMMENT_LENGTH = 200;
 
