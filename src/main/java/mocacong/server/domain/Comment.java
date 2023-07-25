@@ -110,6 +110,6 @@ public class Comment extends BaseTime {
     }
 
     public void updateIsMasked(boolean isMasked) {
-        this.isMasked= isMasked;
+        this.isMasked = isMasked;
     }
 }

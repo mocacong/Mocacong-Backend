@@ -1,10 +1,5 @@
 package mocacong.server.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -34,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -384,6 +380,7 @@ public class CafeService {
 
     @Transactional
     public void deleteNotUsedCafeImages() {
+        //TODO: isMasked == false 조건 추가
         List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalse();
         List<String> imgUrls = cafeImages.stream()
                 .map(CafeImage::getImgUrl)

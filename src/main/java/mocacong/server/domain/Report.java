@@ -7,7 +7,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "report", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "comment_id", "member_id" })
+        @UniqueConstraint(columnNames = { "comment_id", "member_id" }),
+        @UniqueConstraint(columnNames = { "cafe_image_id", "member_id" })
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report {
@@ -22,6 +23,10 @@ public class Report {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cafe_image_id")
+    private CafeImage cafeImage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -39,6 +44,12 @@ public class Report {
         this.reporter = reporter;
         this.reportReason = reportReason;
         this.originalContent = comment.getContent();
+    }
+
+    public Report(CafeImage cafeImage, Member reporter, ReportReason reportReason) {
+        this.cafeImage = cafeImage;
+        this.reporter = reporter;
+        this.reportReason = reportReason;
     }
 
     public Member getReporter() {
