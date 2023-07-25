@@ -1,7 +1,7 @@
 package mocacong.server.security.auth.kakao;
 
 import feign.FeignException;
-import mocacong.server.exception.unauthorized.InvalidTokenException;
+import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -43,7 +43,7 @@ public class KakaoOAuthUserProvider {
         try {
             return kakaoAccessTokenClient.getToken(kakaoAccessTokenRequest);
         } catch (FeignException e) {
-            throw new InvalidTokenException("KAKAO OAuth 인가 코드가 올바르지 않습니다.");
+            throw new InvalidAccessTokenException("KAKAO OAuth 인가 코드가 올바르지 않습니다.");
         }
     }
 }

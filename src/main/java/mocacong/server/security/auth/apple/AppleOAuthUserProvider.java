@@ -2,7 +2,7 @@ package mocacong.server.security.auth.apple;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.exception.unauthorized.InvalidTokenException;
+import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +31,7 @@ public class AppleOAuthUserProvider {
 
     private void validateClaims(Claims claims) {
         if (!appleClaimsValidator.isValid(claims)) {
-            throw new InvalidTokenException("Apple OAuth Claims 값이 올바르지 않습니다.");
+            throw new InvalidAccessTokenException("Apple OAuth Claims 값이 올바르지 않습니다.");
         }
     }
 }

@@ -1,19 +1,20 @@
 package mocacong.server.security.auth.kakao;
 
 import feign.FeignException;
-import mocacong.server.exception.unauthorized.InvalidTokenException;
+import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class KakaoOAuthUserProviderTest {
@@ -51,6 +52,6 @@ class KakaoOAuthUserProviderTest {
     void getKakaoPlatformMemberWhenInvalidAuthorizationCode() {
         when(kakaoAccessTokenClient.getToken(any())).thenThrow(FeignException.class);
         assertThatThrownBy(() -> kakaoOAuthUserProvider.getKakaoPlatformMember("invalid_token"))
-                .isInstanceOf(InvalidTokenException.class);
+                .isInstanceOf(InvalidAccessTokenException.class);
     }
 }

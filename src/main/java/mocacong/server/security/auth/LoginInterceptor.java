@@ -3,7 +3,7 @@ package mocacong.server.security.auth;
 import io.jsonwebtoken.ExpiredJwtException;
 import mocacong.server.domain.RefreshToken;
 import mocacong.server.exception.notfound.NotFoundMemberException;
-import mocacong.server.exception.unauthorized.TokenExpiredException;
+import mocacong.server.exception.unauthorized.AccessTokenExpiredException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.repository.RefreshTokenRepository;
 import org.springframework.http.HttpMethod;
@@ -41,7 +41,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         } catch (ExpiredJwtException e) {
             // Access Token이 만료된 경우
             RefreshToken foundTokenInfo = refreshTokenRepository.findByAccessToken(accessToken)
-                    .orElseThrow(TokenExpiredException::new);
+                    .orElseThrow(AccessTokenExpiredException::new);
 
             String refreshToken = foundTokenInfo.getRefreshToken();
             jwtTokenProvider.validateRefreshToken(refreshToken);

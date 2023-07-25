@@ -1,10 +1,12 @@
 package mocacong.server.security.auth;
 
-import mocacong.server.exception.unauthorized.InvalidTokenException;
-import mocacong.server.exception.unauthorized.TokenExpiredException;
+import io.jsonwebtoken.*;
+import mocacong.server.exception.unauthorized.AccessTokenExpiredException;
+import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
+import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
+import mocacong.server.exception.unauthorized.RefreshTokenExpiredException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import io.jsonwebtoken.*;
 
 import java.util.Date;
 
@@ -56,9 +58,9 @@ public class JwtTokenProvider {
         try {
             accessTokenJwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new TokenExpiredException();
+            throw new AccessTokenExpiredException();
         } catch (JwtException e) {
-            throw new InvalidTokenException();
+            throw new InvalidAccessTokenException();
         }
     }
 
@@ -66,9 +68,9 @@ public class JwtTokenProvider {
         try {
             refreshTokenJwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new TokenExpiredException();
+            throw new RefreshTokenExpiredException();
         } catch (JwtException e) {
-            throw new InvalidTokenException();
+            throw new InvalidRefreshTokenException();
         }
     }
 
@@ -76,9 +78,9 @@ public class JwtTokenProvider {
         try {
             return accessTokenJwtParser.parseClaimsJws(token).getBody().getSubject();
         } catch (ExpiredJwtException e) {
-            throw new TokenExpiredException();
+            throw new AccessTokenExpiredException();
         } catch (JwtException e) {
-            throw new InvalidTokenException();
+            throw new InvalidAccessTokenException();
         }
     }
 }
