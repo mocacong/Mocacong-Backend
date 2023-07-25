@@ -6,11 +6,12 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 import javax.persistence.Id;
+import java.io.Serializable;
 
 @AllArgsConstructor
 @Getter
 @RedisHash(value = "jwtToken", timeToLive = 60*60*24*3)
-public class RefreshToken {
+public class RefreshToken implements Serializable {
 
     @Id
     private String id;
@@ -19,5 +20,4 @@ public class RefreshToken {
 
     @Indexed
     private String accessToken;
-
 }

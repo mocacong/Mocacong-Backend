@@ -3,7 +3,6 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
-import mocacong.server.domain.RefreshToken;
 import mocacong.server.domain.Status;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
@@ -14,7 +13,6 @@ import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.unauthorized.InactiveMemberException;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.repository.RefreshTokenRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
@@ -27,7 +25,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AppleOAuthUserProvider appleOAuthUserProvider;
@@ -43,7 +41,7 @@ public class AuthService {
         String refreshToken = issueRefreshToken();
 
         // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰)
-        refreshTokenRepository.save(new RefreshToken(String.valueOf(findMember.getId()), refreshToken, accessToken));
+        refreshTokenService.saveTokenInfo(findMember.getId(), refreshToken, accessToken);
         int userReportCount = findMember.getReportCount();
 
         return TokenResponse.from(accessToken, refreshToken, userReportCount);
@@ -79,6 +77,7 @@ public class AuthService {
                     int userReportCount = findMember.getReportCount();
                     String accessToken = issueAccessToken(findMember);
                     String refreshToken = issueRefreshToken();
+                    refreshTokenService.saveTokenInfo(findMember.getId(), refreshToken, accessToken);
 
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
                     if (!findMember.isRegisteredOAuthMember()) {
@@ -93,6 +92,7 @@ public class AuthService {
                     Member savedMember = memberRepository.save(oauthMember);
                     String accessToken = issueAccessToken(savedMember);
                     String refreshToken = issueRefreshToken();
+                    refreshTokenService.saveTokenInfo(savedMember.getId(), refreshToken, accessToken);
                     return new OAuthTokenResponse(accessToken, refreshToken, email, false, platformId,
                             savedMember.getReportCount());
                 });
