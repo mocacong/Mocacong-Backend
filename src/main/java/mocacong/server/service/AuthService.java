@@ -3,6 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.RefreshToken;
 import mocacong.server.domain.Status;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
@@ -13,6 +14,7 @@ import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.unauthorized.InactiveMemberException;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.repository.RefreshTokenRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AppleOAuthUserProvider appleOAuthUserProvider;
@@ -37,11 +40,16 @@ public class AuthService {
         validateStatus(findMember);
 
         String token = issueToken(findMember);
+        String refreshToken = issueRefreshToken();
+
+        // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰)
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(findMember.getId()), refreshToken, token));
         int userReportCount = findMember.getReportCount();
 
-        return TokenResponse.from(token, userReportCount);
+        return TokenResponse.from(refreshToken, token, userReportCount);
     }
 
+    // TODO: OAuth 리프레시 토큰 도입
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
         OAuthPlatformMemberResponse applePlatformMember =
                 appleOAuthUserProvider.getApplePlatformMember(request.getToken());
@@ -89,6 +97,10 @@ public class AuthService {
 
     private String issueToken(final Member findMember) {
         return jwtTokenProvider.createToken(findMember.getId());
+    }
+
+    private String issueRefreshToken() {
+        return jwtTokenProvider.createRefreshToken();
     }
 
     private void validatePassword(final Member findMember, final String password) {

@@ -11,12 +11,15 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
     private final String secretKey;
+    private final String refreshSecretKey;
     private final long validityInMilliseconds;
     private final JwtParser jwtParser;
 
     public JwtTokenProvider(@Value("${security.jwt.token.secret-key}") String secretKey,
+                            @Value("${security.jwt.token.refresh-secret-key}") String refreshSecretKey,
                             @Value("${security.jwt.token.expire-length}") long validityInMilliseconds) {
         this.secretKey = secretKey;
+        this.refreshSecretKey = refreshSecretKey;
         this.validityInMilliseconds = validityInMilliseconds;
         this.jwtParser = Jwts.parser().setSigningKey(secretKey);
     }
@@ -30,6 +33,20 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
+    public String createRefreshToken() {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + validityInMilliseconds);
+
+        Claims claims = Jwts.claims();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, refreshSecretKey)
                 .compact();
     }
 
