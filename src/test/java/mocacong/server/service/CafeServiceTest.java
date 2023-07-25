@@ -869,7 +869,6 @@ class CafeServiceTest {
         );
     }
 
-
     @Test
     @DisplayName("사용자가 카페 이미지를 총 3개 보다 많이 저장하면 예외가 발생한다.")
     void saveCafeImagesOver3() throws IOException {

@@ -114,7 +114,7 @@ public class ReportService {
 
     private void createCafeImageReport(CafeImage cafeImage, Member reporter, String reportReason) {
         if (cafeImage.hasAlreadyReported(reporter)) {
-            throw new DuplicateReportCommentException();
+            throw new DuplicateReportCafeImageException();
         }
         ReportReason reason = ReportReason.from(reportReason);
         cafeImage.addReport(new Report(cafeImage, reporter, reason));
