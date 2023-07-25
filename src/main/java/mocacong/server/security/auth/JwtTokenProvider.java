@@ -74,7 +74,7 @@ public class JwtTokenProvider {
 
     public String getPayload(String token) {
         try {
-            return jwtParser.parseClaimsJws(token).getBody().getSubject();
+            return accessTokenJwtParser.parseClaimsJws(token).getBody().getSubject();
         } catch (ExpiredJwtException e) {
             throw new TokenExpiredException();
         } catch (JwtException e) {
