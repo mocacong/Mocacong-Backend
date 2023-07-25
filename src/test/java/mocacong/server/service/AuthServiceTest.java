@@ -97,7 +97,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -124,7 +125,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isTrue(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -144,7 +146,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -165,7 +168,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(email),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -186,7 +190,8 @@ class AuthServiceTest {
         memberRepository.save(member);
 
         assertAll(
-                () -> assertThat(response.getToken()).isNotNull(),
+                () -> assertThat(response.getAccessToken()).isNotNull(),
+                () -> assertThat(response.getRefreshToken()).isNotNull(),
                 () -> assertThat(response.getEmail()).isEqualTo(member.getEmail())
         );
     }
