@@ -45,7 +45,6 @@ public class ReportService {
             // 코멘트를 작성한 회원이 탈퇴한 경우
             if (comment.isDeletedCommenter() && comment.isReportThresholdExceeded()) {
                 maskReportedComment(comment);
-                comment.updateIsMasked(true);
             } else {
                 Member commenter = comment.getMember();
                 if (comment.isWrittenByMember(reporter)) {
@@ -54,7 +53,6 @@ public class ReportService {
                 if (comment.isReportThresholdExceeded()) {
                     commenter.incrementMemberReportCount();
                     maskReportedComment(comment);
-                    comment.updateIsMasked(true);
                 }
             }
         } catch (DataIntegrityViolationException e) {
@@ -74,6 +72,7 @@ public class ReportService {
     private void maskReportedComment(Comment comment) {
         comment.maskComment();
         comment.maskAuthor();
+        comment.updateIsMasked(true);
     }
 
     @EventListener
@@ -94,7 +93,6 @@ public class ReportService {
             // 카페 이미지를 등록한 회원이 탈퇴한 경우
             if (cafeImage.isDeletedAuthor() && cafeImage.isReportThresholdExceeded()) {
                 cafeImage.maskCafeImage();
-                cafeImage.updateIsMasked(true);
             } else {
                 Member author = cafeImage.getMember();
                 if (cafeImage.isSavedByMember(reporter)) {
@@ -103,7 +101,6 @@ public class ReportService {
                 if (cafeImage.isReportThresholdExceeded()) {
                     author.incrementMemberReportCount();
                     cafeImage.maskCafeImage();
-                    cafeImage.updateIsMasked(true);
                 }
             }
         } catch (DataIntegrityViolationException e) {

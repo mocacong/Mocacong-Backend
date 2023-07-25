@@ -90,11 +90,8 @@ public class CafeImage extends BaseTime {
         return isDeletedMember() && isReportThresholdExceeded();
     }
 
-    public void updateIsMasked(boolean isMasked) {
-        this.isMasked = isMasked;
-    }
-
     public void maskCafeImage() {
         this.isUsed = false;
+        this.isMasked = true;
     }
 }

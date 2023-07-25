@@ -1221,18 +1221,16 @@ class CafeServiceTest {
         CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member);
         cafeImageRepository.save(cafeImage1);
         CafeImage cafeImage2 = new CafeImage("test_img2.jpg", false, cafe, member);
-        cafeImage2.updateIsMasked(true);
+        cafeImage2.maskCafeImage();
         cafeImageRepository.save(cafeImage2);
         CafeImage cafeImage3 = new CafeImage("test_img3.jpg", false, cafe, member);
-        cafeImage3.updateIsMasked(true);
+        cafeImage3.maskCafeImage();
         cafeImageRepository.save(cafeImage3);
 
         doNothing().when(awsS3Uploader).deleteImages(new DeleteNotUsedImagesEvent(reportedImgUrls));
         cafeService.deleteNotUsedCafeImages();
-
         List<CafeImage> actual = cafeImageRepository.findAll();
-        assertAll(
-                () -> assertThat(actual).hasSize(3)
-        );
+
+        assertThat(actual).hasSize(3);
     }
 }
