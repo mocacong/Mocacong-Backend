@@ -1,10 +1,5 @@
 package mocacong.server.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -34,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -320,8 +316,7 @@ public class CafeService {
         for (MultipartFile cafeImage : cafeImages) {
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
-            cafeImageSaveResponses.add(new CafeImageSaveResponse(cafeImageRepository.save(uploadedCafeImage).getId(),
-                    member.getReportCount()));
+            cafeImageSaveResponses.add(new CafeImageSaveResponse(cafeImageRepository.save(uploadedCafeImage).getId()));
         }
         return new CafeImagesSaveResponse(cafeImageSaveResponses);
     }
