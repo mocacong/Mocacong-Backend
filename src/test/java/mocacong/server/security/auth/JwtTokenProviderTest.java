@@ -21,7 +21,7 @@ class JwtTokenProviderTest {
     public void createToken() {
         Long payload = 1L;
 
-        String token = jwtTokenProvider.createToken(payload);
+        String token = jwtTokenProvider.createAccessToken(payload);
 
         Assertions.assertNotNull(token);
         Assertions.assertTrue(token.length() > 0);
@@ -30,7 +30,7 @@ class JwtTokenProviderTest {
     @DisplayName("올바른 토큰 정보로 payload를 조회한다")
     @Test
     void getPayload() {
-        token = jwtTokenProvider.createToken(1L);
+        token = jwtTokenProvider.createAccessToken(1L);
 
         String payload = jwtTokenProvider.getPayload(token);
 
@@ -53,7 +53,7 @@ class JwtTokenProviderTest {
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider("secret-key", expirationMillis);
         Long expiredPayload = 1L;
 
-        String expiredToken = jwtTokenProvider.createToken(expiredPayload);
+        String expiredToken = jwtTokenProvider.createAccessToken(expiredPayload);
         try {
             Thread.sleep(expirationMillis);
         } catch (InterruptedException e) {
@@ -72,7 +72,7 @@ class JwtTokenProviderTest {
         String wrongSecretKey = "wrong-secret-key";
 
         JwtTokenProvider tokenProvider = new JwtTokenProvider(correctSecretKey, 3600000L);
-        String token = tokenProvider.createToken(payload);
+        String token = tokenProvider.createAccessToken(payload);
 
         assertThatExceptionOfType(InvalidTokenException.class)
                 .isThrownBy(() -> {

@@ -24,7 +24,7 @@ public class JwtTokenProvider {
         this.jwtParser = Jwts.parser().setSigningKey(secretKey);
     }
 
-    public String createToken(Long memberId) {
+    public String createAccessToken(Long memberId) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 

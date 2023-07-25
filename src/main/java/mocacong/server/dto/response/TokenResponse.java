@@ -10,11 +10,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class TokenResponse {
-    private String token;
+    private String accessToken;
+
+    private String refreshToken;
 
     private int userReportCount;
 
-    public static TokenResponse from(final String token, int userReportCount) {
-        return new TokenResponse(token, userReportCount);
+    public static TokenResponse from(final String accessToken, final String refreshToken, int userReportCount) {
+        return new TokenResponse(accessToken, refreshToken, userReportCount);
     }
 }

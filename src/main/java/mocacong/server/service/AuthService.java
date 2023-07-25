@@ -39,14 +39,14 @@ public class AuthService {
         validatePassword(findMember, request.getPassword());
         validateStatus(findMember);
 
-        String token = issueToken(findMember);
+        String accessToken = issueAccessToken(findMember);
         String refreshToken = issueRefreshToken();
 
         // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰)
-        refreshTokenRepository.save(new RefreshToken(String.valueOf(findMember.getId()), refreshToken, token));
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(findMember.getId()), refreshToken, accessToken));
         int userReportCount = findMember.getReportCount();
 
-        return TokenResponse.from(refreshToken, token, userReportCount);
+        return TokenResponse.from(accessToken, refreshToken, userReportCount);
     }
 
     // TODO: OAuth 리프레시 토큰 도입
@@ -77,7 +77,7 @@ public class AuthService {
                             .orElseThrow(NotFoundMemberException::new);
                     validateStatus(findMember);
                     int userReportCount = findMember.getReportCount();
-                    String token = issueToken(findMember);
+                    String token = issueAccessToken(findMember);
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
                     if (!findMember.isRegisteredOAuthMember()) {
                         return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId,
@@ -89,14 +89,14 @@ public class AuthService {
                 .orElseGet(() -> {
                     Member oauthMember = new Member(email, platform, platformId, Status.ACTIVE);
                     Member savedMember = memberRepository.save(oauthMember);
-                    String token = issueToken(savedMember);
+                    String token = issueAccessToken(savedMember);
                     return new OAuthTokenResponse(token, email, false, platformId,
                             savedMember.getReportCount());
                 });
     }
 
-    private String issueToken(final Member findMember) {
-        return jwtTokenProvider.createToken(findMember.getId());
+    private String issueAccessToken(final Member findMember) {
+        return jwtTokenProvider.createAccessToken(findMember.getId());
     }
 
     private String issueRefreshToken() {
