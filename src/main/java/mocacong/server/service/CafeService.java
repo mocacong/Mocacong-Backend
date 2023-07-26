@@ -379,7 +379,7 @@ public class CafeService {
 
     @Transactional
     public void deleteNotUsedCafeImages() {
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalse();
+        List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalseAndIsMaskedFalse();
         List<String> imgUrls = cafeImages.stream()
                 .map(CafeImage::getImgUrl)
                 .collect(Collectors.toList());

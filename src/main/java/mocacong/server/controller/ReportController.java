@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import mocacong.server.dto.request.CafeImageReportRequest;
 import mocacong.server.dto.request.CommentReportRequest;
+import mocacong.server.dto.response.CafeImageReportResponse;
 import mocacong.server.dto.response.CommentReportResponse;
 import mocacong.server.security.auth.LoginUserId;
 import mocacong.server.service.ReportService;
@@ -30,6 +32,18 @@ public class ReportController {
             @RequestBody @Valid CommentReportRequest request
     ) {
         CommentReportResponse response = reportService.reportComment(memberId, commentId, request.getMyReportReason());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "카페 이미지 신고")
+    @SecurityRequirement(name = "JWT")
+    @PostMapping("/img/{cafeImageId}")
+    public ResponseEntity<CafeImageReportResponse> reportCafeImage(
+            @LoginUserId Long memberId,
+            @PathVariable Long cafeImageId,
+            @RequestBody @Valid CafeImageReportRequest request
+    ) {
+        CafeImageReportResponse response = reportService.reportCafeImage(memberId, cafeImageId, request.getMyReportReason());
         return ResponseEntity.ok(response);
     }
 }
