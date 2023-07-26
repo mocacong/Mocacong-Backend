@@ -3,6 +3,7 @@ package mocacong.server.service;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.Status;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.KakaoLoginRequest;
@@ -10,6 +11,7 @@ import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.exception.unauthorized.InactiveMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
@@ -29,12 +31,15 @@ public class AuthService {
     private final KakaoOAuthUserProvider kakaoOAuthUserProvider;
 
     public TokenResponse login(AuthLoginRequest request) {
-        Member findMember = memberRepository.findByEmail(request.getEmail())
+        Member findMember = memberRepository.findByEmailAndPlatform(request.getEmail(), Platform.MOCACONG)
                 .orElseThrow(NotFoundMemberException::new);
         validatePassword(findMember, request.getPassword());
+        validateStatus(findMember);
 
         String token = issueToken(findMember);
-        return TokenResponse.from(token);
+        int userReportCount = findMember.getReportCount();
+
+        return TokenResponse.from(token, userReportCount);
     }
 
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
@@ -62,30 +67,39 @@ public class AuthService {
                 .map(memberId -> {
                     Member findMember = memberRepository.findById(memberId)
                             .orElseThrow(NotFoundMemberException::new);
+                    validateStatus(findMember);
+                    int userReportCount = findMember.getReportCount();
                     String token = issueToken(findMember);
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
                     if (!findMember.isRegisteredOAuthMember()) {
-                        return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId);
+                        return new OAuthTokenResponse(token, findMember.getEmail(), false, platformId,
+                                userReportCount);
                     }
-                    return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId);
+                    return new OAuthTokenResponse(token, findMember.getEmail(), true, platformId,
+                            userReportCount);
                 })
                 .orElseGet(() -> {
-                    Member oauthMember = new Member(email, platform, platformId);
+                    Member oauthMember = new Member(email, platform, platformId, Status.ACTIVE);
                     Member savedMember = memberRepository.save(oauthMember);
                     String token = issueToken(savedMember);
-                    return new OAuthTokenResponse(token, email, false, platformId);
+                    return new OAuthTokenResponse(token, email, false, platformId,
+                            savedMember.getReportCount());
                 });
     }
 
     private String issueToken(final Member findMember) {
-        String email = findMember.getEmail();
-
-        return jwtTokenProvider.createToken(email);
+        return jwtTokenProvider.createToken(findMember.getId());
     }
 
     private void validatePassword(final Member findMember, final String password) {
         if (!passwordEncoder.matches(password, findMember.getPassword())) {
             throw new PasswordMismatchException();
+        }
+    }
+
+    private void validateStatus(final Member findMember) {
+        if (findMember.getStatus() != Status.ACTIVE) {
+            throw new InactiveMemberException();
         }
     }
 }

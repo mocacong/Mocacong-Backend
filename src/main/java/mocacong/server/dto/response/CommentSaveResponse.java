@@ -9,4 +9,6 @@ import lombok.*;
 public class CommentSaveResponse {
 
     private Long id;
+
+    private int userReportCount;
 }

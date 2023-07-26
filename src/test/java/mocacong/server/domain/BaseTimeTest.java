@@ -26,7 +26,7 @@ class BaseTimeTest {
     @Test
     @DisplayName("멤버를 저장하면 생성 시각이 자동으로 저장된다")
     public void memberCreatedAtNow() {
-        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리");
 
         memberRepository.save(member);
 
@@ -36,7 +36,7 @@ class BaseTimeTest {
     @Test
     @DisplayName("카페 객체를 수정하면 수정 시각이 자동으로 저장된다")
     public void updateCafeAtNow() {
-        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "케이", "010-1234-5678");
+        Member member = new Member("kth990303@naver.com", "a1b2c3d4", "케이");
         memberRepository.save(member);
         Cafe cafe = new Cafe("2143154352323", "케이카페");
         cafeRepository.save(cafe);

@@ -7,20 +7,20 @@ import mocacong.server.dto.request.KakaoLoginRequest;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
-import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
+import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.kakao.KakaoOAuthUserProvider;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AuthAcceptanceTest extends AcceptanceTest {
@@ -33,7 +33,7 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("회원이 정상적으로 로그인한다")
     void login() {
-        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리", "010-1234-5678");
+        MemberSignUpRequest request = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리");
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)

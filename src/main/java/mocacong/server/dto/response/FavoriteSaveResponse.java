@@ -9,4 +9,6 @@ import lombok.*;
 public class FavoriteSaveResponse {
 
     private Long favoriteId;
+
+    private int userReportCount;
 }

@@ -3,10 +3,13 @@ package mocacong.server.support.logging;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -30,7 +33,7 @@ public class LoggingAspect {
     }
 
     @Around("allComponents()")
-    public Object doLogTrace(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object trace(ProceedingJoinPoint joinPoint) throws Throwable {
         final String message = joinPoint.getSignature().toShortString();
         final Object[] args = joinPoint.getArgs();
         try {
@@ -45,7 +48,7 @@ public class LoggingAspect {
     }
 
     @Around("allController()")
-    public Object doLogRequest(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object request(ProceedingJoinPoint joinPoint) throws Throwable {
         loggingStatusManager.syncStatus();
         String taskId = loggingStatusManager.getTaskId();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -60,5 +63,18 @@ public class LoggingAspect {
         } finally {
             loggingStatusManager.release();
         }
+    }
+
+    @AfterReturning(
+            value = "execution(public * mocacong.server.controller..*Controller.*(..))",
+            returning = "result"
+    )
+    public void response(JoinPoint joinPoint, Object result) {
+        String taskId = loggingStatusManager.getTaskId();
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        String controllerMethodName = methodSignature.getMethod()
+                .getName();
+
+        log.info("[{}] method: {}, result: {}", taskId, controllerMethodName, result);
     }
 }

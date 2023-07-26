@@ -2,6 +2,7 @@ package mocacong.server.repository;
 
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.cafedetail.StudyType;
+import mocacong.server.dto.response.MyReviewCafeResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,18 +19,19 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
 
     @Query("select c.mapId from Favorite f " +
             "join f.cafe c join f.member m " +
-            "where c.mapId in :mapIds and m.email = :email")
-    List<String> findNearCafeMapIdsByMyFavoriteCafes(String email, List<String> mapIds);
+            "where c.mapId in :mapIds and m.id = :id")
+    List<String> findNearCafeMapIdsByMyFavoriteCafes(Long id, List<String> mapIds);
 
     @Query("select c from Favorite f " +
             "join f.cafe c " +
             "join f.member m " +
-            "where m.email = :email")
-    Slice<Cafe> findByMyFavoriteCafes(String email, Pageable pageRequest);
+            "where m.id = :id")
+    Slice<Cafe> findByMyFavoriteCafes(Long id, Pageable pageRequest);
 
-    @Query("select c from Review r " +
+    @Query("select new mocacong.server.dto.response.MyReviewCafeResponse(c.mapId,c.name,r.cafeDetail.studyType,s.score) from Review r " +
             "join r.cafe c " +
             "join r.member m " +
-            "where m.email = :email")
-    Slice<Cafe> findByMyReviewCafes(String email, Pageable pageRequest);
+            "join c.score s "+
+            "where m.id = :id and s.member.id = :id")
+    Slice<MyReviewCafeResponse> findMyReviewCafesById(Long id, Pageable pageRequest);
 }

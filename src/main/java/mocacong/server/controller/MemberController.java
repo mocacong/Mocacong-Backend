@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
-import mocacong.server.security.auth.LoginUserEmail;
+import mocacong.server.security.auth.LoginUserId;
 import mocacong.server.service.CafeService;
 import mocacong.server.service.MemberService;
 import org.springframework.http.MediaType;
@@ -63,20 +63,20 @@ public class MemberController {
     @Operation(summary = "마이페이지 조회")
     @SecurityRequirement(name = "JWT")
     @GetMapping("/mypage")
-    public ResponseEntity<MyPageResponse> findMyInfo(@LoginUserEmail String email) {
-        MyPageResponse response = memberService.findMyInfo(email);
+    public ResponseEntity<MyPageResponse> findMyInfo(@LoginUserId Long memberId) {
+        MyPageResponse response = memberService.findMyInfo(memberId);
         return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "마이페이지 - 즐겨찾기 조회")
     @SecurityRequirement(name = "JWT")
     @GetMapping("/mypage/stars")
-    public ResponseEntity<MyFavoriteCafesResponse> findMyInfo(
-            @LoginUserEmail String email,
+    public ResponseEntity<MyFavoriteCafesResponse> findMyFavoriteCafes(
+            @LoginUserId Long memberId,
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count
     ) {
-        MyFavoriteCafesResponse response = cafeService.findMyFavoriteCafes(email, page, count);
+        MyFavoriteCafesResponse response = cafeService.findMyFavoriteCafes(memberId, page, count);
         return ResponseEntity.ok(response);
     }
 
@@ -84,11 +84,11 @@ public class MemberController {
     @SecurityRequirement(name = "JWT")
     @GetMapping("/mypage/reviews")
     public ResponseEntity<MyReviewCafesResponse> findMyReviewCafes(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count
     ) {
-        MyReviewCafesResponse response = cafeService.findMyReviewCafes(email, page, count);
+        MyReviewCafesResponse response = cafeService.findMyReviewCafes(memberId, page, count);
         return ResponseEntity.ok(response);
     }
 
@@ -96,11 +96,11 @@ public class MemberController {
     @SecurityRequirement(name = "JWT")
     @GetMapping("/mypage/comments")
     public ResponseEntity<MyCommentCafesResponse> findMyComments(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @RequestParam("page") final Integer page,
             @RequestParam("count") final int count
     ) {
-        MyCommentCafesResponse response = cafeService.findMyCommentCafes(email, page, count);
+        MyCommentCafesResponse response = cafeService.findMyCommentCafes(memberId, page, count);
         return ResponseEntity.ok(response);
     }
 
@@ -108,10 +108,10 @@ public class MemberController {
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/mypage/img", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateProfileImage(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @RequestParam(value = "file", required = false) MultipartFile multipartFile
     ) {
-        memberService.updateProfileImage(email, multipartFile);
+        memberService.updateProfileImage(memberId, multipartFile);
         return ResponseEntity.ok().build();
     }
 
@@ -119,10 +119,10 @@ public class MemberController {
     @SecurityRequirement(name = "JWT")
     @PutMapping(value = "/info")
     public ResponseEntity<Void> updateProfileInfo(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @RequestBody @Valid MemberProfileUpdateRequest request
     ) {
-        memberService.updateProfileInfo(email, request);
+        memberService.updateProfileInfo(memberId, request);
         return ResponseEntity.ok().build();
     }
 
@@ -130,9 +130,9 @@ public class MemberController {
     @SecurityRequirement(name = "JWT")
     @GetMapping(value = "/info")
     public ResponseEntity<GetUpdateProfileInfoResponse> getUpdateProfileInfo(
-            @LoginUserEmail String email
+            @LoginUserId Long memberId
     ) {
-        GetUpdateProfileInfoResponse response = memberService.getUpdateProfileInfo(email);
+        GetUpdateProfileInfoResponse response = memberService.getUpdateProfileInfo(memberId);
         return ResponseEntity.ok(response);
     }
 
@@ -140,10 +140,10 @@ public class MemberController {
     @SecurityRequirement(name = "JWT")
     @PostMapping("/info/password")
     public ResponseEntity<PasswordVerifyResponse> passwordVerify(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @RequestBody @Valid PasswordVerifyRequest request
     ) {
-        PasswordVerifyResponse response = memberService.verifyPassword(email, request);
+        PasswordVerifyResponse response = memberService.verifyPassword(memberId, request);
         return ResponseEntity.ok(response);
     }
 
@@ -151,18 +151,18 @@ public class MemberController {
     @SecurityRequirement(name = "JWT")
     @PutMapping("/info/reset-password")
     public ResponseEntity<Void> findAndResetPassword(
-            @LoginUserEmail String email,
+            @LoginUserId Long memberId,
             @RequestBody @Valid ResetPasswordRequest request
     ) {
-        memberService.resetPassword(email, request);
+        memberService.resetPassword(memberId, request);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원탈퇴")
     @SecurityRequirement(name = "JWT")
     @DeleteMapping
-    public ResponseEntity<Void> delete(@LoginUserEmail String email) {
-        memberService.delete(email);
+    public ResponseEntity<Void> delete(@LoginUserId Long memberId) {
+        memberService.delete(memberId);
         return ResponseEntity.ok().build();
     }
 

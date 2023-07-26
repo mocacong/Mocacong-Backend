@@ -1,9 +1,5 @@
 package mocacong.server.service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.*;
 import mocacong.server.domain.cafedetail.*;
@@ -11,14 +7,14 @@ import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
 import mocacong.server.exception.badrequest.DuplicateCafeException;
-import mocacong.server.exception.badrequest.ExceedCafeImagesCountsException;
+import mocacong.server.exception.badrequest.ExceedCageImagesTotalCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
 import mocacong.server.repository.*;
+import mocacong.server.service.event.DeleteMemberEvent;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
-import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,13 +28,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class CafeService {
 
-    public static final int CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS = 3;
+    private static final int CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS = 3;
     private static final int CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS = 3;
-    private static final int CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS = 5;
     private final CafeRepository cafeRepository;
     private final MemberRepository memberRepository;
     private final ScoreRepository scoreRepository;
@@ -62,11 +63,11 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public FindCafeResponse findCafeByMapId(String email, String mapId) {
+    public FindCafeResponse findCafeByMapId(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         CafeDetail cafeDetail = cafe.getCafeDetail();
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Score scoreByLoginUser = scoreRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
@@ -95,11 +96,11 @@ public class CafeService {
 
     @Cacheable(key = "#mapId", value = "cafePreviewCache", cacheManager = "cafeCacheManager")
     @Transactional(readOnly = true)
-    public PreviewCafeResponse previewCafeByMapId(String email, String mapId) {
+    public PreviewCafeResponse previewCafeByMapId(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
         CafeDetail cafeDetail = cafe.getCafeDetail();
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
@@ -117,19 +118,24 @@ public class CafeService {
                 .limit(CAFE_SHOW_PAGE_COMMENTS_LIMIT_COUNTS)
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
-                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), true);
+                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(),
+                                comment.getContent(), true);
                     } else {
-                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(),
+                                comment.getWriterNickname(), comment.getContent(), false);
                     }
                 })
                 .collect(Collectors.toList());
     }
 
     private List<CafeImageResponse> findCafeImageResponses(Cafe cafe, Member member) {
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId());
+        Pageable pageable = PageRequest.of(0, 5);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
+
         return cafeImages
+                .getContent()
                 .stream()
-                .limit(CAFE_SHOW_PAGE_IMAGE_LIMIT_COUNTS)
                 .map(cafeImage -> {
                     Boolean isMe = cafeImage.isOwned(member);
                     return new CafeImageResponse(cafeImage.getId(), cafeImage.getImgUrl(), isMe);
@@ -138,35 +144,30 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public MyFavoriteCafesResponse findMyFavoriteCafes(String email, Integer page, int count) {
-        Slice<Cafe> myFavoriteCafes = cafeRepository.findByMyFavoriteCafes(email, PageRequest.of(page, count));
+    public MyFavoriteCafesResponse findMyFavoriteCafes(Long memberId, Integer page, int count) {
+        Slice<Cafe> myFavoriteCafes = cafeRepository.findByMyFavoriteCafes(memberId, PageRequest.of(page, count));
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.findAverageScore()))
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
 
     @Transactional(readOnly = true)
-    public MyReviewCafesResponse findMyReviewCafes(String email, Integer page, int count) {
-        Member member = memberRepository.findByEmail(email)
+    public MyReviewCafesResponse findMyReviewCafes(Long memberId, Integer page, int count) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
-        Slice<Cafe> myReviewCafes = cafeRepository.findByMyReviewCafes(email, PageRequest.of(page, count));
-        List<MyReviewCafeResponse> responses = myReviewCafes
-                .getContent()
-                .stream()
-                .map(cafe -> {
-                    int score = scoreRepository.findScoreByCafeIdAndMemberId(cafe.getId(), member.getId());
-                    return new MyReviewCafeResponse(cafe.getMapId(), cafe.getName(), score);
-                })
-                .collect(Collectors.toList());
+
+        Slice<MyReviewCafeResponse> myReviewCafes =
+                cafeRepository.findMyReviewCafesById(member.getId(), PageRequest.of(page, count));
+        List<MyReviewCafeResponse> responses = myReviewCafes.getContent();
         return new MyReviewCafesResponse(myReviewCafes.isLast(), responses);
     }
 
     @Transactional(readOnly = true)
-    public MyCommentCafesResponse findMyCommentCafes(String email, int page, int count) {
-        Member member = memberRepository.findByEmail(email)
+    public MyCommentCafesResponse findMyCommentCafes(Long memberId, int page, int count) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Slice<Comment> comments = commentRepository.findByMemberId(member.getId(), PageRequest.of(page, count));
 
@@ -174,6 +175,7 @@ public class CafeService {
                 .map(comment -> new MyCommentCafeResponse(
                         comment.getCafe().getMapId(),
                         comment.getCafe().getName(),
+                        comment.getCafe().getStudyType(),
                         comment.getContent()
                 ))
                 .collect(Collectors.toList());
@@ -182,10 +184,10 @@ public class CafeService {
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
-    public CafeReviewResponse saveCafeReview(String email, String mapId, CafeReviewRequest request) {
+    public CafeReviewResponse saveCafeReview(Long memberId, String mapId, CafeReviewRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         checkAlreadySaveCafeReview(cafe, member);
 
@@ -193,7 +195,7 @@ public class CafeService {
         em.flush();
         cafe.updateCafeDetails();
 
-        return CafeReviewResponse.of(cafe.findAverageScore(), cafe);
+        return CafeReviewResponse.of(cafe.findAverageScore(), cafe, member);
     }
 
     private void checkAlreadySaveCafeReview(Cafe cafe, Member member) {
@@ -205,7 +207,6 @@ public class CafeService {
 
     private void saveCafeDetails(CafeReviewRequest request, Cafe cafe, Member member) {
         Score score = new Score(request.getMyScore(), member, cafe);
-        scoreRepository.save(score);
         CafeDetail cafeDetail = new CafeDetail(
                 StudyType.from(request.getMyStudyType()),
                 Wifi.from(request.getMyWifi()),
@@ -217,6 +218,7 @@ public class CafeService {
         );
         Review review = new Review(member, cafe, cafeDetail);
         try {
+            scoreRepository.save(score);
             reviewRepository.save(review);
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyExistsCafeReview();
@@ -224,10 +226,10 @@ public class CafeService {
     }
 
     @Transactional(readOnly = true)
-    public CafeMyReviewResponse findMyCafeReview(String email, String mapId) {
+    public CafeMyReviewResponse findMyCafeReview(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         Review review = reviewRepository.findByCafeIdAndMemberId(cafe.getId(), member.getId())
@@ -237,11 +239,12 @@ public class CafeService {
         return CafeMyReviewResponse.of(score, review);
     }
 
+    @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
-    public CafeReviewUpdateResponse updateCafeReview(String email, String mapId, CafeReviewUpdateRequest request) {
+    public CafeReviewUpdateResponse updateCafeReview(Long memberId, String mapId, CafeReviewUpdateRequest request) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         updateCafeReviewDetails(request, cafe, member);
@@ -270,7 +273,7 @@ public class CafeService {
     }
 
     @EventListener
-    public void updateReviewWhenMemberDelete(MemberEvent event) {
+    public void updateReviewWhenMemberDelete(DeleteMemberEvent event) {
         Long memberId = event.getMember()
                 .getId();
         reviewRepository.findAllByMemberId(memberId)
@@ -282,6 +285,7 @@ public class CafeService {
     public CafeFilterStudyTypeResponse filterCafesByStudyType(String studyTypeValue,
                                                               CafeFilterStudyTypeRequest request) {
         List<Cafe> cafes = cafeRepository.findByStudyTypeValue(StudyType.from(studyTypeValue));
+        cafes.addAll(cafeRepository.findByStudyTypeValue(StudyType.BOTH));
         Set<String> filteredCafeMapIds = cafes.stream()
                 .map(Cafe::getMapId)
                 .collect(Collectors.toSet());
@@ -293,42 +297,49 @@ public class CafeService {
         return new CafeFilterStudyTypeResponse(filteredIds);
     }
 
-    public CafeFilterFavoritesResponse filterCafesByFavorites(String email, CafeFilterFavoritesRequest request) {
+    public CafeFilterFavoritesResponse filterCafesByFavorites(Long memberId, CafeFilterFavoritesRequest request) {
         List<String> mapIds = request.getMapIds();
-        List<String> filteredIds = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(email, mapIds);
+        List<String> filteredIds = cafeRepository.findNearCafeMapIdsByMyFavoriteCafes(memberId, mapIds);
 
         return new CafeFilterFavoritesResponse(filteredIds);
     }
 
     @Transactional
-    public void saveCafeImage(String email, String mapId, List<MultipartFile> cafeImages) {
-        validateCafeImagesCounts(cafeImages);
+    public CafeImagesSaveResponse saveCafeImage(Long memberId, String mapId, List<MultipartFile> cafeImages) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
+        validateOwnedCafeImagesCounts(cafe, member, cafeImages);
+        List<CafeImageSaveResponse> cafeImageSaveResponses = new ArrayList<>();
         for (MultipartFile cafeImage : cafeImages) {
             String imgUrl = awsS3Uploader.uploadImage(cafeImage);
             CafeImage uploadedCafeImage = new CafeImage(imgUrl, true, cafe, member);
-            cafeImageRepository.save(uploadedCafeImage);
+            cafeImageSaveResponses.add(new CafeImageSaveResponse(cafeImageRepository.save(uploadedCafeImage).getId()));
         }
+        return new CafeImagesSaveResponse(cafeImageSaveResponses);
     }
 
-    private void validateCafeImagesCounts(List<MultipartFile> cafeImages) {
-        if (cafeImages.size() > CAFE_IMAGES_PER_REQUEST_LIMIT_COUNTS) {
-            throw new ExceedCafeImagesCountsException();
+    private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> requestCafeImages) {
+        List<CafeImage> currentOwnedCafeImages = cafe.getCafeImages()
+                .stream()
+                .filter(cafeImage -> cafeImage.isOwned(member))
+                .collect(Collectors.toList());
+        if (currentOwnedCafeImages.size() + requestCafeImages.size() > CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS) {
+            throw new ExceedCageImagesTotalCountsException();
         }
     }
 
     @Transactional(readOnly = true)
-    public CafeImagesResponse findCafeImages(String email, String mapId, Integer page, int count) {
+    public CafeImagesResponse findCafeImages(Long memberId, String mapId, Integer page, int count) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         Pageable pageable = PageRequest.of(page, count);
-        Slice<CafeImage> cafeImages = cafeImageRepository.findAllByCafeIdAndIsUsedTrue(cafe.getId(), pageable);
+        Slice<CafeImage> cafeImages = cafeImageRepository.
+                findAllByCafeIdAndIsUsedOrderByCafeImageId(cafe.getId(), member.getId(), pageable);
 
         List<CafeImageResponse> responses = cafeImages
                 .getContent()
@@ -343,18 +354,27 @@ public class CafeService {
     }
 
     @Transactional
-    public void updateCafeImage(String email, String mapId, Long cafeImageId, MultipartFile cafeImg) {
+    public void updateCafeImage(Long memberId, String mapId, Long cafeImageId, MultipartFile cafeImg) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
-        CafeImage notUsedImage = cafeImageRepository.findById(cafeImageId)
+        CafeImage cafeImage = cafeImageRepository.findById(cafeImageId)
                 .orElseThrow(NotFoundCafeImageException::new);
-        notUsedImage.setIsUsed(false);
+        String beforeImgUrl = cafeImage.getImgUrl();
 
         String newImgUrl = awsS3Uploader.uploadImage(cafeImg);
-        CafeImage cafeImage = new CafeImage(newImgUrl, true, cafe, member);
-        cafeImageRepository.save(cafeImage);
+        cafeImage.updateImgUrl(newImgUrl);
+
+        CafeImage notUseImage = new CafeImage(beforeImgUrl, false, cafe, member);
+        cafeImageRepository.save(notUseImage);
+    }
+
+    @EventListener
+    public void updateCafeImagesWhenMemberDelete(DeleteMemberEvent event) {
+        Member member = event.getMember();
+        cafeImageRepository.findAllByMemberId(member.getId())
+                .forEach(CafeImage::removeMember);
     }
 
     @Transactional

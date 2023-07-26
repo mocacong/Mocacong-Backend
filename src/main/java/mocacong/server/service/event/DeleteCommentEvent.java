@@ -2,11 +2,11 @@ package mocacong.server.service.event;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import mocacong.server.domain.Member;
+import mocacong.server.domain.Comment;
 
 @Getter
 @RequiredArgsConstructor
-public class MemberEvent {
+public class DeleteCommentEvent {
 
-    private final Member member;
+    private final Comment comment;
 }

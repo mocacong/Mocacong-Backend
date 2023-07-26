@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
+import mocacong.server.domain.Status;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
@@ -11,8 +12,8 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
+import mocacong.server.service.event.DeleteMemberEvent;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
-import mocacong.server.service.event.MemberEvent;
 import mocacong.server.support.AwsS3Uploader;
 import mocacong.server.support.AwsSESSender;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -52,8 +57,8 @@ public class MemberService {
         validateDuplicateMember(request);
 
         String encodedPassword = passwordEncoder.encode(request.getPassword());
-        try{
-            Member member = new Member(request.getEmail(), encodedPassword, request.getNickname(), request.getPhone());
+        try {
+            Member member = new Member(request.getEmail(), encodedPassword, request.getNickname());
             return new MemberSignUpResponse(memberRepository.save(member).getId());
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateMemberException();
@@ -61,21 +66,15 @@ public class MemberService {
     }
 
     private void validateDuplicateMember(MemberSignUpRequest memberSignUpRequest) {
-        memberRepository.findByEmail(memberSignUpRequest.getEmail())
-                .ifPresent(member -> {
-                    throw new DuplicateMemberException();
-                });
-        memberRepository.findByNickname(memberSignUpRequest.getNickname())
-                .ifPresent(member -> {
-                    throw new DuplicateNicknameException();
-                });
+        if (memberRepository.existsByEmailAndPlatform(memberSignUpRequest.getEmail(), Platform.MOCACONG)) {
+            throw new DuplicateMemberException();
+        }
+        validateDuplicateNickname(memberSignUpRequest.getNickname());
     }
 
     private void validateDuplicateNickname(String nickname) {
-        memberRepository.findByNickname(nickname)
-                .ifPresent(member -> {
-                    throw new DuplicateNicknameException();
-                });
+        if (memberRepository.existsByNickname(nickname))
+            throw new DuplicateNicknameException();
     }
 
     @Transactional
@@ -89,10 +88,11 @@ public class MemberService {
     }
 
     @Transactional
-    public void delete(String email) {
-        Member findMember = memberRepository.findByEmail(email)
+    public void delete(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
-        applicationEventPublisher.publishEvent(new MemberEvent(findMember));
+        findMember.updateProfileImgUrl(null);
+        applicationEventPublisher.publishEvent(new DeleteMemberEvent(findMember));
         memberRepository.delete(findMember);
     }
 
@@ -100,8 +100,7 @@ public class MemberService {
     public MemberGetAllResponse getAllMembers() {
         List<Member> members = memberRepository.findAll();
         List<MemberGetResponse> memberGetResponses = members.stream()
-                .map(member -> new MemberGetResponse(member.getId(), member.getEmail(),
-                        member.getNickname(), member.getPhone()))
+                .map(member -> new MemberGetResponse(member.getId(), member.getEmail(), member.getNickname()))
                 .collect(Collectors.toList());
         return new MemberGetAllResponse(memberGetResponses);
     }
@@ -109,7 +108,7 @@ public class MemberService {
     public IsDuplicateEmailResponse isDuplicateEmail(String email) {
         validateEmail(email);
 
-        Optional<Member> findMember = memberRepository.findByEmail(email);
+        Optional<Member> findMember = memberRepository.findByEmailAndPlatform(email, Platform.MOCACONG);
         return new IsDuplicateEmailResponse(findMember.isPresent());
     }
 
@@ -122,20 +121,20 @@ public class MemberService {
     public EmailVerifyCodeResponse sendEmailVerifyCode(EmailVerifyCodeRequest request) {
         validateNonce(request.getNonce());
         String requestEmail = request.getEmail();
-        memberRepository.findByEmail(requestEmail)
+        Member member = memberRepository.findByEmailAndPlatform(requestEmail, Platform.MOCACONG)
                 .orElseThrow(NotFoundMemberException::new);
         Random random = new Random();
         int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
         String code = String.format("%04d", randomNumber);
         awsSESSender.sendToVerifyEmail(requestEmail, code);
-        String token = jwtTokenProvider.createToken(requestEmail);
+        String token = jwtTokenProvider.createToken(member.getId());
         return new EmailVerifyCodeResponse(token, code);
     }
 
     @Transactional
-    public void resetPassword(String email, ResetPasswordRequest request) {
+    public void resetPassword(Long memberId, ResetPasswordRequest request) {
         validateNonce(request.getNonce());
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         String updatePassword = request.getPassword();
         validatePassword(updatePassword);
@@ -158,8 +157,8 @@ public class MemberService {
     public IsDuplicateNicknameResponse isDuplicateNickname(String nickname) {
         validateNickname(nickname);
 
-        Optional<Member> findMember = memberRepository.findByNickname(nickname);
-        return new IsDuplicateNicknameResponse(findMember.isPresent());
+        Boolean isPresent = memberRepository.existsByNickname(nickname);
+        return new IsDuplicateNicknameResponse(isPresent);
     }
 
     private void validateNickname(String nickname) {
@@ -168,15 +167,15 @@ public class MemberService {
         }
     }
 
-    public MyPageResponse findMyInfo(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public MyPageResponse findMyInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
-        return new MyPageResponse(member.getEmail(), member.getNickname(), member.getPhone(), member.getImgUrl());
+        return new MyPageResponse(member.getEmail(), member.getNickname(), member.getImgUrl());
     }
 
     @Transactional
-    public void updateProfileImage(String email, MultipartFile profileImg) {
-        Member member = memberRepository.findByEmail(email)
+    public void updateProfileImage(Long memberId, MultipartFile profileImg) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         if (profileImg == null) {
             member.updateProfileImgUrl(null);
@@ -189,13 +188,12 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateProfileInfo(String email, MemberProfileUpdateRequest request) {
+    public void updateProfileInfo(Long memberId, MemberProfileUpdateRequest request) {
         String updateNickname = request.getNickname();
-        String updatePhone = request.getPhone();
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         validateDuplicateNickname(updateNickname);
-        member.updateProfileInfo(updateNickname, updatePhone);
+        member.updateProfileInfo(updateNickname);
     }
 
     @Transactional
@@ -212,8 +210,16 @@ public class MemberService {
         memberProfileImageRepository.deleteAllByIdInBatch(ids);
     }
 
-    public PasswordVerifyResponse verifyPassword(String email, PasswordVerifyRequest request) {
-        Member member = memberRepository.findByEmail(email)
+    @Transactional
+    public void setActiveAfter60days() {
+        LocalDate thresholdLocalDate = LocalDate.now().minusDays(60);
+        Instant instant = thresholdLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Date thresholdDate = Date.from(instant);
+        memberRepository.bulkUpdateStatus(Status.ACTIVE, Status.INACTIVE, thresholdDate);
+    }
+
+    public PasswordVerifyResponse verifyPassword(Long memberId, PasswordVerifyRequest request) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         String storedPassword = member.getPassword();
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -222,10 +228,10 @@ public class MemberService {
         return new PasswordVerifyResponse(isSuccess);
     }
 
-    public GetUpdateProfileInfoResponse getUpdateProfileInfo(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public GetUpdateProfileInfoResponse getUpdateProfileInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
-        return new GetUpdateProfileInfoResponse(member.getEmail(), member.getNickname(), member.getPhone());
+        return new GetUpdateProfileInfoResponse(member.getEmail(), member.getNickname());
     }
 }

@@ -12,4 +12,5 @@ public class OAuthTokenResponse {
     private String email;
     private Boolean isRegistered;
     private String platformId;
+    private int userReportCount;
 }

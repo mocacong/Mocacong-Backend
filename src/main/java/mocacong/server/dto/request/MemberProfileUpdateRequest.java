@@ -14,7 +14,4 @@ public class MemberProfileUpdateRequest {
 
     @NotBlank(message = "1012:공백일 수 없습니다.")
     private String nickname;
-
-    @NotBlank(message = "1012:공백일 수 없습니다.")
-    private String phone;
 }

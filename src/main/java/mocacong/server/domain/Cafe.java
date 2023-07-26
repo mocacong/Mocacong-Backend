@@ -35,7 +35,7 @@ public class Cafe extends BaseTime {
     @Embedded
     private CafeDetail cafeDetail;
 
-    @OneToMany(mappedBy = "cafe", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<CafeImage> cafeImages;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
@@ -77,7 +77,7 @@ public class Cafe extends BaseTime {
             StudyType studyType = review.getStudyType();
             if (studyType == StudyType.SOLO) solo++;
             else if (studyType == StudyType.GROUP) group++;
-            else {
+            else if (studyType == StudyType.BOTH) {
                 solo++;
                 group++;
             }
@@ -87,6 +87,10 @@ public class Cafe extends BaseTime {
         else if (solo == group) return StudyType.BOTH;
         else if (solo > group) return StudyType.SOLO;
         else return StudyType.GROUP;
+    }
+
+    public String getStudyType() {
+        return cafeDetail.getStudyTypeValue();
     }
 
     public double findAverageScore() {

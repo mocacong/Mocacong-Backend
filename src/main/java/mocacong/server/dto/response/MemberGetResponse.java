@@ -11,5 +11,4 @@ public class MemberGetResponse {
     private Long id;
     private String email;
     private String nickname;
-    private String phone;
 }

@@ -12,7 +12,7 @@ import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.repository.CafeRepository;
 import mocacong.server.repository.FavoriteRepository;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.service.event.MemberEvent;
+import mocacong.server.service.event.DeleteMemberEvent;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.event.EventListener;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,16 +32,16 @@ public class FavoriteService {
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
-    public FavoriteSaveResponse save(String email, String mapId) {
+    public FavoriteSaveResponse save(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId)
                 .orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
         validateDuplicateFavorite(cafe.getId(), member.getId());
 
         try {
             Favorite favorite = new Favorite(member, cafe);
-            return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId());
+            return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId(), member.getReportCount());
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyExistsFavorite();
         }
@@ -55,9 +55,9 @@ public class FavoriteService {
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
     @Transactional
-    public void delete(String email, String mapId) {
+    public void delete(Long memberId, String mapId) {
         Cafe cafe = cafeRepository.findByMapId(mapId).orElseThrow(NotFoundCafeException::new);
-        Member member = memberRepository.findByEmail(email).orElseThrow(NotFoundMemberException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElseThrow(NotFoundFavoriteException::new);
 
@@ -65,7 +65,7 @@ public class FavoriteService {
     }
 
     @EventListener
-    public void deleteAllWhenMemberDelete(MemberEvent event) {
+    public void deleteAllWhenMemberDelete(DeleteMemberEvent event) {
         Member member = event.getMember();
         favoriteRepository.findAllByMemberId(member.getId()).forEach(Favorite::removeMember);
     }
@@ -73,7 +73,7 @@ public class FavoriteService {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener
-    public void deleteFavoritesWhenMemberDeleted(MemberEvent event) {
+    public void deleteFavoritesWhenMemberDeleted(DeleteMemberEvent event) {
         favoriteRepository.deleteAllByMemberIdIsNull();
     }
 }

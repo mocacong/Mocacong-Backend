@@ -10,11 +10,7 @@
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                 <layout class="mocacong.server.support.logging.MaskingPatternLayout">
-                    <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
-                    <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
-                    <maskPattern>phone\s*=\s*([^,)\s]+)</maskPattern> <!-- Phone Arg pattern -->
                     <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
-                    <maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
                     <pattern>${LOG_PATTERN}</pattern>
                 </layout>
             </encoder>
@@ -32,13 +28,9 @@
             <file>${LOG_PATH}/mocacong-${BY_DATE}.log</file>
             <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                 <layout class="mocacong.server.support.logging.MaskingPatternLayout">
-                    <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
                     <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
-                    <maskPattern>phone\s*=\s*([^,)\s]+)</maskPattern> <!-- Phone Arg pattern -->
-                    <maskPattern>platformId\s*=\s*([^,)\s]+)</maskPattern> <!-- PlatformId Arg pattern -->
                     <maskPattern>nonce\s*=\s*([^,)\s]+)</maskPattern> <!-- Nonce Arg pattern -->
                     <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
-                    <maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
                     <pattern>${LOG_PATTERN}</pattern>
                 </layout>
             </encoder>
@@ -65,13 +57,9 @@
             </filter>
             <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                 <layout class="mocacong.server.support.logging.MaskingPatternLayout">
-                    <maskPattern>email\s*=\s*([^,)\s]+)</maskPattern> <!-- Email Arg pattern -->
                     <maskPattern>password\s*=\s*([^,)\s]+)</maskPattern> <!-- Password Arg pattern -->
-                    <maskPattern>phone\s*=\s*([^,)\s]+)</maskPattern> <!-- Phone Arg pattern -->
-                    <maskPattern>platformId\s*=\s*([^,)\s]+)</maskPattern> <!-- PlatformId Arg pattern -->
                     <maskPattern>nonce\s*=\s*([^,)\s]+)</maskPattern> <!-- Nonce Arg pattern -->
                     <maskPattern>(\d+\.\d+\.\d+\.\d+)</maskPattern> <!-- Ip address IPv4 pattern -->
-                    <maskPattern>(\w+@\w+\.\w+)</maskPattern> <!-- Email pattern -->
                     <pattern>${LOG_PATTERN}</pattern>
                 </layout>
             </encoder>
