@@ -43,8 +43,10 @@ public class ReportService {
             createCommentReport(comment, reporter, reportReason);
 
             // 코멘트를 작성한 회원이 탈퇴한 경우
-            if (comment.isDeletedCommenter()) {
-                maskReportedComment(comment);
+            if (comment.isDeletedMember()) {
+                if (comment.isReportThresholdExceeded()) {
+                    maskReportedComment(comment);
+                }
             } else {
                 Member commenter = comment.getMember();
                 validateCommentReporter(reporter, comment);
@@ -99,8 +101,10 @@ public class ReportService {
             createCafeImageReport(cafeImage, reporter, reportReason);
 
             // 카페 이미지를 등록한 회원이 탈퇴한 경우
-            if (cafeImage.isDeletedAuthor()) {
-                cafeImage.maskCafeImage();
+            if (cafeImage.isDeletedMember()) {
+                if (cafeImage.isReportThresholdExceeded()) {
+                    cafeImage.maskCafeImage();
+                }
             } else {
                 Member author = cafeImage.getMember();
                 validateCafeImageReporter(reporter, cafeImage);

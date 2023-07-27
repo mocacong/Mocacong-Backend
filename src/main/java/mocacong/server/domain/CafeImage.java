@@ -86,10 +86,6 @@ public class CafeImage extends BaseTime {
         return getReportsCount() >= REPORT_CAFE_IMAGE_THRESHOLD_COUNT;
     }
 
-    public boolean isDeletedAuthor() {
-        return isDeletedMember() && isReportThresholdExceeded();
-    }
-
     public void maskCafeImage() {
         this.isUsed = false;
         this.isMasked = true;
