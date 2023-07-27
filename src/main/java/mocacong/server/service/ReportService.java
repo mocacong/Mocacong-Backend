@@ -48,7 +48,8 @@ public class ReportService {
             } else {
                 Member commenter = comment.getMember();
                 validateCommentReporter(reporter, comment);
-                validateCommentReportThreshold(commenter, comment);
+                validateCommentReportThreshold(comment);
+                commenter.incrementMemberReportCount();
             }
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCommentException();
@@ -76,9 +77,8 @@ public class ReportService {
         }
     }
 
-    private void validateCommentReportThreshold(Member commenter, Comment comment) {
+    private void validateCommentReportThreshold(Comment comment) {
         if (comment.isReportThresholdExceeded()) {
-            commenter.incrementMemberReportCount();
             maskReportedComment(comment);
         }
     }
@@ -104,7 +104,8 @@ public class ReportService {
             } else {
                 Member author = cafeImage.getMember();
                 validateCafeImageReporter(reporter, cafeImage);
-                validateCafeImageReportThreshold(author, cafeImage);
+                validateCafeImageReportThreshold(cafeImage);
+                author.incrementMemberReportCount();
             }
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCafeImageException();
@@ -126,9 +127,8 @@ public class ReportService {
         }
     }
 
-    private void validateCafeImageReportThreshold(Member author, CafeImage cafeImage) {
+    private void validateCafeImageReportThreshold(CafeImage cafeImage) {
         if (cafeImage.isReportThresholdExceeded()) {
-            author.incrementMemberReportCount();
             cafeImage.maskCafeImage();
         }
     }
