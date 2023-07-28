@@ -6,7 +6,7 @@ import lombok.Getter;
 public class AccessTokenExpiredException extends UnauthorizedException {
 
     public AccessTokenExpiredException() {
-        super("로그인 인증 유효기간이 만료되었습니다. 다시 로그인 해주세요.", 1014);
+        super("Access Token 유효기간이 만료되었습니다.", 1014);
     }
 
     public AccessTokenExpiredException(String message) {

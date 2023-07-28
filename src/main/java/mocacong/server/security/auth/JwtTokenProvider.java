@@ -4,7 +4,6 @@ import io.jsonwebtoken.*;
 import mocacong.server.exception.unauthorized.AccessTokenExpiredException;
 import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
 import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
-import mocacong.server.exception.unauthorized.RefreshTokenExpiredException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -81,8 +80,6 @@ public class JwtTokenProvider {
     public String getPayloadForRefreshToken(String refreshToken) {
         try {
             return refreshTokenJwtParser.parseClaimsJws(refreshToken).getBody().getSubject();
-        } catch (ExpiredJwtException e) {
-            throw new RefreshTokenExpiredException();
         } catch (JwtException e) {
             throw new InvalidRefreshTokenException();
         }

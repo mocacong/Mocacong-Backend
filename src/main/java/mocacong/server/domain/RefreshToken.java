@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @AllArgsConstructor
 @Getter
-@RedisHash(value = "jwtToken", timeToLive = 60*60*24*3)
+@RedisHash(value = "jwtToken", timeToLive = 60*60*24*14) // 리프레시 토큰을 발급한 후 14일 동안 유효
 public class RefreshToken implements Serializable {
 
     @Id
