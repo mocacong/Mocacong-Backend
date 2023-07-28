@@ -46,14 +46,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken() {
+    public String createRefreshToken(Long memberId) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityRefreshTokenInMilliseconds);
 
-        Claims claims = Jwts.claims();
-
         return Jwts.builder()
-                .setClaims(claims)
+                .setSubject(String.valueOf(memberId))
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, refreshSecretKey)
@@ -70,16 +68,6 @@ public class JwtTokenProvider {
         }
     }
 
-    public void validateRefreshToken(String token) {
-        try {
-            refreshTokenJwtParser.parseClaimsJws(token);
-        } catch (ExpiredJwtException e) {
-            throw new RefreshTokenExpiredException();
-        } catch (JwtException e) {
-            throw new InvalidRefreshTokenException();
-        }
-    }
-
     public String getPayload(String token) {
         try {
             return accessTokenJwtParser.parseClaimsJws(token).getBody().getSubject();
@@ -87,6 +75,16 @@ public class JwtTokenProvider {
             throw new AccessTokenExpiredException();
         } catch (JwtException e) {
             throw new InvalidAccessTokenException();
+        }
+    }
+
+    public String getPayloadForRefreshToken(String refreshToken) {
+        try {
+            return refreshTokenJwtParser.parseClaimsJws(refreshToken).getBody().getSubject();
+        } catch (ExpiredJwtException e) {
+            throw new RefreshTokenExpiredException();
+        } catch (JwtException e) {
+            throw new InvalidRefreshTokenException();
         }
     }
 }

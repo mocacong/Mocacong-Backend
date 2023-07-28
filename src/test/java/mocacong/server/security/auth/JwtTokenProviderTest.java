@@ -36,7 +36,7 @@ class JwtTokenProviderTest {
         Long payload = 1L;
 
         accessToken = jwtTokenProvider.createAccessToken(payload);
-        refreshToken = jwtTokenProvider.createRefreshToken();
+        refreshToken = jwtTokenProvider.createRefreshToken(payload);
 
         Assertions.assertAll(
                 () -> Assertions.assertNotNull(accessToken),
@@ -116,7 +116,7 @@ class JwtTokenProviderTest {
 
         // 새로운 액세스 토큰 및 리프레시 토큰 발급
         String newAccessToken = jwtTokenProvider.createAccessToken(memberId);
-        String newRefreshToken = jwtTokenProvider.createRefreshToken();
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
         Assertions.assertAll(
                 () -> assertThatThrownBy(() -> jwtTokenProvider.validateAccessToken(expiredAccessToken))

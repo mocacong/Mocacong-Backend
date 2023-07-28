@@ -2,11 +2,11 @@ package mocacong.server.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.KakaoLoginRequest;
+import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.service.AuthService;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @Tag(name = "Login", description = "인증")
 @RestController
@@ -42,6 +44,13 @@ public class AuthController {
     @PostMapping("/kakao")
     public ResponseEntity<OAuthTokenResponse> loginKakao(@RequestBody @Valid KakaoLoginRequest request) {
         OAuthTokenResponse response = authService.kakaoOAuthLogin(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "토큰 재발급")
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refreshAccessToken(@RequestBody @Valid RefreshTokenRequest request) {
+        TokenResponse response = authService.refreshAccessToken(request);
         return ResponseEntity.ok(response);
     }
 }
