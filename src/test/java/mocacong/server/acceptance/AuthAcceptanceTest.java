@@ -3,6 +3,7 @@ package mocacong.server.acceptance;
 import io.restassured.RestAssured;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.OAuthTokenResponse;
+import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
@@ -115,19 +116,15 @@ public class AuthAcceptanceTest extends AcceptanceTest {
 
         String refreshToken = tokenResponse.getRefreshToken();
         RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
-        TokenResponse response = RestAssured.given().log().all()
+        ReissueTokenResponse response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
-                .when().post("/login/refresh")
+                .when().post("/login/reissue")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract()
-                .as(TokenResponse.class);
+                .as(ReissueTokenResponse.class);
 
-        assertAll(
-                () -> assertNotNull(response.getAccessToken()),
-                () -> assertNotNull(response.getRefreshToken()),
-                () -> assertThat(response.getRefreshToken()).isEqualTo(refreshToken)
-        );
+        assertNotNull(response.getAccessToken());
     }
 }

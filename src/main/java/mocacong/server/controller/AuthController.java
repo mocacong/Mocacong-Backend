@@ -8,6 +8,7 @@ import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.KakaoLoginRequest;
 import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
+import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -48,9 +49,9 @@ public class AuthController {
     }
 
     @Operation(summary = "토큰 재발급")
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshAccessToken(@RequestBody @Valid RefreshTokenRequest request) {
-        TokenResponse response = authService.reissueAccessToken(request);
+    @PostMapping("/reissue")
+    public ResponseEntity<ReissueTokenResponse> refreshAccessToken(@RequestBody @Valid RefreshTokenRequest request) {
+        ReissueTokenResponse response = authService.reissueAccessToken(request);
         return ResponseEntity.ok(response);
     }
 }

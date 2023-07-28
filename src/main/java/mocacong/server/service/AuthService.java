@@ -9,6 +9,7 @@ import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.KakaoLoginRequest;
 import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
+import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
@@ -122,13 +123,13 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse reissueAccessToken(RefreshTokenRequest request) {
+    public ReissueTokenResponse reissueAccessToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
         // 새로운 액세스 토큰 발급
         String newAccessToken = jwtTokenProvider.createAccessToken(member.getId());
         refreshTokenService.saveTokenInfo(member.getId(), refreshToken, newAccessToken);
 
-        return TokenResponse.from(newAccessToken, refreshToken, member.getReportCount());
+        return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
     }
 }

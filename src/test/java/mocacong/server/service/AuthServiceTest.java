@@ -7,6 +7,7 @@ import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
+import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.unauthorized.InactiveMemberException;
@@ -233,13 +234,9 @@ class AuthServiceTest {
 
         String refreshToken = tokenResponse.getRefreshToken();
         RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
-        TokenResponse newTokenResponse = authService.reissueAccessToken(request);
+        ReissueTokenResponse newTokenResponse = authService.reissueAccessToken(request);
 
-        assertAll(
-                () -> assertThat(newTokenResponse.getRefreshToken()).isEqualTo(refreshToken),
-                () -> assertNotNull(newTokenResponse.getAccessToken()),
-                () -> assertNotNull(newTokenResponse.getRefreshToken())
-        );
+        assertNotNull(newTokenResponse.getAccessToken());
     }
 
     @Test
