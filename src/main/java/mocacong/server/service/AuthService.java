@@ -50,7 +50,6 @@ public class AuthService {
         return TokenResponse.from(accessToken, refreshToken, userReportCount);
     }
 
-    // TODO: OAuth 리프레시 토큰 도입
     public OAuthTokenResponse appleOAuthLogin(AppleLoginRequest request) {
         OAuthPlatformMemberResponse applePlatformMember =
                 appleOAuthUserProvider.getApplePlatformMember(request.getToken());

@@ -115,7 +115,6 @@ public class AuthAcceptanceTest extends AcceptanceTest {
 
         String refreshToken = tokenResponse.getRefreshToken();
         RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
-
         TokenResponse response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(request)
