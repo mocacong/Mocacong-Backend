@@ -123,7 +123,7 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse refreshAccessToken(RefreshTokenRequest request) {
+    public TokenResponse reissueAccessToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
         // 새로운 액세스 토큰 발급

@@ -50,7 +50,7 @@ public class AuthController {
     @Operation(summary = "토큰 재발급")
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshAccessToken(@RequestBody @Valid RefreshTokenRequest request) {
-        TokenResponse response = authService.refreshAccessToken(request);
+        TokenResponse response = authService.reissueAccessToken(request);
         return ResponseEntity.ok(response);
     }
 }
