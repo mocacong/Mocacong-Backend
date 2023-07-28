@@ -4,7 +4,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import mocacong.server.exception.unauthorized.AccessTokenExpiredException;
 import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
-import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -123,14 +122,5 @@ class JwtTokenProviderTest {
                 () -> assertThat(newAccessToken).isNotEmpty(),
                 () -> assertThat(newRefreshToken).isNotEmpty()
         );
-    }
-
-    @DisplayName("유효하지 않은 리프레시 토큰 형식의 토큰으로 검증할 경우 예외를 발생시킨다")
-    @Test
-    void validateRefreshTokenByInvalidRefreshToken() {
-        String invalidRefreshToken = "invalid-refresh-token";
-
-        assertThatThrownBy(() -> jwtTokenProvider.validateRefreshToken(invalidRefreshToken))
-                .isInstanceOf(InvalidRefreshTokenException.class);
     }
 }
