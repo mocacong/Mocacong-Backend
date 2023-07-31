@@ -6,6 +6,15 @@
     <property name="LOG_PATTERN"
               value="[%d{yyyy-MM-dd HH:mm:ss}:%-4relative] %green([%thread]) %highlight(%-5level) [%C.%M:%line] - %msg%n"/>
 
+    <!-- SQL 로그 -->
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <!-- SQL 바인딩 파라미터 로그 -->
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+    <!-- 커넥션 풀 로그 -->
+    <logger name="com.zaxxer.hikari" level="DEBUG"/>
+    <!-- 트랜잭션 매니저 로그 -->
+    <logger name="org.springframework.orm.jpa.JpaTransactionManager" level="DEBUG"/>
+
     <springProfile name="default">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
