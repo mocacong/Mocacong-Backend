@@ -12,7 +12,6 @@ spring:
       hibernate:
         create_empty_composites:
           enabled: true
-        show_sql: true
         format_sql: true
   servlet:
     multipart:
