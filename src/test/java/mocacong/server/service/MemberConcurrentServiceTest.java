@@ -3,6 +3,7 @@ package mocacong.server.service;
 import mocacong.server.domain.Member;
 import mocacong.server.dto.request.MemberSignUpRequest;
 import mocacong.server.exception.badrequest.DuplicateMemberException;
+import mocacong.server.exception.badrequest.DuplicateNicknameException;
 import mocacong.server.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ public class MemberConcurrentServiceTest {
                     memberService.signUp(request);
                 } catch (DuplicateMemberException e) {
                     exceptions.add(e); // 중복 예외를 리스트에 추가
+                } catch (DuplicateNicknameException e) {
+                    exceptions.add(e);
                 }
                 latch.countDown();
             });

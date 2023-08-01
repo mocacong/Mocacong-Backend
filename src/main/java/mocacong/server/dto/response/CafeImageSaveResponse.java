@@ -9,6 +9,4 @@ import lombok.*;
 public class CafeImageSaveResponse {
 
     private Long id;
-
-    private int userReportCount;
 }
