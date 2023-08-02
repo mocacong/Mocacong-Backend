@@ -1,14 +1,12 @@
 package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
-import mocacong.server.domain.Member;
-import mocacong.server.domain.MemberProfileImage;
-import mocacong.server.domain.Platform;
-import mocacong.server.domain.Status;
+import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.repository.DeletedMemberRepository;
 import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
@@ -42,6 +40,7 @@ public class MemberService {
     private static final int EMAIL_VERIFY_CODE_MAXIMUM_NUMBER = 9999;
 
     private final MemberRepository memberRepository;
+    private final DeletedMemberRepository deletedMemberRepository;
     private final MemberProfileImageRepository memberProfileImageRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -91,9 +90,19 @@ public class MemberService {
     public void delete(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
+        DeletedMember deletedMember = DeletedMember.from(findMember);
         findMember.updateProfileImgUrl(null);
         applicationEventPublisher.publishEvent(new DeleteMemberEvent(findMember));
+        deletedMemberRepository.save(deletedMember);
         memberRepository.delete(findMember);
+    }
+
+    @Transactional
+    public void deleteLogicallyDeletedMemberAfter30Days() {
+        LocalDate thresholdLocalDate = LocalDate.now().minusDays(30);
+        Instant instant = thresholdLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Date thresholdDate = Date.from(instant);
+        deletedMemberRepository.deleteDeletedMemberByCreatedTime(thresholdDate);
     }
 
     @Transactional(readOnly = true)

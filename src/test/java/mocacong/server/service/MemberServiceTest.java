@@ -1,5 +1,6 @@
 package mocacong.server.service;
 
+import mocacong.server.domain.DeletedMember;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.MemberProfileImage;
 import mocacong.server.domain.Platform;
@@ -7,6 +8,7 @@ import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.*;
 import mocacong.server.exception.notfound.NotFoundMemberException;
+import mocacong.server.repository.DeletedMemberRepository;
 import mocacong.server.repository.MemberProfileImageRepository;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.service.event.DeleteNotUsedImagesEvent;
@@ -45,6 +47,8 @@ class MemberServiceTest {
     private MemberService memberService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private DeletedMemberRepository deletedMemberRepository;
 
     @MockBean
     private AwsS3Uploader awsS3Uploader;
@@ -274,6 +278,22 @@ class MemberServiceTest {
 
         List<Member> actual = memberRepository.findAll();
         assertThat(actual).hasSize(0);
+    }
+
+    @Test
+    @DisplayName("회원을 정상적으로 탈되되었을 때 회원의 데이터를 찾을 수 있다.")
+    void logicalDeleteMember() {
+        Member savedMember = memberRepository.save(new Member("kth990303@naver.com", "a1b2c3d4", "메리"));
+
+        memberService.delete(savedMember.getId());
+
+        List<DeletedMember> actualDeletedMember = deletedMemberRepository.findAll();
+        List<Member> actual = memberRepository.findAll();
+
+        assertAll(
+                () -> assertThat(actualDeletedMember).hasSize(1),
+                () -> assertThat(actual).hasSize(0)
+        );
     }
 
     @Test
