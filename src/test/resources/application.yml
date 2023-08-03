@@ -12,6 +12,8 @@ spring:
           enabled: true
         format_sql: true
         show_sql: false
+        default_batch_fetch_size: 100
+
   redis:
     host: localhost
     port: 16379

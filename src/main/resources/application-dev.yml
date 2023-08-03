@@ -13,6 +13,7 @@ spring:
         create_empty_composites:
           enabled: true
         format_sql: true
+        default_batch_fetch_size: 100
   servlet:
     multipart:
       max-file-size: 10MB

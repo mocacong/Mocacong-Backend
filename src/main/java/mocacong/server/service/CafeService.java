@@ -119,10 +119,10 @@ public class CafeService {
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
                         return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(),
-                                comment.getContent(), true);
+                                comment.getContent(), comment.getLikeCounts(), true);
                     } else {
                         return new CommentResponse(comment.getId(), comment.getWriterImgUrl(),
-                                comment.getWriterNickname(), comment.getContent(), false);
+                                comment.getWriterNickname(), comment.getContent(), comment.getLikeCounts(), false);
                     }
                 })
                 .collect(Collectors.toList());
