@@ -22,11 +22,8 @@ class JwtTokenProviderTest {
 
     @Value("${security.jwt.token.secret-key}")
     private String secretKey;
-    @Value("${security.jwt.token.refresh-secret-key}")
-    private String refreshSecretKey;
 
     private String accessToken;
-    private String refreshToken;
 
     @DisplayName("payload 정보를 통해 유효한 JWT 토큰을 생성한다")
     @Test
@@ -34,13 +31,10 @@ class JwtTokenProviderTest {
         Long payload = 1L;
 
         accessToken = jwtTokenProvider.createAccessToken(payload);
-        refreshToken = jwtTokenProvider.createRefreshToken(payload);
 
         Assertions.assertAll(
                 () -> Assertions.assertNotNull(accessToken),
-                () -> Assertions.assertNotNull(refreshToken),
-                () -> Assertions.assertTrue(accessToken.length() > 0),
-                () -> Assertions.assertTrue(refreshToken.length() > 0)
+                () -> Assertions.assertTrue(accessToken.length() > 0)
         );
     }
 
@@ -68,7 +62,7 @@ class JwtTokenProviderTest {
     void getPayloadByExpiredToken() {
         long expirationMillis = 1L;
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider("secret-key",
-                "refresh-secret-key", expirationMillis, expirationMillis);
+                 expirationMillis);
         Long expiredPayload = 1L;
 
         String expiredToken = jwtTokenProvider.createAccessToken(expiredPayload);
@@ -89,14 +83,14 @@ class JwtTokenProviderTest {
         String correctSecretKey = "correct-secret-key";
         String wrongSecretKey = "wrong-secret-key";
 
-        JwtTokenProvider tokenProvider = new JwtTokenProvider(correctSecretKey, "refresh-secret-key",
-                3600000L, 3600000L);
+        JwtTokenProvider tokenProvider = new JwtTokenProvider(correctSecretKey,
+                3600000L);
         String token = tokenProvider.createAccessToken(payload);
 
         assertThatExceptionOfType(InvalidAccessTokenException.class)
                 .isThrownBy(() -> {
-                    JwtTokenProvider wrongTokenProvider = new JwtTokenProvider(wrongSecretKey, "refresh-secret-key",
-                            3600000L, 3600000L);
+                    JwtTokenProvider wrongTokenProvider = new JwtTokenProvider(wrongSecretKey,
+                            3600000L);
                     wrongTokenProvider.getPayload(token);
                 });
     }
@@ -114,13 +108,11 @@ class JwtTokenProviderTest {
 
         // 새로운 액세스 토큰 및 리프레시 토큰 발급
         String newAccessToken = jwtTokenProvider.createAccessToken(memberId);
-        String newRefreshToken = jwtTokenProvider.createRefreshToken(memberId);
 
         Assertions.assertAll(
                 () -> assertThatThrownBy(() -> jwtTokenProvider.validateAccessToken(expiredAccessToken))
                         .isInstanceOf(AccessTokenExpiredException.class),
-                () -> assertThat(newAccessToken).isNotEmpty(),
-                () -> assertThat(newRefreshToken).isNotEmpty()
+                () -> assertThat(newAccessToken).isNotEmpty()
         );
     }
 }

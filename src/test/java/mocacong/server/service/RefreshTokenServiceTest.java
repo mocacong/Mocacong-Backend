@@ -28,7 +28,7 @@ class RefreshTokenServiceTest {
         String email = "dlawotn3@naver.com";
         memberRepository.save(new Member(email, "abcd1234", "메리"));
         Long payload = 1L;
-        String refreshToken = jwtTokenProvider.createRefreshToken(payload);
+        String refreshToken = refreshTokenService.createRefreshToken();
 
         Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
 

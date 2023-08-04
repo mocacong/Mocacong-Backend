@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.domain.Status;
+import mocacong.server.domain.Token;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.KakaoLoginRequest;
@@ -11,6 +12,7 @@ import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
+import mocacong.server.exception.badrequest.NotExpiredAccessTokenException;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.unauthorized.InactiveMemberException;
@@ -19,10 +21,12 @@ import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.kakao.KakaoOAuthUserProvider;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AppleOAuthUserProvider appleOAuthUserProvider;
     private final KakaoOAuthUserProvider kakaoOAuthUserProvider;
+    private final RedisTemplate<String, Token> redisTemplate;
 
     public TokenResponse login(AuthLoginRequest request) {
         Member findMember = memberRepository.findByEmailAndPlatform(request.getEmail(), Platform.MOCACONG)
@@ -44,7 +49,7 @@ public class AuthService {
         String accessToken = issueAccessToken(findMember);
         String refreshToken = issueRefreshToken(findMember);
 
-        // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰)
+        // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰, 만료 날짜)
         refreshTokenService.saveTokenInfo(findMember.getId(), refreshToken, accessToken);
         int userReportCount = findMember.getReportCount();
 
@@ -80,6 +85,7 @@ public class AuthService {
                     int userReportCount = findMember.getReportCount();
                     String accessToken = issueAccessToken(findMember);
                     String refreshToken = issueRefreshToken(findMember);
+
                     refreshTokenService.saveTokenInfo(findMember.getId(), refreshToken, accessToken);
 
                     // OAuth 로그인은 성공했지만 회원가입에 실패한 경우
@@ -95,6 +101,7 @@ public class AuthService {
                     Member savedMember = memberRepository.save(oauthMember);
                     String accessToken = issueAccessToken(savedMember);
                     String refreshToken = issueRefreshToken(savedMember);
+
                     refreshTokenService.saveTokenInfo(savedMember.getId(), refreshToken, accessToken);
                     return new OAuthTokenResponse(accessToken, refreshToken, email, false, platformId,
                             savedMember.getReportCount());
@@ -107,7 +114,7 @@ public class AuthService {
 
     private String issueRefreshToken(final Member findMember)
     {
-        return jwtTokenProvider.createRefreshToken(findMember.getId());
+        return refreshTokenService.createRefreshToken();
     }
 
     private void validatePassword(final Member findMember, final String password) {
@@ -126,10 +133,16 @@ public class AuthService {
     public ReissueTokenResponse reissueAccessToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
+        Token token = refreshTokenService.findTokenByRefreshToken(refreshToken);
+        String oldAccessToken = token.getAccessToken();
         // 새로운 액세스 토큰 발급
-        String newAccessToken = jwtTokenProvider.createAccessToken(member.getId());
-        refreshTokenService.saveTokenInfo(member.getId(), refreshToken, newAccessToken);
+        if (jwtTokenProvider.validateReissueAccessToken(oldAccessToken)) {
+            String newAccessToken = jwtTokenProvider.createAccessToken(member.getId());
+            token.setAccessToken(newAccessToken);
+            redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration(), TimeUnit.SECONDS);
 
-        return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
+            return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
+        }
+        throw new NotExpiredAccessTokenException();
     }
 }

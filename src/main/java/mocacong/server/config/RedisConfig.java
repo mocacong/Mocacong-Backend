@@ -1,5 +1,6 @@
 package mocacong.server.config;
 
+import mocacong.server.domain.Token;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,15 @@ public class RedisConfig {
         /* Java 기본 직렬화가 아닌 JSON 직렬화 설정 */
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, Token> redisRefreshTokenTemplate() {
+        RedisTemplate<String, Token> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return redisTemplate;
     }
 }
