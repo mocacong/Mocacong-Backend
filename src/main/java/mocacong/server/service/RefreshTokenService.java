@@ -25,9 +25,9 @@ public class RefreshTokenService {
     }
 
     public Member validateRefreshTokenAndGetMember(String refreshToken) {
-       String memberId = jwtTokenProvider.getPayloadForRefreshToken(refreshToken);
+        String memberId = jwtTokenProvider.getPayloadForRefreshToken(refreshToken);
 
-       return memberRepository.findById(Long.parseLong(memberId))
-               .orElseThrow(InvalidRefreshTokenException::new);
+        return memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(InvalidRefreshTokenException::new);
     }
 }
