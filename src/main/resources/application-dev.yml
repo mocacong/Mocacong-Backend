@@ -4,6 +4,9 @@ spring:
     url: ${RDS_URL}
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
+    hikari:
+      maximum-pool-size: ${MAXIMUM_POOL_SIZE}
+      connection-timeout: ${CONNECTION_TIMEOUT}
   jpa:
     hibernate:
       ddl-auto: update
