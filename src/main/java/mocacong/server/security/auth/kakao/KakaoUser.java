@@ -15,10 +15,6 @@ public class KakaoUser {
     @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 
-    public static KakaoUser of(Long id, String email) {
-        return new KakaoUser(id, new KakaoAccount(email));
-    }
-
     public String getEmail() {
         return kakaoAccount.getEmail();
     }

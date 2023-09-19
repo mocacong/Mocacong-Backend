@@ -10,5 +10,5 @@ public interface KakaoUserClient {
 
     @GetMapping
     KakaoUser getUser(@SpringQueryMap KakaoUserRequest request,
-                      @RequestHeader(name = "Authorization") String authorization);
+                      @RequestHeader(name = "Authorization") String token);
 }
