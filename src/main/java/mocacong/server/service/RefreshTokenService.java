@@ -26,10 +26,10 @@ public class RefreshTokenService {
                 .id(memberId)
                 .refreshToken(refreshToken)
                 .accessToken(accessToken)
-                .expiration(240) // 리프레시 토큰 유효기간
+                .expiration(1728000) // 리프레시 토큰 유효기간
                 .build();
 
-        redisTemplate.opsForValue().set(refreshToken, token, 240, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(refreshToken, token, 1728000, TimeUnit.SECONDS);
     }
 
     public Member validateRefreshTokenAndGetMember(String refreshToken) {

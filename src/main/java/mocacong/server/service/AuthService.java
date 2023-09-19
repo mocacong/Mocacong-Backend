@@ -1,6 +1,7 @@
 package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.domain.Status;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -49,7 +51,7 @@ public class AuthService {
         String accessToken = issueAccessToken(findMember);
         String refreshToken = issueRefreshToken(findMember);
 
-        // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰, 만료 날짜)
+        // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰)
         refreshTokenService.saveTokenInfo(findMember.getId(), refreshToken, accessToken);
         int userReportCount = findMember.getReportCount();
 
@@ -135,14 +137,15 @@ public class AuthService {
         Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
         Token token = refreshTokenService.findTokenByRefreshToken(refreshToken);
         String oldAccessToken = token.getAccessToken();
-        // 새로운 액세스 토큰 발급
-        if (jwtTokenProvider.validateReissueAccessToken(oldAccessToken)) {
+
+        // 이전에 발급된 액세스 토큰이 만료가 되어야 새로운 액세스 토큰 발급
+        if (jwtTokenProvider.validateIsExpiredAccessToken(oldAccessToken)) {
             String newAccessToken = jwtTokenProvider.createAccessToken(member.getId());
             token.setAccessToken(newAccessToken);
-            redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration(), TimeUnit.SECONDS);
-
+            redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration()-14400, TimeUnit.SECONDS);
             return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
+        } else {
+            throw new NotExpiredAccessTokenException();
         }
-        throw new NotExpiredAccessTokenException();
     }
 }

@@ -45,7 +45,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean validateReissueAccessToken(String token) {
+    public boolean validateIsExpiredAccessToken(String token) {
         try {
             accessTokenJwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
