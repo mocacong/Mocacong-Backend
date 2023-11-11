@@ -179,7 +179,7 @@ public class CafeService {
                         MyCommentCafeResponse.of(commentsGroupingByCafe.getKey(), commentsGroupingByCafe.getValue()))
                 .collect(Collectors.toList());
 
-        int toIndex = Math.min((page + 1) * count - 1, responses.size());
+        int toIndex = Math.min((page + 1) * count - 1, responses.size() - 1);
         int fromIndex = Math.min(toIndex, page * count);
 
         return new MyCommentCafesResponse(findIsEnd(page, count, responses), responses.subList(fromIndex, toIndex));
