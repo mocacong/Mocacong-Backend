@@ -487,14 +487,14 @@ class CafeServiceTest {
         commentRepository.save(new Comment(cafe2, member1, "댓글3"));
         commentRepository.save(new Comment(cafe2, member2, "댓글4"));
 
-        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getId(), 0, 5);
+        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getId(), 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
-                () -> assertThat(actual.getCafes()).hasSize(3),
-                () -> assertThat(actual.getCafes().get(0).getComment()).isEqualTo("댓글1"),
-                () -> assertThat(actual.getCafes().get(1).getComment()).isEqualTo("댓글2"),
-                () -> assertThat(actual.getCafes().get(2).getComment()).isEqualTo("댓글3")
+                // 댓글 수는 3개지만, 카페 종류가 2종류이므로 response size는 2개
+                () -> assertThat(actual.getCafes()).hasSize(2),
+                () -> assertThat(actual.getCafes().get(0).getComments()).containsExactlyInAnyOrder("댓글1", "댓글2"),
+                () -> assertThat(actual.getCafes().get(1).getComments()).containsExactlyInAnyOrder("댓글3")
         );
     }
 
