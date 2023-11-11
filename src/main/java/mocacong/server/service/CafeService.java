@@ -179,7 +179,10 @@ public class CafeService {
                         MyCommentCafeResponse.of(commentsGroupingByCafe.getKey(), commentsGroupingByCafe.getValue()))
                 .collect(Collectors.toList());
 
-        return new MyCommentCafesResponse(findIsEnd(page, count, comments), responses);
+        int toIndex = Math.min((page + 1) * count - 1, responses.size());
+        int fromIndex = Math.min(toIndex, page * count);
+
+        return new MyCommentCafesResponse(findIsEnd(page, count, responses), responses.subList(fromIndex, toIndex));
     }
 
     /*
@@ -187,13 +190,11 @@ public class CafeService {
      *   comments 를 Slice 로 받아온 후 grouping 할 경우 페이지네이션 시 count 보다 적은 데이터 수가 반환될 수 있음.
      *   따라서 comments 전체를 받아온 후, mapId로 grouping 해야 한 후 페이지네이션해야 하므로 isLast 여부를 jpa Slice 로 구할 수 없음.
      *
-     *   grouping 한 결과를 페이지네이션하면 카페 종류 수만큼 페이지네이션되므로, comments 전체를 바탕으로 페이지네이션하여 isEnd 를 찾음.
-     *
-     *   또한, 현재 mapId가 동일하다면 댓글 전체를 리스트로 반환하므로 API 스펙 협의 및 로직 개선 필요.
+     *   또한, 현재 mapId가 동일한 카페의 댓글 전체를 리스트로 반환하므로 API 스펙 협의 및 로직 개선 필요.
      */
-    private boolean findIsEnd(int page, int count, List<Comment> comments) {
+    private boolean findIsEnd(int page, int count, List<MyCommentCafeResponse> responses) {
         int lastDataIndex = (page + 1) * count - 1;
-        return comments.size() - 1 <= lastDataIndex;
+        return responses.size() - 1 <= lastDataIndex;
     }
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
