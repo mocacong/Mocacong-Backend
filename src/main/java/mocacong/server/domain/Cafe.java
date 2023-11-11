@@ -107,4 +107,21 @@ public class Cafe extends BaseTime {
     public void addReview(Review review) {
         this.reviews.add(review);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Cafe cafe = (Cafe) o;
+        return Objects.equals(mapId, cafe.mapId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mapId);
+    }
 }
