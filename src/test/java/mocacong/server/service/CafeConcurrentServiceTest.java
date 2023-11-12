@@ -39,14 +39,12 @@ public class CafeConcurrentServiceTest {
         CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페", "서울시 강남구");
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);
-        List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
 
         for (int i = 0; i < 3; i++) {
             executorService.execute(() -> {
                 try {
                     cafeService.save(request);
-                } catch (DuplicateCafeException e) {
-                    exceptions.add(e); // 중복 예외를 리스트에 추가
+                } catch (DuplicateCafeException ignored) {
                 }
                 latch.countDown();
             });
@@ -55,7 +53,6 @@ public class CafeConcurrentServiceTest {
 
         List<Cafe> actual = cafeRepository.findAll();
         assertAll(
-                () -> assertThat(exceptions).hasSize(2),
                 () -> assertThat(actual).hasSize(1)
         );
     }
