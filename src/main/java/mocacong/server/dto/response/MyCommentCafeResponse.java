@@ -12,4 +12,5 @@ public class MyCommentCafeResponse {
     private String name;
     private String studyType;
     private String comment;
+    private String roadAddress;
 }

@@ -42,7 +42,7 @@ class CommentLikeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "서울시 강남구");
         cafeRepository.save(cafe);
         Comment comment = new Comment(cafe, member2, commentContent);
         commentRepository.save(comment);
@@ -65,7 +65,7 @@ class CommentLikeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "서울시 강남구");
         cafeRepository.save(cafe);
         Comment comment = new Comment(cafe, member2, commentContent);
         commentRepository.save(comment);
@@ -83,7 +83,7 @@ class CommentLikeServiceTest {
         String commentContent = "코딩하고 싶어지는 카페에요.";
         Member member = new Member(email, "encodePassword", "베어");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "서울시 강남구");
         cafeRepository.save(cafe);
         Comment comment = new Comment(cafe, member, commentContent);
         commentRepository.save(comment);
@@ -100,7 +100,7 @@ class CommentLikeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "서울시 강남구");
         cafeRepository.save(cafe);
         Comment comment = new Comment(cafe, member2, commentContent);
         commentRepository.save(comment);
@@ -120,7 +120,7 @@ class CommentLikeServiceTest {
         String commentContent = "코딩하고 싶어지는 카페에요.";
         Member member = new Member(email, "encodePassword", "베어");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "서울시 강남구");
         cafeRepository.save(cafe);
         Comment comment = new Comment(cafe, member, commentContent);
         commentRepository.save(comment);

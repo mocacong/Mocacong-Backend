@@ -24,7 +24,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     void saveComment() {
         String expected = "공부하기 좋아요~🥰";
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "100"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -51,7 +51,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페 코멘트 목록을 조회한다")
     void findComments() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "100"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -71,7 +71,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페 코멘트 첫번째 목록을 조회한다")
     void findCommentsFirstPage() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "베어네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "베어네 카페", "100"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
         회원_가입(signUpRequest);
@@ -94,7 +94,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페 코멘트 첫번째 목록을 제외한 페이지를 조회한다")
     void findCommentsNotFirstPage() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "베어네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "베어네 카페", "100"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
         회원_가입(signUpRequest);
@@ -117,7 +117,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페 코멘트 목록 중 내가 작성한 코멘트만을 조회한다")
     void findOnlyMyComments() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "100"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -145,7 +145,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     void updateComment() {
         String content = "공부하기 좋아요~🥰";
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "100"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -179,7 +179,7 @@ public class CommentAcceptanceTest extends AcceptanceTest {
     void deleteComment() {
         String content = "공부하기 좋아요~🥰";
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "100"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);

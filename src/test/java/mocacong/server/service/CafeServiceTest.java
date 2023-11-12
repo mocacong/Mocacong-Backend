@@ -57,7 +57,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("등록되지 않은 카페를 성공적으로 등록한다")
     void cafeSave() {
-        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페");
+        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페", "100");
 
         cafeService.save(request);
 
@@ -66,18 +66,17 @@ class CafeServiceTest {
     }
 
     @Test
-    @DisplayName("등록되어 있는 카페는 등록하지 않는다")
+    @DisplayName("등록되어 있는 카페를 등록하면 주소가 업데이트 된다")
     void cafeSaveDuplicate() {
-        CafeRegisterRequest request1 = new CafeRegisterRequest("20", "메리네 카페");
+        CafeRegisterRequest request1 = new CafeRegisterRequest("20", "메리네 카페", "100");
         cafeService.save(request1);
 
-        CafeRegisterRequest request2 = new CafeRegisterRequest("20", "카페");
+        CafeRegisterRequest request2 = new CafeRegisterRequest("20", "카페", "200");
+        cafeService.save(request2);
 
         List<Cafe> actual = cafeRepository.findAll();
-        assertAll(
-                () -> assertThrows(DuplicateCafeException.class, () -> cafeService.save(request2)),
-                () -> assertThat(actual).hasSize(1)
-        );
+        assertThat(actual).hasSize(1);
+        assertThat(actual.get(0).getRoadAddress()).isEqualTo("200");
     }
 
     @Test
@@ -85,7 +84,7 @@ class CafeServiceTest {
     void findCafe() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
 
         FindCafeResponse actual = cafeService.findCafeByMapId(member.getId(), cafe.getMapId());
@@ -110,7 +109,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Score score1 = new Score(4, member1, cafe);
         scoreRepository.save(score1);
@@ -138,7 +137,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
@@ -176,7 +175,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
@@ -219,7 +218,7 @@ class CafeServiceTest {
     void previewCafe() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
 
         PreviewCafeResponse actual = cafeService.previewCafeByMapId(member.getId(), cafe.getMapId());
@@ -239,7 +238,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         scoreRepository.save(new Score(4, member1, cafe));
         scoreRepository.save(new Score(5, member2, cafe));
@@ -262,7 +261,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(3, "group", "느려요", "없어요",
@@ -287,7 +286,7 @@ class CafeServiceTest {
     void findCafeAndShowLimitComments() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Comment comment1 = new Comment(cafe, member, "댓글1");
         commentRepository.save(comment1);
@@ -313,7 +312,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(), new CafeReviewRequest(1,
                 "group", "느려요", "없어요",
@@ -344,7 +343,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
@@ -387,7 +386,7 @@ class CafeServiceTest {
         memberRepository.save(member);
         memberRepository.save(member2);
 
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         String mapId = cafe.getMapId();
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/" + expected);
@@ -417,7 +416,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(1, "group", "느려요", "없어요",
@@ -443,8 +442,8 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
-        Cafe cafe2 = new Cafe("2154122541112", "메리카페");
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페", "200");
+        Cafe cafe2 = new Cafe("2154122541112", "메리카페", "100");
         cafeRepository.save(cafe1);
         cafeRepository.save(cafe2);
         cafeService.saveCafeReview(member1.getId(), cafe1.getMapId(),
@@ -463,10 +462,10 @@ class CafeServiceTest {
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 () -> assertThat(actual.getCafes().get(0).getMyScore()).isEqualTo(1),
                 () -> assertThat(actual.getCafes().get(0).getMyStudyType()).isEqualTo("solo"),
-                () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("케이카페"),
+                () -> assertThat(actual.getCafes().get(0).getName()).isEqualTo("케이카페", "200"),
                 () -> assertThat(actual.getCafes().get(1).getMyScore()).isEqualTo(5),
                 () -> assertThat(actual.getCafes().get(1).getMyStudyType()).isEqualTo("group"),
-                () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("메리카페"),
+                () -> assertThat(actual.getCafes().get(1).getName()).isEqualTo("메리카페", "100"),
                 () -> assertThat(actual.getCafes()).hasSize(2)
         );
     }
@@ -478,8 +477,8 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
-        Cafe cafe2 = new Cafe("1212121212121", "메리카페");
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페", "200");
+        Cafe cafe2 = new Cafe("1212121212121", "메리카페", "100");
         cafeRepository.save(cafe1);
         cafeRepository.save(cafe2);
         commentRepository.save(new Comment(cafe1, member1, "댓글1"));
@@ -505,7 +504,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
@@ -536,7 +535,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
 
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
@@ -556,7 +555,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
@@ -584,7 +583,7 @@ class CafeServiceTest {
     void findNotRegisteredCafeReview() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
 
         CafeMyReviewResponse actual = cafeService.findMyCafeReview(member.getId(), cafe.getMapId());
@@ -608,7 +607,7 @@ class CafeServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member1.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
@@ -625,7 +624,7 @@ class CafeServiceTest {
     public void updateCafeReview() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
@@ -653,7 +652,7 @@ class CafeServiceTest {
     public void updateCafeReviewWhenDetailsNull() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
@@ -681,7 +680,7 @@ class CafeServiceTest {
     public void updateCafeReviewNotFoundReview() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
 
         assertThatThrownBy(() -> cafeService.updateCafeReview(member.getId(), cafe.getMapId(),
@@ -697,11 +696,11 @@ class CafeServiceTest {
         Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
-        Cafe cafe2 = new Cafe("2143154311111", "메리카페");
-        Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점");
-        Cafe cafe4 = new Cafe("1585656565441", "메리벅스");
-        Cafe cafe5 = new Cafe("1582212121441", "메리설빙");
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페", "200");
+        Cafe cafe2 = new Cafe("2143154311111", "메리카페", "100");
+        Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점", "300");
+        Cafe cafe4 = new Cafe("1585656565441", "메리벅스", "400");
+        Cafe cafe5 = new Cafe("1582212121441", "메리설빙", "500");
         cafeRepository.save(cafe1);
         cafeRepository.save(cafe2);
         cafeRepository.save(cafe3);
@@ -737,7 +736,7 @@ class CafeServiceTest {
     void getCafesFilterStudyTypeWhenNoMatch() {
         Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         cafeService.saveCafeReview(member.getId(), cafe.getMapId(),
                 new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
@@ -754,10 +753,10 @@ class CafeServiceTest {
     void getCafesFilterFavorites() {
         Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
-        Cafe cafe1 = new Cafe("2143154352323", "케이카페");
-        Cafe cafe2 = new Cafe("2143154311111", "메리카페");
-        Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점");
-        Cafe cafe4 = new Cafe("1585656565441", "메리벅스");
+        Cafe cafe1 = new Cafe("2143154352323", "케이카페", "200");
+        Cafe cafe2 = new Cafe("2143154311111", "메리카페", "100");
+        Cafe cafe3 = new Cafe("2111111125885", "메리카페 2호점", "300");
+        Cafe cafe4 = new Cafe("1585656565441", "메리벅스", "400");
         cafeRepository.save(cafe1);
         cafeRepository.save(cafe2);
         cafeRepository.save(cafe3);
@@ -779,7 +778,7 @@ class CafeServiceTest {
     void getCafesFilterFavoritesWhenNoMatch() {
         Member member = new Member("dlawotn3@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
 
         CafeFilterFavoritesRequest requestBody = new CafeFilterFavoritesRequest(List.of(cafe.getMapId()));
@@ -793,7 +792,7 @@ class CafeServiceTest {
     @DisplayName("카페 이미지를 성공적으로 저장한다")
     void saveCafeImage() throws IOException {
         String expected = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -817,7 +816,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("카페 이미지를 저장한 후 Response를 반환한다.")
     void saveCafeImageWithResponse() throws IOException {
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -838,7 +837,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("카페 이미지를 한 번에 3개까지 저장할 수 있다")
     void saveCafeImagesPerRequest() throws IOException {
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -864,7 +863,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("카페 이미지를 한 번에 세 개를 초과하여 저장하면 예외를 반환한다")
     void saveCafeImagesManyPerRequest() throws IOException {
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("kth990303@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -893,7 +892,7 @@ class CafeServiceTest {
     @DisplayName("사용자가 카페 이미지를 여러 번 저장한다")
     void saveCafeImages() throws IOException {
         String expected = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -920,7 +919,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("사용자가 카페 이미지를 총 3개 보다 많이 저장하면 예외가 발생한다.")
     void saveCafeImagesOver3() throws IOException {
-        Cafe cafe = new Cafe("2143154352323", "베어카페");
+        Cafe cafe = new Cafe("2143154352323", "베어카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("rlawjddn103@naver.com", "a1b2c3d4", "베어", null);
         memberRepository.save(member);
@@ -957,7 +956,7 @@ class CafeServiceTest {
     @DisplayName("사용자가 카페 이미지를 조회한다")
     void findCafeImages() throws IOException {
         String expected = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -983,7 +982,7 @@ class CafeServiceTest {
     @DisplayName("자신이 등록한 카페 이미지를 조회하는 경우 isMe가 True로 반환된다")
     void findCafeMyImagesReturnTrue() throws IOException {
         String expected = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -1009,7 +1008,7 @@ class CafeServiceTest {
     @DisplayName("타인이 등록한 카페이미지를 조회할 때 isMe가 false로 반환된다")
     void findOtherCafeImagesReturnFalse() throws IOException {
         String expected = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member1 = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member1);
@@ -1039,7 +1038,7 @@ class CafeServiceTest {
     @DisplayName("자신이 등록한 이미지부터 등록 순으로 이미지를 조회한다")
     void findCafeImagesReturnOrderedImages() throws IOException {
         String expected = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member1 = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member1);
@@ -1075,7 +1074,7 @@ class CafeServiceTest {
     @DisplayName("타인이 나중에 이미지를 등록해도 자신이 등록한 이미지부터 등록 순으로 조회한다")
     void findCafeImagesReturnOrderedMyImages() throws IOException {
         String expected = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member1 = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member1);
@@ -1112,7 +1111,7 @@ class CafeServiceTest {
     void updateCafeImage() throws IOException {
         String oldImage = "test_img.jpg";
         String newImage = "test_img2.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -1147,7 +1146,7 @@ class CafeServiceTest {
     @DisplayName("존재하지 않는 카페 이미지를 수정 시도할 시 예외를 반환한다")
     void updateCafeImageNotFoundImage() throws IOException {
         String newImage = "test_img.jpg";
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         Member member = new Member("dlawotn3@naver.com", "a1b2c3d4", "메리", null);
         memberRepository.save(member);
@@ -1172,7 +1171,7 @@ class CafeServiceTest {
         memberRepository.save(member);
         memberRepository.save(member2);
 
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         String mapId = cafe.getMapId();
         FileInputStream oldFileInputStream = new FileInputStream("src/test/resources/images/" + oldImage);
@@ -1215,7 +1214,7 @@ class CafeServiceTest {
     void cafeImagesWhenMemberDelete() throws IOException {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/test_img.jpg");
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg",
@@ -1238,7 +1237,7 @@ class CafeServiceTest {
         List<String> notUsedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "200");
         cafeRepository.save(cafe);
         CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member);
         cafeImageRepository.save(cafeImage1);

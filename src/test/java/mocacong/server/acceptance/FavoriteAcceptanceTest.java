@@ -17,7 +17,7 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
     @DisplayName("회원이 카페 즐겨찾기 등록을 진행한다")
     void saveFavoriteCafe() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
@@ -34,7 +34,7 @@ public class FavoriteAcceptanceTest extends AcceptanceTest {
     @DisplayName("회원이 카페 즐겨찾기 삭제를 진행한다")
     void deleteFavoriteCafe() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());

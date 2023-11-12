@@ -25,7 +25,7 @@ class CafeImageTest {
     @DisplayName("해당 카페 이미지의 작성자가 해당 회원이 맞는지 여부를 반환한다")
     @MethodSource("provideCafeImagesMember")
     void isOwned(Member input, boolean expected) {
-        Cafe cafe = new Cafe("123454321", "케이카페");
+        Cafe cafe = new Cafe("123454321", "케이카페", "100");
         CafeImage cafeImage = new CafeImage("test_url", true, cafe, member);
 
         assertThat(cafeImage.isOwned(input)).isEqualTo(expected);
@@ -34,7 +34,7 @@ class CafeImageTest {
     @Test
     @DisplayName("해당 카페 이미지 작성자가 없을 경우, 해당 회원이 맞는지 여부 반환은 항상 false 반환한다")
     void isOwnedWhenMemberNull() {
-        Cafe cafe = new Cafe("123454321", "케이카페");
+        Cafe cafe = new Cafe("123454321", "케이카페", "100");
         CafeImage cafeImage = new CafeImage("test_url", true, cafe, null);
 
         assertThat(cafeImage.isOwned(member)).isFalse();
@@ -43,7 +43,7 @@ class CafeImageTest {
     @Test
     @DisplayName("카페 이미지 작성자를 null 처리한다")
     void removeMember() {
-        Cafe cafe = new Cafe("123454321", "케이카페");
+        Cafe cafe = new Cafe("123454321", "케이카페", "100");
         CafeImage cafeImage = new CafeImage("test_url", true, cafe, member);
 
         cafeImage.removeMember();
@@ -55,7 +55,7 @@ class CafeImageTest {
     @DisplayName("특정 카페 이미지 url을 수정한다")
     void updateCafeImageUrl() {
         String expected = "test_update_url";
-        Cafe cafe = new Cafe("123454321", "케이카페");
+        Cafe cafe = new Cafe("123454321", "케이카페", "100");
         CafeImage cafeImage = new CafeImage("test_url", true, cafe, member);
 
         cafeImage.updateImgUrl(expected);

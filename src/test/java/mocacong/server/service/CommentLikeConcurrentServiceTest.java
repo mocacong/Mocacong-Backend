@@ -43,7 +43,7 @@ public class CommentLikeConcurrentServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "100");
         cafeRepository.save(cafe);
         Comment comment = new Comment(cafe, member2, commentContent);
         commentRepository.save(comment);

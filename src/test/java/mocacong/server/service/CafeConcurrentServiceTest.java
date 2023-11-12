@@ -36,7 +36,7 @@ public class CafeConcurrentServiceTest {
     @Test
     @DisplayName("등록되지 않은 카페를 동시에 여러 번 등록하려 해도 한 번만 등록된다")
     void saveCafeWithConcurrent() throws InterruptedException {
-        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페");
+        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페", "서울시 강남구");
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);
         List<Throwable> exceptions = Collections.synchronizedList(new ArrayList<>());
@@ -65,7 +65,7 @@ public class CafeConcurrentServiceTest {
     void saveScoreWithConcurrent() throws InterruptedException {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);
@@ -97,7 +97,7 @@ public class CafeConcurrentServiceTest {
     void saveCafeReviewWithConcurrent() throws InterruptedException {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);

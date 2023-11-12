@@ -27,7 +27,7 @@ public class CafeImageRepositoryTest {
     @DisplayName("내가 올린 카페 이미지부터 등록 순으로 조회한다")
     void findAllByCafeIdAndIsUsedOrderByCafeImageIdDesc() {
         Pageable pageable = PageRequest.of(0, 5);
-        Cafe cafe = cafeRepository.save(new Cafe("1", "케이카페"));
+        Cafe cafe = cafeRepository.save(new Cafe("1", "케이카페", "서울시 강남구"));
         Member member1 = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         Member member2 = memberRepository.save(new Member("dla@naver.com", "abcd1234", "메리"));
         CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member1);

@@ -29,6 +29,9 @@ public class Cafe extends BaseTime {
     @Column(name = "map_id", unique = true, nullable = false)
     private String mapId;
 
+    @Column(name = "road_address", nullable = false)
+    private String roadAddress;
+
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
 
@@ -44,9 +47,10 @@ public class Cafe extends BaseTime {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    public Cafe(String mapId, String name) {
+    public Cafe(String mapId, String name, String roadAddress) {
         this.mapId = mapId;
         this.name = name;
+        this.roadAddress = roadAddress;
         this.cafeDetail = new CafeDetail();
         this.cafeImages = new ArrayList<>();
         this.score = new ArrayList<>();
@@ -69,6 +73,10 @@ public class Cafe extends BaseTime {
         Sound sound = Sound.averageFrom(reviews.stream().map(Review::getSound)
                 .filter(Objects::nonNull).mapToDouble(Sound::getScore).average().orElse(NONE_REVIEW_SCORE));
         this.cafeDetail = new CafeDetail(studyType, wifi, parking, toilet, desk, power, sound);
+    }
+
+    public void updateCafeRoadAddress(String roadAddress) {
+        this.roadAddress = roadAddress;
     }
 
     private StudyType getMostFrequentStudyType() {

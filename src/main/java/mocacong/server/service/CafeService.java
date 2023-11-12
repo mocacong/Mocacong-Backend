@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,14 @@ public class CafeService {
 
     @Transactional
     public void save(CafeRegisterRequest request) {
-        Cafe cafe = new Cafe(request.getId(), request.getName());
+        Cafe cafe = new Cafe(request.getId(), request.getName(), request.getRoadAddress());
+
+        Optional<Cafe> cafeOptional = cafeRepository.findByMapId(request.getId());
+
+        if (cafeOptional.isPresent()) {
+            cafeOptional.get().updateCafeRoadAddress(request.getRoadAddress());
+            return;
+        }
 
         try {
             cafeRepository.save(cafe);
@@ -149,7 +157,7 @@ public class CafeService {
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore()))
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore(), cafe.getRoadAddress()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
@@ -176,7 +184,8 @@ public class CafeService {
                         comment.getCafe().getMapId(),
                         comment.getCafe().getName(),
                         comment.getCafe().getStudyType(),
-                        comment.getContent()
+                        comment.getContent(),
+                        comment.getCafe().getRoadAddress()
                 ))
                 .collect(Collectors.toList());
         return new MyCommentCafesResponse(comments.isLast(), responses);

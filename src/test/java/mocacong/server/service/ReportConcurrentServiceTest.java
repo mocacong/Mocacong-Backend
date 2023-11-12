@@ -41,7 +41,7 @@ public class ReportConcurrentServiceTest {
         Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
         ExecutorService executorService = Executors.newFixedThreadPool(3);
