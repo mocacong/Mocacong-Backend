@@ -28,7 +28,7 @@ public interface CafeRepository extends JpaRepository<Cafe, Long> {
             "where m.id = :id")
     Slice<Cafe> findByMyFavoriteCafes(Long id, Pageable pageRequest);
 
-    @Query("select new mocacong.server.dto.response.MyReviewCafeResponse(c.mapId,c.name,r.cafeDetail.studyType,s.score,c.roadAddress) from Review r " +
+    @Query("select new mocacong.server.dto.response.MyReviewCafeResponse(c.mapId,c.name,r.cafeDetail.studyType,s.score,c.roadAddress, r.cafeDetail) from Review r " +
             "join r.cafe c " +
             "join r.member m " +
             "join c.score s " +
