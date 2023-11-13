@@ -1,7 +1,6 @@
 package mocacong.server.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.domain.Status;
@@ -132,7 +131,7 @@ public class AuthService {
     @Transactional
     public ReissueTokenResponse reissueAccessToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
-        Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
+        Member member = refreshTokenService.getMemberFromRefreshToken(refreshToken);
         Token token = refreshTokenService.findTokenByRefreshToken(refreshToken);
         String oldAccessToken = token.getAccessToken();
 

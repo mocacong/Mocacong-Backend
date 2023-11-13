@@ -32,7 +32,7 @@ public class RefreshTokenService {
         redisTemplate.opsForValue().set(refreshToken, token, 1728000, TimeUnit.SECONDS);
     }
 
-    public Member validateRefreshTokenAndGetMember(String refreshToken) {
+    public Member getMemberFromRefreshToken(String refreshToken) {
         Token token = redisTemplate.opsForValue().get(refreshToken);
         if (token != null && token.getExpiration() > 0) {
             Long memberId = token.getId();

@@ -24,7 +24,7 @@ class RefreshTokenServiceTest {
 
     @DisplayName("올바른 refresh token 을 가지고 회원 정보를 얻는다")
     @Test
-    public void validateRefreshTokenAndGetMember() {
+    public void getMemberFromRefreshToken() {
         String email = "dlawotn3@naver.com";
         Member member = memberRepository.save(new Member(email, "abcd1234", "메리"));
         Long payload = 1L;
@@ -32,7 +32,7 @@ class RefreshTokenServiceTest {
         String refreshToken = refreshTokenService.createRefreshToken();
         String accessToken = jwtTokenProvider.createAccessToken(payload);
         refreshTokenService.saveTokenInfo(member.getId(), refreshToken, accessToken);
-        Member findMember = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
+        Member findMember = refreshTokenService.getMemberFromRefreshToken(refreshToken);
 
         Assertions.assertAll(
                 () -> Assertions.assertNotNull(refreshToken),
@@ -47,7 +47,7 @@ class RefreshTokenServiceTest {
         String refreshToken = "wrong-refresh-token";
 
         assertThrows(InvalidRefreshTokenException.class,
-                () -> refreshTokenService.validateRefreshTokenAndGetMember(refreshToken)
+                () -> refreshTokenService.getMemberFromRefreshToken(refreshToken)
         );
     }
 }
