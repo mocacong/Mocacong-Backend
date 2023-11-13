@@ -137,7 +137,7 @@ public class AuthService {
 
         // 이전에 발급된 액세스 토큰이 만료가 되어야 새로운 액세스 토큰 발급
         if (jwtTokenProvider.validateIsExpiredAccessToken(oldAccessToken)) {
-            String newAccessToken = jwtTokenProvider.createAccessToken(member.getId());
+            String newAccessToken = issueAccessToken(member);
             token.setAccessToken(newAccessToken);
             redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration()-14400, TimeUnit.SECONDS);
             return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
