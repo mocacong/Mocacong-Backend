@@ -137,6 +137,7 @@ public class AuthService {
         Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
         Token token = refreshTokenService.findTokenByRefreshToken(refreshToken);
         String oldAccessToken = token.getAccessToken();
+        log.info("예전액세스"+oldAccessToken);
 
         // 이전에 발급된 액세스 토큰이 만료가 되어야 새로운 액세스 토큰 발급
         if (jwtTokenProvider.validateIsExpiredAccessToken(oldAccessToken)) {

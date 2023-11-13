@@ -36,9 +36,8 @@ public class RefreshTokenService {
         Token token = redisTemplate.opsForValue().get(refreshToken);
         if (token != null && token.getExpiration() > 0) {
             Long memberId = token.getId();
-            Member findMember = memberRepository.findById(memberId)
+            return memberRepository.findById(memberId)
                     .orElseThrow(NotFoundMemberException::new);
-            return findMember;
         }
         throw new InvalidRefreshTokenException();
     }

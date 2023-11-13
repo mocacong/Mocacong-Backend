@@ -3,7 +3,6 @@ package mocacong.server.service;
 import mocacong.server.domain.Member;
 import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.security.auth.JwtTokenProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +16,6 @@ class RefreshTokenServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private RefreshTokenService refreshTokenService;
 
