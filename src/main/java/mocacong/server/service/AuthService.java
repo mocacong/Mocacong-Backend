@@ -16,7 +16,6 @@ import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
-import mocacong.server.security.auth.kakao.KakaoOAuthUserProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,6 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AppleOAuthUserProvider appleOAuthUserProvider;
-    private final KakaoOAuthUserProvider kakaoOAuthUserProvider;
 
     public TokenResponse login(AuthLoginRequest request) {
         Member findMember = memberRepository.findByEmailAndPlatform(request.getEmail(), Platform.MOCACONG)
@@ -54,8 +52,6 @@ public class AuthService {
 
     public OAuthTokenResponse kakaoOAuthLogin(KakaoLoginRequest request) {
 
-//        OAuthPlatformMemberResponse kakaoPlatformMember =
-//                kakaoOAuthUserProvider.getKakaoPlatformMember(request.getToken());
         return generateOAuthTokenResponse(
                 Platform.KAKAO,
                 request.getEmail(),
