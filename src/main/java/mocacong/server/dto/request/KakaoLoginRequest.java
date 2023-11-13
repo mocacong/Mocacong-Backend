@@ -13,5 +13,8 @@ import javax.validation.constraints.NotBlank;
 public class KakaoLoginRequest {
 
     @NotBlank(message = "1012:공백일 수 없습니다.")
-    private String token;
+    private String email;
+
+    @NotBlank(message = "1012:공백일 수 없습니다.")
+    private String platformId;
 }
