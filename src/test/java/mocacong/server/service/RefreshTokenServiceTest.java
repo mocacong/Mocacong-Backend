@@ -3,6 +3,7 @@ package mocacong.server.service;
 import mocacong.server.domain.Member;
 import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
 import mocacong.server.repository.MemberRepository;
+import mocacong.server.security.auth.JwtTokenProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RefreshTokenServiceTest {
 
     @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    @Autowired
     private MemberRepository memberRepository;
     @Autowired
     private RefreshTokenService refreshTokenService;
@@ -23,16 +26,18 @@ class RefreshTokenServiceTest {
     @Test
     public void validateRefreshTokenAndGetMember() {
         String email = "dlawotn3@naver.com";
-        memberRepository.save(new Member(email, "abcd1234", "메리"));
+        Member member = memberRepository.save(new Member(email, "abcd1234", "메리"));
         Long payload = 1L;
-        String refreshToken = refreshTokenService.createRefreshToken();
 
-        Member member = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
+        String refreshToken = refreshTokenService.createRefreshToken();
+        String accessToken = jwtTokenProvider.createAccessToken(payload);
+        refreshTokenService.saveTokenInfo(member.getId(), refreshToken, accessToken);
+        Member findMember = refreshTokenService.validateRefreshTokenAndGetMember(refreshToken);
 
         Assertions.assertAll(
                 () -> Assertions.assertNotNull(refreshToken),
                 () -> Assertions.assertTrue(refreshToken.length() > 0),
-                () -> assertThat(member.getId()).isEqualTo(payload)
+                () -> assertThat(findMember.getId()).isEqualTo(payload)
         );
     }
 

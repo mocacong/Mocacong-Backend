@@ -49,7 +49,7 @@ public class AuthService {
         validateStatus(findMember);
 
         String accessToken = issueAccessToken(findMember);
-        String refreshToken = issueRefreshToken(findMember);
+        String refreshToken = issueRefreshToken();
 
         // Redis에 refresh 토큰 저장 (사용자 기본키 Id, refresh 토큰, access 토큰)
         refreshTokenService.saveTokenInfo(findMember.getId(), refreshToken, accessToken);
@@ -86,7 +86,7 @@ public class AuthService {
                     validateStatus(findMember);
                     int userReportCount = findMember.getReportCount();
                     String accessToken = issueAccessToken(findMember);
-                    String refreshToken = issueRefreshToken(findMember);
+                    String refreshToken = issueRefreshToken();
 
                     refreshTokenService.saveTokenInfo(findMember.getId(), refreshToken, accessToken);
 
@@ -102,7 +102,7 @@ public class AuthService {
                     Member oauthMember = new Member(email, platform, platformId, Status.ACTIVE);
                     Member savedMember = memberRepository.save(oauthMember);
                     String accessToken = issueAccessToken(savedMember);
-                    String refreshToken = issueRefreshToken(savedMember);
+                    String refreshToken = issueRefreshToken();
 
                     refreshTokenService.saveTokenInfo(savedMember.getId(), refreshToken, accessToken);
                     return new OAuthTokenResponse(accessToken, refreshToken, email, false, platformId,
@@ -114,8 +114,7 @@ public class AuthService {
         return jwtTokenProvider.createAccessToken(findMember.getId());
     }
 
-    private String issueRefreshToken(final Member findMember)
-    {
+    private String issueRefreshToken() {
         return refreshTokenService.createRefreshToken();
     }
 
