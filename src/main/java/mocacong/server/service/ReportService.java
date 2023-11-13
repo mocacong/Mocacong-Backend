@@ -57,7 +57,7 @@ public class ReportService {
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCommentException();
         }
-        return new CommentReportResponse(comment.getReportsCount(), reporter.getReportCount());
+        return new CommentReportResponse(comment.getReportsCount());
     }
 
     private void createCommentReport(Comment comment, Member reporter, String reportReason) {
