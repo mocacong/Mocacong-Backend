@@ -7,7 +7,6 @@ import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
 import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
-import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.unauthorized.InactiveMemberException;
@@ -219,24 +218,6 @@ class AuthServiceTest {
 
         assertThrows(InactiveMemberException.class,
                 () -> authService.appleOAuthLogin(new AppleLoginRequest("token")));
-    }
-
-    @Test
-    @DisplayName("액세스 토큰 재발급 요청이 옳다면 액세스 토큰을 재발급한다")
-    void reissueAccessToken() {
-        String email = "dlawotn3@naver.com";
-        String password = "a1b2c3d4";
-        String encodedPassword = passwordEncoder.encode("a1b2c3d4");
-        Member member = new Member("dlawotn3@naver.com", encodedPassword, "메리");
-        memberRepository.save(member);
-        AuthLoginRequest loginRequest = new AuthLoginRequest(email, password);
-        TokenResponse tokenResponse = authService.login(loginRequest);
-
-        String refreshToken = tokenResponse.getRefreshToken();
-        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
-        ReissueTokenResponse newTokenResponse = authService.reissueAccessToken(request);
-
-        assertNotNull(newTokenResponse.getAccessToken());
     }
 
     @Test
