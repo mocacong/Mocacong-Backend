@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-@Slf4j
 @Component
 public class JwtTokenProvider {
     private final String secretKey;
@@ -51,7 +50,6 @@ public class JwtTokenProvider {
         try {
             jwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            log.info("만료 ok");
             return true;
         }
         return false;
