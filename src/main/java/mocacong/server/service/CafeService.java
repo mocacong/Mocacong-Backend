@@ -58,16 +58,16 @@ public class CafeService {
 
         Optional<Cafe> cafeOptional = cafeRepository.findByMapId(request.getId());
 
-        if (cafeOptional.isPresent()) {
-            cafeOptional.get().updateCafeRoadAddress(request.getRoadAddress());
-            return;
-        }
-
         try {
-            cafeRepository.save(cafe);
+            cafeRepository.findByMapId(request.getId())
+                    .ifPresentOrElse(
+                            existedCafe -> existedCafe.updateCafeRoadAddress(request.getRoadAddress()),
+                            () -> cafeRepository.save(cafe)
+                    );
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateCafeException();
         }
+
     }
 
     @Transactional(readOnly = true)
@@ -180,13 +180,7 @@ public class CafeService {
         Slice<Comment> comments = commentRepository.findByMemberId(member.getId(), PageRequest.of(page, count));
 
         List<MyCommentCafeResponse> responses = comments.stream()
-                .map(comment -> new MyCommentCafeResponse(
-                        comment.getCafe().getMapId(),
-                        comment.getCafe().getName(),
-                        comment.getCafe().getStudyType(),
-                        comment.getContent(),
-                        comment.getCafe().getRoadAddress()
-                ))
+                .map(MyCommentCafeResponse::from)
                 .collect(Collectors.toList());
         return new MyCommentCafesResponse(comments.isLast(), responses);
     }
