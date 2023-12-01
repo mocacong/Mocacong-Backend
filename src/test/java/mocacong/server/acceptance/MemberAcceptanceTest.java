@@ -397,7 +397,10 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .extract()
                 .as(MyCommentCafesResponse.class);
 
-        assertThat(response.getCafes()).hasSize(3);
+        assertAll(
+                ()->assertThat(response.getCafes()).hasSize(2),
+                ()->assertThat(response.getCafes().get(0).getComments()).containsExactlyInAnyOrder("댓글3")
+        );
     }
 
     @Test
