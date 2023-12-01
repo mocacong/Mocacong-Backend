@@ -35,7 +35,7 @@ class FavoriteServiceTest {
     void save() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
 
         FavoriteSaveResponse actual = favoriteService.save(member.getId(), cafe.getMapId());
@@ -52,7 +52,7 @@ class FavoriteServiceTest {
     void saveDuplicate() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         favoriteService.save(member.getId(), cafe.getMapId());
 
@@ -65,7 +65,7 @@ class FavoriteServiceTest {
     void delete() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         Favorite favorite = new Favorite(member, cafe);
         favoriteRepository.save(favorite);
@@ -80,7 +80,7 @@ class FavoriteServiceTest {
     void deleteWithException() {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
 
         assertThrows(NotFoundFavoriteException.class,

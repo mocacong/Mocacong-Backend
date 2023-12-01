@@ -35,10 +35,10 @@ class CafeRepositoryTest {
         String mapId2 = "2";
         String mapId3 = "3";
         String mapId4 = "4";
-        Cafe savedCafe1 = cafeRepository.save(new Cafe(mapId1, "케이카페1"));
-        Cafe savedCafe2 = cafeRepository.save(new Cafe(mapId2, "케이카페2"));
-        Cafe savedCafe3 = cafeRepository.save(new Cafe(mapId3, "케이카페3"));
-        Cafe savedCafe4 = cafeRepository.save(new Cafe(mapId4, "케이카페4"));
+        Cafe savedCafe1 = cafeRepository.save(new Cafe(mapId1, "케이카페", "1001"));
+        Cafe savedCafe2 = cafeRepository.save(new Cafe(mapId2, "케이카페", "1002"));
+        Cafe savedCafe3 = cafeRepository.save(new Cafe(mapId3, "케이카페", "1003"));
+        Cafe savedCafe4 = cafeRepository.save(new Cafe(mapId4, "케이카페", "1004"));
         Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         favoriteRepository.save(new Favorite(member, savedCafe1));
         favoriteRepository.save(new Favorite(member, savedCafe2));
@@ -58,10 +58,10 @@ class CafeRepositoryTest {
     @Test
     @DisplayName("내가 즐겨찾기에 등록한 카페 목록을 조회한다")
     void findByMyFavoriteCafes() {
-        Cafe savedCafe1 = cafeRepository.save(new Cafe("1", "케이카페1"));
-        Cafe savedCafe2 = cafeRepository.save(new Cafe("2", "케이카페2"));
-        Cafe savedCafe3 = cafeRepository.save(new Cafe("3", "케이카페3"));
-        Cafe savedCafe4 = cafeRepository.save(new Cafe("4", "케이카페4"));
+        Cafe savedCafe1 = cafeRepository.save(new Cafe("1", "케이카페1", "100"));
+        Cafe savedCafe2 = cafeRepository.save(new Cafe("2", "케이카페2", "100"));
+        Cafe savedCafe3 = cafeRepository.save(new Cafe("3", "케이카페3", "100"));
+        Cafe savedCafe4 = cafeRepository.save(new Cafe("4", "케이카페4", "100"));
         Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         favoriteRepository.save(new Favorite(member, savedCafe1));
         favoriteRepository.save(new Favorite(member, savedCafe2));
@@ -84,9 +84,9 @@ class CafeRepositoryTest {
     void findByMyReviewCafesById() {
         Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
 
-        Cafe savedCafe1 = cafeRepository.save(new Cafe("1", "케이카페1"));
-        Cafe savedCafe2 = cafeRepository.save(new Cafe("2", "케이카페2"));
-        Cafe savedCafe3 = cafeRepository.save(new Cafe("3", "케이카페3"));
+        Cafe savedCafe1 = cafeRepository.save(new Cafe("1", "케이카페1", "100"));
+        Cafe savedCafe2 = cafeRepository.save(new Cafe("2", "케이카페2", "100"));
+        Cafe savedCafe3 = cafeRepository.save(new Cafe("3", "케이카페3", "100"));
 
         Score score1 = new Score(1, member, savedCafe1);
         Score score2 = new Score(1, member, savedCafe2);

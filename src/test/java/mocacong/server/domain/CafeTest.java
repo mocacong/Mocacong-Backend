@@ -21,7 +21,7 @@ class CafeTest {
     @Test
     @DisplayName("카페에 평점을 기여한 사람이 없으면 0점을 반환한다")
     void findScoreWithNoReviews() {
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
 
         double actual = cafe.findAverageScore();
 
@@ -32,7 +32,7 @@ class CafeTest {
     @DisplayName("카페의 평점을 올바르게 계산하여 반환한다")
     void findScore() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
         Score score1 = new Score(5, member, cafe);
         Score score2 = new Score(2, member, cafe);
 
@@ -46,7 +46,7 @@ class CafeTest {
     void updateCafeDetails() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
 
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
 
         CafeDetail cafeDetail1 = new CafeDetail(StudyType.SOLO, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
         Review review1 = new Review(member, cafe, cafeDetail1);
@@ -76,7 +76,7 @@ class CafeTest {
     @DisplayName("카페 세부정보 리뷰로 both가 작성될 경우 solo, group 포인트가 모두 1씩 증가한다")
     void updateCafeDetailsWhenStudyTypesAddBoth() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
 
         // BOTH 리뷰 추가 -> SOLO, GROUP 모두 1포인트
         CafeDetail cafeDetail1 = new CafeDetail(StudyType.BOTH, Wifi.NORMAL, Parking.COMFORTABLE, Toilet.NORMAL, Desk.UNCOMFORTABLE, Power.FEW, Sound.NOISY);
@@ -111,7 +111,7 @@ class CafeTest {
     void updateCafeDetailsWhenStudyTypesEqual() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
 
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
 
         CafeDetail cafeDetail1 = new CafeDetail(StudyType.SOLO, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
         Review review1 = new Review(member, cafe, cafeDetail1);
@@ -131,7 +131,7 @@ class CafeTest {
     void updateCafeDetailsWhenSomeTypesNoReviews() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
 
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
         CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD);
 
         Review review = new Review(member, cafe, cafeDetail);
@@ -146,7 +146,7 @@ class CafeTest {
     @Test
     @DisplayName("카페에 리뷰가 하나도 없을 경우 모든 세부정보 타입에 null을 반환한다")
     void updateCafeDetailsWhenNoReviews() {
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
 
         cafe.updateCafeDetails();
 
@@ -165,7 +165,7 @@ class CafeTest {
     @DisplayName("카페의 스터디 타입을 반환한다")
     void getStudyType() {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
         CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, null, Toilet.CLEAN, null, Power.MANY, Sound.LOUD);
         Review review = new Review(member, cafe, cafeDetail);
         cafe.addReview(review);
@@ -177,8 +177,20 @@ class CafeTest {
     @Test
     @DisplayName("리뷰가 없는 카페의 스터디 타입은 null 을 반환한다")
     void getStudyTypeWhenNotHasReviews() {
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
 
         assertThat(cafe.getStudyType()).isNull();
     }
+
+    @Test
+    @DisplayName("카페의 도로명 주소를 업데이트한다")
+    void updateRoadAddress() {
+        Cafe cafe = new Cafe("1", "케이카페", "100");
+        String expected = "서울시 강남구 테헤란로 123";
+
+        cafe.updateCafeRoadAddress(expected);
+
+        assertThat(cafe.getRoadAddress()).isEqualTo(expected);
+    }
+
 }

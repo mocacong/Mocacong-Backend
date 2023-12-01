@@ -64,7 +64,7 @@ public class ReportServiceTest {
         Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         commentService.save(member1.getId(), mapId, "이 카페 완전 돈 아깝;;");
 
@@ -84,7 +84,7 @@ public class ReportServiceTest {
         String mapId = "2143154352323";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         CommentSaveResponse saveResponse = commentService.save(member.getId(), mapId, "굳이 이런데 가야하나 ㅋ");
 
@@ -100,7 +100,7 @@ public class ReportServiceTest {
         Member member2 = new Member("dlawotn3@naver.com", "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         commentService.save(member1.getId(), mapId, "이 카페 완전 돈 아깝;;");
 
@@ -119,7 +119,7 @@ public class ReportServiceTest {
         Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         CommentSaveResponse saveResponse = commentService.save(member1.getId(), mapId, "아~ 소설보고 싶다");
 
@@ -141,7 +141,7 @@ public class ReportServiceTest {
             members.add(member);
             memberRepository.save(member);
         }
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         CommentSaveResponse saveResponse = commentService.save(members.get(0).getId(), mapId, "아~ 소설보고 싶다");
 
@@ -173,7 +173,7 @@ public class ReportServiceTest {
         Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         Comment comment = new Comment(cafe, member1, "이 카페 완전 돈 아깝;;");
         commentRepository.save(comment);
@@ -267,7 +267,7 @@ public class ReportServiceTest {
             members.add(member);
             memberRepository.save(member);
         }
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         FileInputStream fileInputStream = new FileInputStream("src/test/resources/images/test_img.jpg");
         MockMultipartFile mockMultipartFile = new MockMultipartFile("test_img", "test_img.jpg",

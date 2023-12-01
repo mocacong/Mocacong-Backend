@@ -24,7 +24,7 @@ public class ReportAcceptanceTest extends AcceptanceTest {
     void reportComment() {
         String reportReason = "insult";
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리");

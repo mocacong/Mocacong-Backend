@@ -26,7 +26,7 @@ class CommentRepositoryTest {
     @DisplayName("코멘트 id, 멤버 id로 댓글 좋아요 id를 조회한다")
     void findByCommentIdAndMemberId() {
         Cafe savedCafe = cafeRepository
-                .save(new Cafe("1", "베어카페"));
+                .save(new Cafe("1", "베어카페", "서울시 강남구"));
         Member savedMember = memberRepository
                 .save(new Member("rlawjddn103@naver.com", "abcd1234", "베어"));
         Comment savedComment = commentRepository

@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,13 +54,21 @@ public class CafeService {
 
     @Transactional
     public void save(CafeRegisterRequest request) {
-        Cafe cafe = new Cafe(request.getId(), request.getName());
+        Cafe cafe = new Cafe(request.getId(), request.getName(), request.getRoadAddress(), request.getPhoneNumber());
+
+
+        Optional<Cafe> cafeOptional = cafeRepository.findByMapId(request.getId());
 
         try {
-            cafeRepository.save(cafe);
+            cafeRepository.findByMapId(request.getId())
+                    .ifPresentOrElse(
+                            existedCafe -> existedCafe.updateCafeRoadAddress(request.getRoadAddress()),
+                            () -> cafeRepository.save(cafe)
+                    );
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateCafeException();
         }
+
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +87,9 @@ public class CafeService {
         return new FindCafeResponse(
                 favoriteId != null,
                 favoriteId,
+                cafe.getName(),
+                cafe.getRoadAddress(),
+                cafe.getPhoneNumber(),
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 cafeDetail.getStudyTypeValue(),
@@ -105,6 +117,8 @@ public class CafeService {
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
         return new PreviewCafeResponse(
+                cafe.getName(),
+                cafe.getRoadAddress(),
                 favoriteId != null,
                 cafe.findAverageScore(),
                 cafeDetail.getStudyTypeValue(),
@@ -149,7 +163,7 @@ public class CafeService {
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore()))
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore(), cafe.getRoadAddress()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
@@ -172,6 +186,7 @@ public class CafeService {
         List<Comment> comments = commentRepository.findAllByMemberId(member.getId());
 
         List<MyCommentCafeResponse> responses = comments.stream()
+//                .map(MyCommentCafeResponse::from)
                 .collect(Collectors.groupingByConcurrent(Comment::getCafe))
                 .entrySet()
                 .stream()
