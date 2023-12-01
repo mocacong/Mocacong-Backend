@@ -4,7 +4,6 @@ import mocacong.server.domain.*;
 import mocacong.server.dto.request.*;
 import mocacong.server.dto.response.*;
 import mocacong.server.exception.badrequest.AlreadyExistsCafeReview;
-import mocacong.server.exception.badrequest.DuplicateCafeException;
 import mocacong.server.exception.badrequest.ExceedCageImagesTotalCountsException;
 import mocacong.server.exception.notfound.NotFoundCafeImageException;
 import mocacong.server.exception.notfound.NotFoundReviewException;
@@ -25,7 +24,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +55,7 @@ class CafeServiceTest {
     @Test
     @DisplayName("등록되지 않은 카페를 성공적으로 등록한다")
     void cafeSave() {
-        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페", "100");
+        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페", "100", "010-1234-5678");
 
         cafeService.save(request);
 
@@ -68,10 +66,10 @@ class CafeServiceTest {
     @Test
     @DisplayName("등록되어 있는 카페를 등록하면 주소가 업데이트 된다")
     void cafeSaveDuplicate() {
-        CafeRegisterRequest request1 = new CafeRegisterRequest("20", "메리네 카페", "100");
+        CafeRegisterRequest request1 = new CafeRegisterRequest("20", "메리네 카페", "100", "010-1234-5678");
         cafeService.save(request1);
 
-        CafeRegisterRequest request2 = new CafeRegisterRequest("20", "카페", "200");
+        CafeRegisterRequest request2 = new CafeRegisterRequest("20", "카페", "200", "010-1234-5678");
         cafeService.save(request2);
 
         List<Cafe> actual = cafeRepository.findAll();
@@ -486,14 +484,14 @@ class CafeServiceTest {
         commentRepository.save(new Comment(cafe2, member1, "댓글3"));
         commentRepository.save(new Comment(cafe2, member2, "댓글4"));
 
-        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getId(), 0, 5);
+        MyCommentCafesResponse actual = cafeService.findMyCommentCafes(member1.getId(), 0, 3);
 
         assertAll(
                 () -> assertThat(actual.getIsEnd()).isTrue(),
-                () -> assertThat(actual.getCafes()).hasSize(3),
-                () -> assertThat(actual.getCafes().get(0).getComment()).isEqualTo("댓글1"),
-                () -> assertThat(actual.getCafes().get(1).getComment()).isEqualTo("댓글2"),
-                () -> assertThat(actual.getCafes().get(2).getComment()).isEqualTo("댓글3")
+                // 댓글 수는 3개지만, 카페 종류가 2종류이므로 response size는 2개
+                () -> assertThat(actual.getCafes()).hasSize(2),
+                () -> assertThat(actual.getCafes().get(0).getComments()).containsExactlyInAnyOrder("댓글1", "댓글2"),
+                () -> assertThat(actual.getCafes().get(1).getComments()).containsExactlyInAnyOrder("댓글3")
         );
     }
 
@@ -915,7 +913,6 @@ class CafeServiceTest {
         );
     }
 
-
     @Test
     @DisplayName("사용자가 카페 이미지를 총 3개 보다 많이 저장하면 예외가 발생한다.")
     void saveCafeImagesOver3() throws IOException {
@@ -1255,5 +1252,29 @@ class CafeServiceTest {
                 () -> assertThat(actual).extracting("imgUrl")
                         .containsExactlyInAnyOrder("test_img.jpg")
         );
+    }
+
+    @Test
+    @DisplayName("신고되어 마스킹된 카페 이미지들은 배치 작업으로 삭제하지 않는다")
+    void notDeleteReportedCafeImages() {
+        List<String> reportedImgUrls = List.of("test_img2.jpg", "test_img3.jpg");
+        Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
+        memberRepository.save(member);
+        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        cafeRepository.save(cafe);
+        CafeImage cafeImage1 = new CafeImage("test_img.jpg", true, cafe, member);
+        cafeImageRepository.save(cafeImage1);
+        CafeImage cafeImage2 = new CafeImage("test_img2.jpg", false, cafe, member);
+        cafeImage2.maskCafeImage();
+        cafeImageRepository.save(cafeImage2);
+        CafeImage cafeImage3 = new CafeImage("test_img3.jpg", false, cafe, member);
+        cafeImage3.maskCafeImage();
+        cafeImageRepository.save(cafeImage3);
+
+        doNothing().when(awsS3Uploader).deleteImages(new DeleteNotUsedImagesEvent(reportedImgUrls));
+        cafeService.deleteNotUsedCafeImages();
+        List<CafeImage> actual = cafeImageRepository.findAll();
+
+        assertThat(actual).hasSize(3);
     }
 }

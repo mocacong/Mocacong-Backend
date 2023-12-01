@@ -17,7 +17,7 @@ public class CommentLikeAcceptanceTest extends AcceptanceTest{
     void saveCommentLike() {
         String mapId = "12332312";
         String comment = "코딩하고 싶어지는 카페에요.";
-        카페_등록(new CafeRegisterRequest(mapId, "정우네 카페", "서울시 강남구"));
+        카페_등록(new CafeRegisterRequest(mapId, "정우네 카페", "서울시 강남구", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
         회원_가입(signUpRequest1);
@@ -43,7 +43,7 @@ public class CommentLikeAcceptanceTest extends AcceptanceTest{
     void deleteCommentLike() {
         String mapId = "12332312";
         String comment = "코딩하고 싶어지는 카페에요.";
-        카페_등록(new CafeRegisterRequest(mapId, "정우네 카페", "서울시 강남구"));
+        카페_등록(new CafeRegisterRequest(mapId, "정우네 카페", "서울시 강남구", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("rlawjddn103@naver.com", "a1b2c3d4", "베어");
         회원_가입(signUpRequest1);

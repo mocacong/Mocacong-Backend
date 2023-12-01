@@ -9,6 +9,16 @@ import org.junit.jupiter.api.Test;
 class CafeTest {
 
     @Test
+    @DisplayName("카페 mapId가 같으면 동일 카페로 간주한다")
+    void equals() {
+        String cafeMapId = "12345";
+        Cafe cafe1 = new Cafe(cafeMapId, "케이카페");
+        Cafe cafe2 = new Cafe(cafeMapId, "이름만다른케이카페");
+
+        assertThat(cafe1.equals(cafe2)).isTrue();
+    }
+
+    @Test
     @DisplayName("카페에 평점을 기여한 사람이 없으면 0점을 반환한다")
     void findScoreWithNoReviews() {
         Cafe cafe = new Cafe("1", "케이카페", "100");

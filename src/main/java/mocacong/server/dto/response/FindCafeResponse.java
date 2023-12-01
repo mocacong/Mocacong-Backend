@@ -11,6 +11,9 @@ public class FindCafeResponse {
 
     private Boolean favorite;
     private Long favoriteId;
+    private String name;
+    private String roadAddress;
+    private String phoneNumber;
     private double score;
     private Integer myScore;
     private String studyType;

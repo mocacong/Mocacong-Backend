@@ -36,7 +36,7 @@ public class CafeConcurrentServiceTest {
     @Test
     @DisplayName("등록되지 않은 카페를 동시에 여러 번 등록하려 해도 한 번만 등록된다")
     void saveCafeWithConcurrent() throws InterruptedException {
-        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페", "서울시 강남구");
+        CafeRegisterRequest request = new CafeRegisterRequest("20", "메리네 카페", "서울시 강남구", "010-1234-5678");
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);
 

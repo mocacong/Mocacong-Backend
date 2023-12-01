@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public class Member extends BaseTime {
 
     private static final Pattern NICKNAME_REGEX = Pattern.compile("^[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]{2,6}$");
-    private static final int REPORT_MEMBER_THRESHOLD_COUNT = 11;
+    private static final int REPORT_MEMBER_THRESHOLD_COUNT = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

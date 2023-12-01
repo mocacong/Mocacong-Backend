@@ -29,8 +29,11 @@ public class Cafe extends BaseTime {
     @Column(name = "map_id", unique = true, nullable = false)
     private String mapId;
 
-    @Column(name = "road_address", nullable = false)
+    @Column(name = "road_address")
     private String roadAddress;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
@@ -47,10 +50,32 @@ public class Cafe extends BaseTime {
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
+    public Cafe(String mapId, String name) {
+        this.mapId = mapId;
+        this.name = name;
+        this.cafeDetail = new CafeDetail();
+        this.cafeImages = new ArrayList<>();
+        this.score = new ArrayList<>();
+        this.reviews = new ArrayList<>();
+        this.comments = new ArrayList<>();
+    }
+
     public Cafe(String mapId, String name, String roadAddress) {
         this.mapId = mapId;
         this.name = name;
         this.roadAddress = roadAddress;
+        this.cafeDetail = new CafeDetail();
+        this.cafeImages = new ArrayList<>();
+        this.score = new ArrayList<>();
+        this.reviews = new ArrayList<>();
+        this.comments = new ArrayList<>();
+    }
+
+    public Cafe(String mapId, String name, String roadAddress, String phoneNumber) {
+        this.mapId = mapId;
+        this.name = name;
+        this.roadAddress = roadAddress;
+        this.phoneNumber = phoneNumber;
         this.cafeDetail = new CafeDetail();
         this.cafeImages = new ArrayList<>();
         this.score = new ArrayList<>();
@@ -114,5 +139,22 @@ public class Cafe extends BaseTime {
 
     public void addReview(Review review) {
         this.reviews.add(review);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Cafe)) {
+            return false;
+        }
+        Cafe cafe = (Cafe) o;
+        return Objects.equals(mapId, cafe.mapId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mapId);
     }
 }
