@@ -54,13 +54,13 @@ public class CafeService {
 
     @Transactional
     public void save(CafeRegisterRequest request) {
-        Cafe cafe = new Cafe(request.getId(), request.getName(), request.getRoadAddress(), request.getPhoneNumber());
+        Cafe cafe = new Cafe(request.getMapId(), request.getName(), request.getRoadAddress(), request.getPhoneNumber());
 
 
-        Optional<Cafe> cafeOptional = cafeRepository.findByMapId(request.getId());
+        Optional<Cafe> cafeOptional = cafeRepository.findByMapId(request.getMapId());
 
         try {
-            cafeRepository.findByMapId(request.getId())
+            cafeRepository.findByMapId(request.getMapId())
                     .ifPresentOrElse(
                             existedCafe -> existedCafe.updateCafeRoadAddress(request.getRoadAddress()),
                             () -> cafeRepository.save(cafe)
