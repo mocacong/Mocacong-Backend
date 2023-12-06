@@ -91,10 +91,6 @@ public class Comment extends BaseTime {
         return getReportsCount() >= REPORT_COMMENT_THRESHOLD_COUNT;
     }
 
-    public boolean isDeletedCommenter() {
-        return isDeletedMember() && isReportThresholdExceeded();
-    }
-
     public boolean hasAlreadyReported(Member member) {
         return this.reports.stream()
                 .anyMatch(report -> report.getReporter().equals(member));
@@ -113,7 +109,7 @@ public class Comment extends BaseTime {
     }
 
     public void updateIsMasked(boolean isMasked) {
-        this.isMasked= isMasked;
+        this.isMasked = isMasked;
     }
 
     public int getLikeCounts() {

@@ -59,7 +59,3 @@ oauth:
     iss: https://appleid.apple.com
     client-id: test
     nonce: nonce
-  kakao:
-    client-id: test
-    client-secret: test
-    redirect-uri: test

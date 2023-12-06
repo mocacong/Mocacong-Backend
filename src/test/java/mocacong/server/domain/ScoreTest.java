@@ -13,7 +13,7 @@ class ScoreTest {
     @DisplayName("평점이 1점 이상 5점 이하가 아니면 예외를 반환한다")
     void invalidRangeScore(int score) {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
 
         assertThatThrownBy(() -> new Score(score, member, cafe))
                 .isInstanceOf(InvalidScoreException.class);
@@ -24,7 +24,7 @@ class ScoreTest {
     @DisplayName("수정 시 평점이 1점 이상 5점 이하가 아니면 예외를 반환한다")
     void updateInvalidRangeScore(int score) {
         Member member = new Member("kth@naver.com", "a1b2c3d4", "케이");
-        Cafe cafe = new Cafe("1", "케이카페");
+        Cafe cafe = new Cafe("1", "케이카페", "100");
         Score oldScore = new Score(3, member, cafe);
         assertThatThrownBy(() -> oldScore.updateScore(score))
                 .isInstanceOf(InvalidScoreException.class);

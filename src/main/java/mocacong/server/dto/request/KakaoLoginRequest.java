@@ -1,10 +1,11 @@
 package mocacong.server.dto.request;
 
-import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -12,5 +13,8 @@ import lombok.NoArgsConstructor;
 public class KakaoLoginRequest {
 
     @NotBlank(message = "1012:공백일 수 없습니다.")
-    private String code;
+    private String email;
+
+    @NotBlank(message = "1012:공백일 수 없습니다.")
+    private String platformId;
 }

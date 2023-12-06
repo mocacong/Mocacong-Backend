@@ -21,7 +21,7 @@ class ScoreRepositoryTest {
     @Test
     @DisplayName("카페 id, 멤버 id로 해당 멤버가 특정 카페에 등록한 평점을 조회한다")
     void findScoreByCafeIdAndMemberId() {
-        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페"));
+        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페", "서울시 강남구"));
         Member member = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         Score score = new Score(4, member, savedCafe);
         scoreRepository.save(score);

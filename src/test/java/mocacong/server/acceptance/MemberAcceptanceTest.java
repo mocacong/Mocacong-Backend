@@ -92,7 +92,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
 
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-1234"));
         카페_리뷰_작성(token, mapId, new CafeReviewRequest(4, "solo", "빵빵해요", "여유로워요",
                 "깨끗해요", "충분해요", "조용해요", "편해요"));
         카페_코멘트_작성(token, mapId, new CommentSaveRequest("좋아요~"));
@@ -113,7 +113,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
         회원_가입(memberSignUpRequest);
         String token = 로그인_토큰_발급(memberSignUpRequest.getEmail(), memberSignUpRequest.getPassword());
 
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-1234"));
         즐겨찾기_등록(token, mapId);
 
         RestAssured.given().log().all()
@@ -313,7 +313,7 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     @DisplayName("마이페이지에서 즐겨찾기 등록한 카페 목록을 조회한다")
     void findMyFavoriteCafes() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-1234"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
@@ -333,8 +333,8 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void findMyReviewCafes() {
         String mapId1 = "12332312";
         String mapId2 = "12121212";
-        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페"));
-        카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페", "서울시 강남구", "010-1234-1234"));
+        카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페", "서울시 강남구", "010-1234-1234"));
         MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리");
         회원_가입(signUpRequest1);
@@ -375,8 +375,8 @@ public class MemberAcceptanceTest extends AcceptanceTest {
     void findMyCommentCafes() {
         String mapId1 = "12332312";
         String mapId2 = "12121212";
-        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페"));
-        카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페", "서울시 강남구", "010-1234-1234"));
+        카페_등록(new CafeRegisterRequest(mapId2, "케이네 카페", "서울시 강남구", "010-1234-1234"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("mery@naver.com", "a1b2c3d4", "메리");
@@ -397,7 +397,10 @@ public class MemberAcceptanceTest extends AcceptanceTest {
                 .extract()
                 .as(MyCommentCafesResponse.class);
 
-        assertThat(response.getCafes()).hasSize(3);
+        assertAll(
+                ()->assertThat(response.getCafes()).hasSize(2),
+                ()->assertThat(response.getCafes().get(0).getComments()).containsExactlyInAnyOrder("댓글3")
+        );
     }
 
     @Test

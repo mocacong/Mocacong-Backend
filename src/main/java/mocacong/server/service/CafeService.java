@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,13 +54,21 @@ public class CafeService {
 
     @Transactional
     public void save(CafeRegisterRequest request) {
-        Cafe cafe = new Cafe(request.getId(), request.getName());
+        Cafe cafe = new Cafe(request.getId(), request.getName(), request.getRoadAddress(), request.getPhoneNumber());
+
+
+        Optional<Cafe> cafeOptional = cafeRepository.findByMapId(request.getId());
 
         try {
-            cafeRepository.save(cafe);
+            cafeRepository.findByMapId(request.getId())
+                    .ifPresentOrElse(
+                            existedCafe -> existedCafe.updateCafeRoadAddress(request.getRoadAddress()),
+                            () -> cafeRepository.save(cafe)
+                    );
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateCafeException();
         }
+
     }
 
     @Transactional(readOnly = true)
@@ -78,6 +87,9 @@ public class CafeService {
         return new FindCafeResponse(
                 favoriteId != null,
                 favoriteId,
+                cafe.getName(),
+                cafe.getRoadAddress(),
+                cafe.getPhoneNumber(),
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 cafeDetail.getStudyTypeValue(),
@@ -105,6 +117,8 @@ public class CafeService {
         Long favoriteId = favoriteRepository.findFavoriteIdByCafeIdAndMemberId(cafe.getId(), member.getId())
                 .orElse(null);
         return new PreviewCafeResponse(
+                cafe.getName(),
+                cafe.getRoadAddress(),
                 favoriteId != null,
                 cafe.findAverageScore(),
                 cafeDetail.getStudyTypeValue(),
@@ -149,7 +163,7 @@ public class CafeService {
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore()))
+                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore(), cafe.getRoadAddress()))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
@@ -169,17 +183,33 @@ public class CafeService {
     public MyCommentCafesResponse findMyCommentCafes(Long memberId, int page, int count) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
-        Slice<Comment> comments = commentRepository.findByMemberId(member.getId(), PageRequest.of(page, count));
+        List<Comment> comments = commentRepository.findAllByMemberId(member.getId());
 
         List<MyCommentCafeResponse> responses = comments.stream()
-                .map(comment -> new MyCommentCafeResponse(
-                        comment.getCafe().getMapId(),
-                        comment.getCafe().getName(),
-                        comment.getCafe().getStudyType(),
-                        comment.getContent()
-                ))
+//                .map(MyCommentCafeResponse::from)
+                .collect(Collectors.groupingByConcurrent(Comment::getCafe))
+                .entrySet()
+                .stream()
+                .map(commentsGroupingByCafe ->
+                        MyCommentCafeResponse.of(commentsGroupingByCafe.getKey(), commentsGroupingByCafe.getValue()))
                 .collect(Collectors.toList());
-        return new MyCommentCafesResponse(comments.isLast(), responses);
+
+        int toIndex = Math.min((page + 1) * count, responses.size());
+        int fromIndex = Math.min(toIndex, page * count);
+
+        return new MyCommentCafesResponse(findIsEnd(page, count, responses), responses.subList(fromIndex, toIndex));
+    }
+
+    /*
+     *   TODO (23.11.11.)
+     *   comments 를 Slice 로 받아온 후 grouping 할 경우 페이지네이션 시 count 보다 적은 데이터 수가 반환될 수 있음.
+     *   따라서 comments 전체를 받아온 후, mapId로 grouping 해야 한 후 페이지네이션해야 하므로 isLast 여부를 jpa Slice 로 구할 수 없음.
+     *
+     *   또한, 현재 mapId가 동일한 카페의 댓글 전체를 리스트로 반환하므로 API 스펙 협의 및 로직 개선 필요.
+     */
+    private boolean findIsEnd(int page, int count, List<MyCommentCafeResponse> responses) {
+        int lastDataIndex = (page + 1) * count - 1;
+        return responses.size() - 1 <= lastDataIndex;
     }
 
     @CacheEvict(key = "#mapId", value = "cafePreviewCache")
@@ -379,7 +409,7 @@ public class CafeService {
 
     @Transactional
     public void deleteNotUsedCafeImages() {
-        List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalse();
+        List<CafeImage> cafeImages = cafeImageRepository.findAllByIsUsedFalseAndIsMaskedFalse();
         List<String> imgUrls = cafeImages.stream()
                 .map(CafeImage::getImgUrl)
                 .collect(Collectors.toList());
