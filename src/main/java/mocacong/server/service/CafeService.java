@@ -350,7 +350,7 @@ public class CafeService {
     private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> requestCafeImages) {
         List<CafeImage> currentOwnedCafeImages = cafe.getCafeImages()
                 .stream()
-                .filter(cafeImage -> cafeImage.isOwned(member))
+                .filter(cafeImage -> cafeImage.isOwned(member) && cafeImage.getIsUsed())
                 .collect(Collectors.toList());
         if (currentOwnedCafeImages.size() + requestCafeImages.size() > CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS) {
             throw new ExceedCageImagesTotalCountsException();
