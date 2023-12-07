@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,13 +53,10 @@ public class CafeService {
 
     @Transactional
     public void save(CafeRegisterRequest request) {
-        Cafe cafe = new Cafe(request.getId(), request.getName(), request.getRoadAddress(), request.getPhoneNumber());
-
-
-        Optional<Cafe> cafeOptional = cafeRepository.findByMapId(request.getId());
+        Cafe cafe = new Cafe(request.getMapId(), request.getName(), request.getRoadAddress(), request.getPhoneNumber());
 
         try {
-            cafeRepository.findByMapId(request.getId())
+            cafeRepository.findByMapId(request.getMapId())
                     .ifPresentOrElse(
                             existedCafe -> existedCafe.updateCafeRoadAddress(request.getRoadAddress()),
                             () -> cafeRepository.save(cafe)
