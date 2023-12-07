@@ -1,12 +1,11 @@
 package mocacong.server.dto.response;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.*;
-
 import mocacong.server.domain.Cafe;
 import mocacong.server.domain.Comment;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,7 +17,7 @@ public class MyCommentCafeResponse {
     private String name;
     private String studyType;
     private String roadAddress;
-    private List<String> comments;
+    private List<String> commentContents;
 
     public static MyCommentCafeResponse of(Cafe cafe, List<Comment> comments) {
         List<String> contents = comments.stream()
