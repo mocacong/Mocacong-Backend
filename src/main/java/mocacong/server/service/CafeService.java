@@ -182,7 +182,6 @@ public class CafeService {
         List<Comment> comments = commentRepository.findAllByMemberId(member.getId());
 
         List<MyCommentCafeResponse> responses = comments.stream()
-//                .map(MyCommentCafeResponse::from)
                 .collect(Collectors.groupingByConcurrent(Comment::getCafe))
                 .entrySet()
                 .stream()
