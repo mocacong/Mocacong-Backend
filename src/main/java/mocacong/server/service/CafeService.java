@@ -349,11 +349,15 @@ public class CafeService {
     private void validateOwnedCafeImagesCounts(Cafe cafe, Member member, List<MultipartFile> requestCafeImages) {
         List<CafeImage> currentOwnedCafeImages = cafe.getCafeImages()
                 .stream()
-                .filter(cafeImage -> cafeImage.isOwned(member))
+                .filter(cafeImage -> isOwnedAndUsed(cafeImage, member))
                 .collect(Collectors.toList());
         if (currentOwnedCafeImages.size() + requestCafeImages.size() > CAFE_IMAGES_PER_MEMBER_LIMIT_COUNTS) {
             throw new ExceedCageImagesTotalCountsException();
         }
+    }
+
+    private boolean isOwnedAndUsed(CafeImage cafeImage, Member member) {
+        return cafeImage.isOwned(member) && cafeImage.getIsUsed();
     }
 
     @Transactional(readOnly = true)
