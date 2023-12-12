@@ -57,4 +57,9 @@ public class RefreshTokenService {
         }
         throw new InvalidRefreshTokenException();
     }
+
+    @Transactional
+    public void updateToken(Token token) {
+        redisTemplate.opsForValue().set(token.getRefreshToken(), token, token.getExpiration(), TimeUnit.SECONDS);
+    }
 }

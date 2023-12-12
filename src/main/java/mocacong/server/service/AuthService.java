@@ -21,12 +21,10 @@ import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import mocacong.server.security.auth.kakao.KakaoOAuthUserProvider;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +36,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AppleOAuthUserProvider appleOAuthUserProvider;
     private final KakaoOAuthUserProvider kakaoOAuthUserProvider;
-    private final RedisTemplate<String, Object> redisTemplate;
 
     public TokenResponse login(AuthLoginRequest request) {
         Member findMember = memberRepository.findByEmailAndPlatform(request.getEmail(), Platform.MOCACONG)
@@ -139,7 +136,7 @@ public class AuthService {
         if (jwtTokenProvider.validateIsExpiredAccessToken(oldAccessToken)) {
             String newAccessToken = issueAccessToken(member);
             token.setAccessToken(newAccessToken);
-            redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration(), TimeUnit.SECONDS);
+            refreshTokenService.updateToken(token);
             return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
         }
         throw new NotExpiredAccessTokenException();
