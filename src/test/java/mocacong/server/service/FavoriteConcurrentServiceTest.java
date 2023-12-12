@@ -37,7 +37,7 @@ public class FavoriteConcurrentServiceTest {
     void saveFavoriteWithConcurrent() throws InterruptedException {
         Member member = new Member("kth990303@naver.com", "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "서울시 강남구");
         cafeRepository.save(cafe);
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         CountDownLatch latch = new CountDownLatch(3);

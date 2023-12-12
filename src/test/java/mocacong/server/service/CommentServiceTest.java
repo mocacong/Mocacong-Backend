@@ -49,7 +49,7 @@ class CommentServiceTest {
         String expected = "공부하기 좋아요~🥰";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
 
         CommentSaveResponse savedComment = commentService.save(member.getId(), mapId, expected);
@@ -78,7 +78,7 @@ class CommentServiceTest {
         String mapId = "2143154352323";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
 
         commentService.save(member.getId(), mapId, "공부하기 좋아요~🥰");
@@ -93,7 +93,7 @@ class CommentServiceTest {
         String mapId = "2143154352323";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
         commentRepository.save(new Comment(cafe, member, "댓글1"));
         commentRepository.save(new Comment(cafe, member, "댓글2"));
@@ -118,7 +118,7 @@ class CommentServiceTest {
         String mapId = "2143154352323";
         Member member = new Member(email, "encodePassword", "베어");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "100");
         cafeRepository.save(cafe);
         commentRepository.save(new Comment(cafe, member, "댓글1"));
         commentRepository.save(new Comment(cafe, member, "댓글2"));
@@ -148,7 +148,7 @@ class CommentServiceTest {
         Member member2 = new Member("mery@naver.com", "encodePassword", "메리");
         memberRepository.save(member);
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
         commentRepository.save(new Comment(cafe, member, "댓글1"));
         commentRepository.save(new Comment(cafe, member2, "댓글2"));
@@ -174,7 +174,7 @@ class CommentServiceTest {
         String comment = "공부하기 좋아요~🥰";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
         CommentSaveResponse savedComment = commentService.save(member.getId(), mapId, comment);
         String expected = "조용하고 좋네요";
@@ -194,7 +194,7 @@ class CommentServiceTest {
         String comment = "공부하기 좋아요~🥰";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
         CommentSaveResponse savedComment = commentService.save(member.getId(), mapId, comment);
         String expected = "조용하고 좋네요";
@@ -214,7 +214,7 @@ class CommentServiceTest {
         memberRepository.save(member1);
         Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
         CommentSaveResponse savedComment = commentService.save(member1.getId(), mapId, "조용하고 좋네요");
 
@@ -229,7 +229,7 @@ class CommentServiceTest {
         String mapId = "2143154352323";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
         CommentSaveResponse response = commentService.save(member.getId(), mapId, "공부하기 좋아요~🥰");
 
@@ -246,7 +246,7 @@ class CommentServiceTest {
         String mapId = "2143154352323";
         Member member = new Member(email, "encodePassword", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
 
         assertThatThrownBy(() -> commentService.delete(member.getId(), mapId, 9999L))
@@ -263,7 +263,7 @@ class CommentServiceTest {
         Member member2 = new Member(email2, "encodePassword", "메리");
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Cafe cafe = new Cafe(mapId, "케이카페");
+        Cafe cafe = new Cafe(mapId, "케이카페", "100");
         cafeRepository.save(cafe);
         CommentSaveResponse response = commentService.save(member1.getId(), mapId, "공부하기 좋아요~🥰");
 
@@ -279,7 +279,7 @@ class CommentServiceTest {
         String commentContent = "코딩하고 싶어지는 카페에요.";
         Member member = new Member(email, "encodePassword", "베어");
         memberRepository.save(member);
-        Cafe cafe = new Cafe(mapId, "베어카페");
+        Cafe cafe = new Cafe(mapId, "베어카페", "100");
         cafeRepository.save(cafe);
         Comment savedComment = commentRepository.save(new Comment(cafe, member, commentContent));
         commentLikeRepository.save(new CommentLike(member, savedComment));

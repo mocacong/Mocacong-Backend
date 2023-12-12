@@ -9,7 +9,6 @@ import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
-import mocacong.server.security.auth.kakao.KakaoOAuthUserProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,8 +27,6 @@ public class AuthAcceptanceTest extends AcceptanceTest {
 
     @MockBean
     private AppleOAuthUserProvider appleOAuthUserProvider;
-    @MockBean
-    private KakaoOAuthUserProvider kakaoOAuthUserProvider;
 
     @Test
     @DisplayName("회원이 정상적으로 로그인한다")
@@ -85,8 +81,7 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     void loginKakaoOAuth() {
         String expected = "kth@kakao.com";
         OAuthPlatformMemberResponse oauthResponse = new OAuthPlatformMemberResponse("1234321", expected);
-        when(kakaoOAuthUserProvider.getKakaoPlatformMember(anyString())).thenReturn(oauthResponse);
-        KakaoLoginRequest request = new KakaoLoginRequest("token");
+        KakaoLoginRequest request = new KakaoLoginRequest(expected, oauthResponse.getPlatformId());
 
         OAuthTokenResponse actual = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
