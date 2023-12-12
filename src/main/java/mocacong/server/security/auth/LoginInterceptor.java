@@ -1,6 +1,5 @@
 package mocacong.server.security.auth;
 
-import mocacong.server.repository.MemberRepository;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,11 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
-    private final MemberRepository memberRepository;
 
-    public LoginInterceptor(final JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository) {
+    public LoginInterceptor(final JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.memberRepository = memberRepository;
     }
 
     @Override

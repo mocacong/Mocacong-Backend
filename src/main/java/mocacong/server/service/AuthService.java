@@ -141,8 +141,7 @@ public class AuthService {
             token.setAccessToken(newAccessToken);
             redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration()-14400, TimeUnit.SECONDS);
             return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
-        } else {
-            throw new NotExpiredAccessTokenException();
         }
+        throw new NotExpiredAccessTokenException();
     }
 }
