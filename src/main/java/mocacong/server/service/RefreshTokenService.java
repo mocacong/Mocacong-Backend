@@ -51,6 +51,10 @@ public class RefreshTokenService {
     }
 
     public Token findTokenByRefreshToken(String refreshToken) {
-        return (Token) redisTemplate.opsForValue().get(refreshToken);
+        Token token = (Token) redisTemplate.opsForValue().get(refreshToken);
+        if (token != null) {
+            return token;
+        }
+        throw new InvalidRefreshTokenException();
     }
 }
