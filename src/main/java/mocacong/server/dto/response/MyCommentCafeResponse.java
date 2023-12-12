@@ -17,12 +17,14 @@ public class MyCommentCafeResponse {
     private String name;
     private String studyType;
     private String roadAddress;
+    private double score;
     private List<String> commentContents;
 
     public static MyCommentCafeResponse of(Cafe cafe, List<Comment> comments) {
         List<String> contents = comments.stream()
                 .map(Comment::getContent)
                 .collect(Collectors.toList());
-        return new MyCommentCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.getRoadAddress(), contents);
+        return new MyCommentCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.getRoadAddress(),
+                cafe.findAverageScore(),  contents);
     }
 }
