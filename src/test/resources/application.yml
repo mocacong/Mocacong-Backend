@@ -25,6 +25,7 @@ spring:
 security.jwt.token:
   secret-key: testtesttesttesttesttesttesttesttesttest
   access-key-expire-length: 864000
+  refresh-key-expire-length: 1728000
 
 cloud:
   aws:

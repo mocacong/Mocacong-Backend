@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.TimeToLive;
 
 import javax.persistence.Id;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -27,5 +28,9 @@ public class Token {
 
     public void setAccessToken(String newAccessToken) {
         this.accessToken = newAccessToken;
+    }
+
+    public static String createRefreshToken() {
+        return UUID.randomUUID().toString();
     }
 }

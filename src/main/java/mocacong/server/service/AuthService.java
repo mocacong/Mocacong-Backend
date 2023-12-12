@@ -38,7 +38,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AppleOAuthUserProvider appleOAuthUserProvider;
     private final KakaoOAuthUserProvider kakaoOAuthUserProvider;
-    private final RedisTemplate<String, Token> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public TokenResponse login(AuthLoginRequest request) {
         Member findMember = memberRepository.findByEmailAndPlatform(request.getEmail(), Platform.MOCACONG)
@@ -113,7 +113,7 @@ public class AuthService {
     }
 
     private String issueRefreshToken() {
-        return refreshTokenService.createRefreshToken();
+        return Token.createRefreshToken();
     }
 
     private void validatePassword(final Member findMember, final String password) {

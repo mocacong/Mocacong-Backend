@@ -10,21 +10,19 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class RefreshTokenService {
 
     private final long validityRefreshTokenInMilliseconds;
-
     private final MemberRepository memberRepository;
-    private final RedisTemplate<String, Token> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public RefreshTokenService(@Value("${security.jwt.token.refresh-key-expire-length}")
                             long validityRefreshTokenInMilliseconds,
                                MemberRepository memberRepository,
-                               RedisTemplate<String, Token> redisTemplate) {
+                               RedisTemplate<String, Object> redisTemplate) {
         this.validityRefreshTokenInMilliseconds = validityRefreshTokenInMilliseconds;
         this.memberRepository = memberRepository;
         this.redisTemplate = redisTemplate;
@@ -43,7 +41,7 @@ public class RefreshTokenService {
     }
 
     public Member getMemberFromRefreshToken(String refreshToken) {
-        Token token = redisTemplate.opsForValue().get(refreshToken);
+        Token token = findTokenByRefreshToken(refreshToken);
         if (token != null && token.getExpiration() > 0) {
             Long memberId = token.getId();
             return memberRepository.findById(memberId)
@@ -52,11 +50,7 @@ public class RefreshTokenService {
         throw new InvalidRefreshTokenException();
     }
 
-    public String createRefreshToken() {
-        return UUID.randomUUID().toString();
-    }
-
     public Token findTokenByRefreshToken(String refreshToken) {
-        return redisTemplate.opsForValue().get(refreshToken);
+        return (Token) redisTemplate.opsForValue().get(refreshToken);
     }
 }

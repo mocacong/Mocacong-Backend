@@ -1,6 +1,7 @@
 package mocacong.server.service;
 
 import mocacong.server.domain.Member;
+import mocacong.server.domain.Token;
 import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.JwtTokenProvider;
@@ -29,7 +30,7 @@ class RefreshTokenServiceTest {
         Member member = memberRepository.save(new Member(email, "abcd1234", "메리"));
         Long payload = 1L;
 
-        String refreshToken = refreshTokenService.createRefreshToken();
+        String refreshToken = Token.createRefreshToken();
         String accessToken = jwtTokenProvider.createAccessToken(payload);
         refreshTokenService.saveTokenInfo(member.getId(), refreshToken, accessToken);
         Member findMember = refreshTokenService.getMemberFromRefreshToken(refreshToken);
