@@ -490,8 +490,8 @@ class CafeServiceTest {
                 () -> assertThat(actual.getIsEnd()).isTrue(),
                 // 댓글 수는 3개지만, 카페 종류가 2종류이므로 response size는 2개
                 () -> assertThat(actual.getCafes()).hasSize(2),
-                () -> assertThat(actual.getCafes().get(0).getComments()).containsExactlyInAnyOrder("댓글1", "댓글2"),
-                () -> assertThat(actual.getCafes().get(1).getComments()).containsExactlyInAnyOrder("댓글3")
+                () -> assertThat(actual.getCafes().get(0).getCommentContents()).containsExactlyInAnyOrder("댓글1", "댓글2"),
+                () -> assertThat(actual.getCafes().get(1).getCommentContents()).containsExactlyInAnyOrder("댓글3")
         );
     }
 
