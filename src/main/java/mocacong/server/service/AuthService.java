@@ -139,7 +139,7 @@ public class AuthService {
         if (jwtTokenProvider.validateIsExpiredAccessToken(oldAccessToken)) {
             String newAccessToken = issueAccessToken(member);
             token.setAccessToken(newAccessToken);
-            redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration()-14400, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(refreshToken, token, token.getExpiration(), TimeUnit.SECONDS);
             return ReissueTokenResponse.from(newAccessToken, member.getReportCount());
         }
         throw new NotExpiredAccessTokenException();

@@ -1,11 +1,11 @@
 package mocacong.server.service;
 
-import lombok.RequiredArgsConstructor;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Token;
 import mocacong.server.exception.notfound.NotFoundMemberException;
 import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
 import mocacong.server.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +14,21 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@RequiredArgsConstructor
 public class RefreshTokenService {
+
+    private final long validityRefreshTokenInMilliseconds;
 
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Token> redisTemplate;
+
+    public RefreshTokenService(@Value("${security.jwt.token.refresh-key-expire-length}")
+                            long validityRefreshTokenInMilliseconds,
+                               MemberRepository memberRepository,
+                               RedisTemplate<String, Token> redisTemplate) {
+        this.validityRefreshTokenInMilliseconds = validityRefreshTokenInMilliseconds;
+        this.memberRepository = memberRepository;
+        this.redisTemplate = redisTemplate;
+    }
 
     @Transactional
     public void saveTokenInfo(Long memberId, String refreshToken, String accessToken) {
@@ -26,10 +36,10 @@ public class RefreshTokenService {
                 .id(memberId)
                 .refreshToken(refreshToken)
                 .accessToken(accessToken)
-                .expiration(1728000) // 리프레시 토큰 유효기간
+                .expiration(validityRefreshTokenInMilliseconds) // 리프레시 토큰 유효기간
                 .build();
 
-        redisTemplate.opsForValue().set(refreshToken, token, 1728000, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(refreshToken, token, validityRefreshTokenInMilliseconds, TimeUnit.SECONDS);
     }
 
     public Member getMemberFromRefreshToken(String refreshToken) {

@@ -1,7 +1,6 @@
 package mocacong.server.security.auth;
 
 import io.jsonwebtoken.*;
-import lombok.extern.slf4j.Slf4j;
 import mocacong.server.exception.unauthorized.AccessTokenExpiredException;
 import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
 import org.springframework.beans.factory.annotation.Value;

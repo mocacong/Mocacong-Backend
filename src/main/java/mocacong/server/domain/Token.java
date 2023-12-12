@@ -23,7 +23,7 @@ public class Token {
     private String accessToken;
 
     @TimeToLive(unit = TimeUnit.SECONDS)
-    private Integer expiration;
+    private long expiration;
 
     public void setAccessToken(String newAccessToken) {
         this.accessToken = newAccessToken;
