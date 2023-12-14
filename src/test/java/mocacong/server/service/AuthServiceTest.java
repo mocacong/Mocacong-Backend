@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
 
-@Slf4j
 @ServiceTest
 class AuthServiceTest {
 
