@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -28,7 +27,6 @@ public class RefreshTokenService {
         this.redisTemplate = redisTemplate;
     }
 
-    @Transactional
     public void saveTokenInfo(Long memberId, String refreshToken, String accessToken) {
         Token token = Token.builder()
                 .id(memberId)
@@ -58,7 +56,6 @@ public class RefreshTokenService {
         throw new InvalidRefreshTokenException();
     }
 
-    @Transactional
     public void updateToken(Token token) {
         redisTemplate.opsForValue().set(token.getRefreshToken(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
     }
