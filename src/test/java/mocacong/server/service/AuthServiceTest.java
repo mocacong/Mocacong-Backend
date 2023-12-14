@@ -1,5 +1,8 @@
 package mocacong.server.service;
 
+import groovy.util.logging.Slf4j;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.domain.Status;
@@ -10,25 +13,28 @@ import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
 import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
+import mocacong.server.exception.badrequest.NotExpiredAccessTokenException;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.unauthorized.InactiveMemberException;
-import mocacong.server.exception.unauthorized.InvalidRefreshTokenException;
 import mocacong.server.repository.MemberRepository;
-import mocacong.server.security.auth.JwtTokenProvider;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.when;
 
+@Slf4j
 @ServiceTest
 class AuthServiceTest {
 
@@ -38,6 +44,8 @@ class AuthServiceTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthService authService;
+    @Value("${security.jwt.token.secret-key}")
+    private String secretKey;
 
     @MockBean
     private AppleOAuthUserProvider appleOAuthUserProvider;
@@ -229,8 +237,13 @@ class AuthServiceTest {
     @Test
     @DisplayName("액세스 토큰 재발급 요청이 올바르다면 액세스 토큰을 재발급한다")
     void reissueAccessToken() {
-        String refreshToken = "validRefreshToken";
-        String expiredAccessToken = "expiredAccessToken";
+        String refreshToken = "valid-refresh-token";
+        Date now = new Date();
+        long expiredValidityInMilliseconds = 0L;
+        String expiredAccessToken = Jwts.builder()
+                .setExpiration(new Date(now.getTime() + expiredValidityInMilliseconds))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
         String encodedPassword = passwordEncoder.encode("a1b2c3d4");
         Member member = new Member("kth990303@naver.com", encodedPassword, "케이");
 
@@ -248,12 +261,25 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("액세스 토큰 재발급 요청이 올바르지 않다면 액세스 토큰을 재발급하지 않는다")
-    void notReissueAccessToken() {
-        String refreshToken = "wrong-refresh-token";
+    @DisplayName("만료되지 않은 액세스 토큰을 가지고 재발급 요청 시 예외 발생")
+    void reissueAccessTokenFailsWhenNotExpired() {
+        String refreshToken = "valid-refresh-token";
+        Date now = new Date();
+        long futureValidityInMilliseconds = 3600000L;
+        String validAccessToken = Jwts.builder()
+                .setExpiration(new Date(now.getTime() + futureValidityInMilliseconds))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+        String encodedPassword = passwordEncoder.encode("a1b2c3d4");
+        Member member = new Member("kth990303@naver.com", encodedPassword, "케이");
+
+        Token token = new Token(member.getId(), refreshToken, validAccessToken, 999);
+        when(refreshTokenService.getMemberFromRefreshToken(refreshToken)).thenReturn(member);
+        when(refreshTokenService.findTokenByRefreshToken(refreshToken)).thenReturn(token);
+
         RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
 
-        assertThrows(InvalidRefreshTokenException.class,
+        assertThrows(NotExpiredAccessTokenException.class,
                 () -> authService.reissueAccessToken(request));
     }
 }

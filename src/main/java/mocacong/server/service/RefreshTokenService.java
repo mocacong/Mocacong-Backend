@@ -60,6 +60,6 @@ public class RefreshTokenService {
 
     @Transactional
     public void updateToken(Token token) {
-        redisTemplate.opsForValue().set(token.getRefreshToken(), token, token.getExpiration(), TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(token.getRefreshToken(), token, token.getExpiration(), TimeUnit.MILLISECONDS);
     }
 }

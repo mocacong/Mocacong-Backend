@@ -130,7 +130,7 @@ public class AuthService {
         String oldAccessToken = token.getAccessToken();
 
         // 이전에 발급된 액세스 토큰이 만료가 되어야 새로운 액세스 토큰 발급
-        if (jwtTokenProvider.validateIsExpiredAccessToken(oldAccessToken)) {
+        if (jwtTokenProvider.isExpiredAccessToken(oldAccessToken)) {
             String newAccessToken = issueAccessToken(member);
             token.setAccessToken(newAccessToken);
             refreshTokenService.updateToken(token);
