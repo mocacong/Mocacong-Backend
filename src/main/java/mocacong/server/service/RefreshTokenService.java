@@ -42,7 +42,7 @@ public class RefreshTokenService {
 
     public Member getMemberFromRefreshToken(String refreshToken) {
         Token token = findTokenByRefreshToken(refreshToken);
-        if (token != null && token.getExpiration() > 0) {
+        if (token.getExpiration() > 0) {
             Long memberId = token.getId();
             return memberRepository.findById(memberId)
                     .orElseThrow(NotFoundMemberException::new);
