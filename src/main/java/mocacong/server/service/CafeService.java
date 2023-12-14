@@ -84,8 +84,8 @@ public class CafeService {
                 favoriteId != null,
                 favoriteId,
                 cafe.getName(),
-                cafe.getRoadAddress(),
-                cafe.getPhoneNumber(),
+                cafe.getRoadAddress() != null ? cafe.getRoadAddress() : null,
+                cafe.getPhoneNumber() != null ? cafe.getPhoneNumber() : null,
                 cafe.findAverageScore(),
                 scoreByLoginUser != null ? scoreByLoginUser.getScore() : null,
                 cafeDetail.getStudyTypeValue(),
@@ -114,7 +114,7 @@ public class CafeService {
                 .orElse(null);
         return new PreviewCafeResponse(
                 cafe.getName(),
-                cafe.getRoadAddress(),
+                cafe.getRoadAddress() != null ? cafe.getRoadAddress() : null,
                 favoriteId != null,
                 cafe.findAverageScore(),
                 cafeDetail.getStudyTypeValue(),
@@ -159,7 +159,9 @@ public class CafeService {
         List<MyFavoriteCafeResponse> responses = myFavoriteCafes
                 .getContent()
                 .stream()
-                .map(cafe -> new MyFavoriteCafeResponse(cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore(), cafe.getRoadAddress()))
+                .map(cafe -> new MyFavoriteCafeResponse(
+                        cafe.getMapId(), cafe.getName(), cafe.getStudyType(), cafe.findAverageScore(),
+                        cafe.getRoadAddress() != null ? cafe.getRoadAddress() : null))
                 .collect(Collectors.toList());
         return new MyFavoriteCafesResponse(myFavoriteCafes.isLast(), responses);
     }
