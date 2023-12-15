@@ -114,7 +114,7 @@ public class ReportService {
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateReportCafeImageException();
         }
-        return new CafeImageReportResponse(cafeImage.getReportsCount(), reporter.getReportCount());
+        return new CafeImageReportResponse(cafeImage.getReportsCount());
     }
 
     private void createCafeImageReport(CafeImage cafeImage, Member reporter, String reportReason) {
