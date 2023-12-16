@@ -1,29 +1,31 @@
 package mocacong.server.security.auth;
 
-import mocacong.server.exception.unauthorized.InvalidTokenException;
-import mocacong.server.exception.unauthorized.TokenExpiredException;
+import io.jsonwebtoken.*;
+import mocacong.server.exception.unauthorized.AccessTokenExpiredException;
+import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import io.jsonwebtoken.*;
 
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
     private final String secretKey;
-    private final long validityInMilliseconds;
+    private final long validityAccessTokenInMilliseconds;
+
     private final JwtParser jwtParser;
 
     public JwtTokenProvider(@Value("${security.jwt.token.secret-key}") String secretKey,
-                            @Value("${security.jwt.token.expire-length}") long validityInMilliseconds) {
+                            @Value("${security.jwt.token.access-key-expire-length}")
+                            long validityAccessTokenInMilliseconds) {
         this.secretKey = secretKey;
-        this.validityInMilliseconds = validityInMilliseconds;
+        this.validityAccessTokenInMilliseconds = validityAccessTokenInMilliseconds;
         this.jwtParser = Jwts.parser().setSigningKey(secretKey);
     }
 
-    public String createToken(Long memberId) {
+    public String createAccessToken(Long memberId) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + validityAccessTokenInMilliseconds);
 
         return Jwts.builder()
                 .setSubject(String.valueOf(memberId))
@@ -33,23 +35,32 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void validateToken(String token) {
+    public void validateAccessToken(String token) {
         try {
             jwtParser.parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new TokenExpiredException();
+            throw new AccessTokenExpiredException();
         } catch (JwtException e) {
-            throw new InvalidTokenException();
+            throw new InvalidAccessTokenException();
         }
+    }
+
+    public boolean isExpiredAccessToken(String token) {
+        try {
+            jwtParser.parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
+        return false;
     }
 
     public String getPayload(String token) {
         try {
             return jwtParser.parseClaimsJws(token).getBody().getSubject();
         } catch (ExpiredJwtException e) {
-            throw new TokenExpiredException();
+            throw new AccessTokenExpiredException();
         } catch (JwtException e) {
-            throw new InvalidTokenException();
+            throw new InvalidAccessTokenException();
         }
     }
 }

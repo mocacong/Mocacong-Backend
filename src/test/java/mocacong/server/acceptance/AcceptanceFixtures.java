@@ -28,7 +28,7 @@ public class AcceptanceFixtures {
                 .statusCode(HttpStatus.OK.value())
                 .extract()
                 .as(TokenResponse.class)
-                .getToken();
+                .getAccessToken();
     }
 
     public static ExtractableResponse<Response> 카페_등록(CafeRegisterRequest request) {

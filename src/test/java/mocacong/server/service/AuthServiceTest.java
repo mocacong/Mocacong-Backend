@@ -1,22 +1,33 @@
 package mocacong.server.service;
 
+import groovy.util.logging.Slf4j;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import mocacong.server.domain.Member;
 import mocacong.server.domain.Platform;
 import mocacong.server.domain.Status;
+import mocacong.server.domain.Token;
 import mocacong.server.dto.request.AppleLoginRequest;
 import mocacong.server.dto.request.AuthLoginRequest;
+import mocacong.server.dto.request.RefreshTokenRequest;
 import mocacong.server.dto.response.OAuthTokenResponse;
+import mocacong.server.dto.response.ReissueTokenResponse;
 import mocacong.server.dto.response.TokenResponse;
+import mocacong.server.exception.badrequest.NotExpiredAccessTokenException;
 import mocacong.server.exception.badrequest.PasswordMismatchException;
 import mocacong.server.exception.unauthorized.InactiveMemberException;
 import mocacong.server.repository.MemberRepository;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import mocacong.server.security.auth.apple.AppleOAuthUserProvider;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,9 +43,13 @@ class AuthServiceTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthService authService;
+    @Value("${security.jwt.token.secret-key}")
+    private String secretKey;
 
     @MockBean
     private AppleOAuthUserProvider appleOAuthUserProvider;
+    @MockBean
+    private RefreshTokenService refreshTokenService;
 
     @Test
     @DisplayName("회원 로그인 요청이 옳다면 토큰을 발급하고 상태는 ACTIVE로 반환한다")
@@ -50,7 +65,8 @@ class AuthServiceTest {
 
         assertAll(
                 () -> assertThat(member.getStatus()).isEqualTo(Status.ACTIVE),
-                () -> assertNotNull(tokenResponse.getToken()),
+                () -> assertNotNull(tokenResponse.getAccessToken()),
+                () -> assertNotNull(tokenResponse.getRefreshToken()),
                 () -> assertThat(tokenResponse.getUserReportCount()).isEqualTo(0)
         );
     }
@@ -96,7 +112,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -123,7 +140,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isTrue(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -143,7 +161,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(expected),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -164,7 +183,8 @@ class AuthServiceTest {
         OAuthTokenResponse actual = authService.appleOAuthLogin(new AppleLoginRequest("token"));
 
         assertAll(
-                () -> assertThat(actual.getToken()).isNotNull(),
+                () -> assertThat(actual.getAccessToken()).isNotNull(),
+                () -> assertThat(actual.getRefreshToken()).isNotNull(),
                 () -> assertThat(actual.getEmail()).isEqualTo(email),
                 () -> assertThat(actual.getIsRegistered()).isFalse(),
                 () -> assertThat(actual.getPlatformId()).isEqualTo(platformId)
@@ -185,7 +205,8 @@ class AuthServiceTest {
         memberRepository.save(member);
 
         assertAll(
-                () -> assertThat(response.getToken()).isNotNull(),
+                () -> assertThat(response.getAccessToken()).isNotNull(),
+                () -> assertThat(response.getRefreshToken()).isNotNull(),
                 () -> assertThat(response.getEmail()).isEqualTo(member.getEmail())
         );
     }
@@ -210,5 +231,54 @@ class AuthServiceTest {
 
         assertThrows(InactiveMemberException.class,
                 () -> authService.appleOAuthLogin(new AppleLoginRequest("token")));
+    }
+
+    @Test
+    @DisplayName("액세스 토큰 재발급 요청이 올바르다면 액세스 토큰을 재발급한다")
+    void reissueAccessToken() {
+        String refreshToken = "valid-refresh-token";
+        Date now = new Date();
+        long expiredValidityInMilliseconds = 0L;
+        String expiredAccessToken = Jwts.builder()
+                .setExpiration(new Date(now.getTime() + expiredValidityInMilliseconds))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+        String encodedPassword = passwordEncoder.encode("a1b2c3d4");
+        Member member = new Member("kth990303@naver.com", encodedPassword, "케이");
+
+        Token token = new Token(member.getId(), refreshToken, expiredAccessToken, 0);
+        when(refreshTokenService.getMemberFromRefreshToken(refreshToken)).thenReturn(member);
+        when(refreshTokenService.findTokenByRefreshToken(refreshToken)).thenReturn(token);
+
+        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
+        ReissueTokenResponse response = authService.reissueAccessToken(request);
+
+        Assertions.assertAll(
+                () -> assertNotNull(response),
+                () -> assertEquals(member.getReportCount(), response.getUserReportCount())
+        );
+    }
+
+    @Test
+    @DisplayName("만료되지 않은 액세스 토큰을 가지고 재발급 요청 시 예외 발생")
+    void reissueAccessTokenFailsWhenNotExpired() {
+        String refreshToken = "valid-refresh-token";
+        Date now = new Date();
+        long futureValidityInMilliseconds = 3600000L;
+        String validAccessToken = Jwts.builder()
+                .setExpiration(new Date(now.getTime() + futureValidityInMilliseconds))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+        String encodedPassword = passwordEncoder.encode("a1b2c3d4");
+        Member member = new Member("kth990303@naver.com", encodedPassword, "케이");
+
+        Token token = new Token(member.getId(), refreshToken, validAccessToken, 999);
+        when(refreshTokenService.getMemberFromRefreshToken(refreshToken)).thenReturn(member);
+        when(refreshTokenService.findTokenByRefreshToken(refreshToken)).thenReturn(token);
+
+        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
+
+        assertThrows(NotExpiredAccessTokenException.class,
+                () -> authService.reissueAccessToken(request));
     }
 }

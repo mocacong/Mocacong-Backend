@@ -11,6 +11,4 @@ import lombok.NoArgsConstructor;
 public class CommentReportResponse {
 
     private int commentReportCount;
-
-    private int userReportCount;
 }

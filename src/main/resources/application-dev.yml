@@ -31,7 +31,8 @@ spring:
 
 security.jwt.token:
   secret-key: ${JWT_SECRET_KEY}
-  expire-length: ${JWT_EXPIRE_LENGTH}
+  access-key-expire-length: ${JWT_ACCESS_EXPIRE_LENGTH}
+  refresh-key-expire-length: ${JWT_REFRESH_EXPIRE_LENGTH}
 
 springdoc:
   default-consumes-media-type: application/json

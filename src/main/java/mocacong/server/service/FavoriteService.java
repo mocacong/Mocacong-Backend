@@ -41,7 +41,7 @@ public class FavoriteService {
 
         try {
             Favorite favorite = new Favorite(member, cafe);
-            return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId(), member.getReportCount());
+            return new FavoriteSaveResponse(favoriteRepository.save(favorite).getId());
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyExistsFavorite();
         }

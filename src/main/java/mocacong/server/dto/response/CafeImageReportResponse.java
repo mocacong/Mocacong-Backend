@@ -11,6 +11,4 @@ import lombok.NoArgsConstructor;
 public class CafeImageReportResponse {
 
     private int cafeImageReportCount;
-
-    private int userReportCount;
 }

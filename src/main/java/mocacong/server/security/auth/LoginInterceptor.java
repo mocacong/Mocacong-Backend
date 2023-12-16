@@ -1,10 +1,11 @@
 package mocacong.server.security.auth;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -20,8 +21,8 @@ public class LoginInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String token = AuthorizationExtractor.extractAccessToken(request);
-        jwtTokenProvider.validateToken(token);
+        String accessToken = AuthorizationExtractor.extractAccessToken(request);
+        jwtTokenProvider.validateAccessToken(accessToken);
         return true;
     }
 

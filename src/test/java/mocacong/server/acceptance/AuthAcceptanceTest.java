@@ -15,7 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -47,8 +49,11 @@ public class AuthAcceptanceTest extends AcceptanceTest {
                 .extract()
                 .as(TokenResponse.class);
 
-        assertNotNull(tokenResponse);
-        assertNotNull(tokenResponse.getToken());
+        assertAll(
+                () -> assertNotNull(tokenResponse),
+                () -> assertNotNull(tokenResponse.getAccessToken()),
+                () -> assertNotNull(tokenResponse.getRefreshToken())
+        );
     }
 
     @Test

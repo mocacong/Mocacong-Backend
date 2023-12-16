@@ -3,16 +3,18 @@ package mocacong.server.security.auth.apple;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import mocacong.server.exception.unauthorized.AccessTokenExpiredException;
+import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import java.security.*;
 import java.util.Date;
 import java.util.Map;
-import mocacong.server.exception.unauthorized.InvalidTokenException;
-import mocacong.server.exception.unauthorized.TokenExpiredException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 class AppleJwtParserTest {
 
@@ -45,7 +47,7 @@ class AppleJwtParserTest {
     @DisplayName("올바르지 않은 형식의 Apple identity token으로 헤더를 파싱하면 예외를 반환한다")
     void parseHeadersWithInvalidToken() {
         assertThatThrownBy(() -> appleJwtParser.parseHeaders("invalidToken"))
-                .isInstanceOf(InvalidTokenException.class);
+                .isInstanceOf(InvalidAccessTokenException.class);
     }
 
     @Test
@@ -97,7 +99,7 @@ class AppleJwtParserTest {
                 .compact();
 
         assertThatThrownBy(() -> appleJwtParser.parsePublicKeyAndGetClaims(identityToken, publicKey))
-                .isInstanceOf(TokenExpiredException.class);
+                .isInstanceOf(AccessTokenExpiredException.class);
     }
 
     @Test
@@ -122,6 +124,6 @@ class AppleJwtParserTest {
                 .compact();
 
         assertThatThrownBy(() -> appleJwtParser.parsePublicKeyAndGetClaims(identityToken, differentPublicKey))
-                .isInstanceOf(InvalidTokenException.class);
+                .isInstanceOf(InvalidAccessTokenException.class);
     }
 }
