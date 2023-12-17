@@ -35,7 +35,7 @@ public class RefreshTokenService {
                 .expiration(validityRefreshTokenInMilliseconds) // 리프레시 토큰 유효기간
                 .build();
 
-        redisTemplate.opsForValue().set(refreshToken, token, validityRefreshTokenInMilliseconds, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(refreshToken, token, validityRefreshTokenInMilliseconds, TimeUnit.MILLISECONDS);
     }
 
     public Member getMemberFromRefreshToken(String refreshToken) {
