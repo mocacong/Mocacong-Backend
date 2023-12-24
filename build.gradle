@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.9'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'jacoco'
 }
 
 group = 'mocacong'
@@ -16,6 +17,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+}
+
+jacoco {
+    toolVersion = '0.8.8'
 }
 
 repositories {
@@ -47,4 +52,78 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports{
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(true)
+        html.destination file("$buildDir/reports/jacoco/index.html")
+        xml.destination file("$buildDir/reports/jacoco/index.xml")
+        csv.destination file("$buildDir/reports/jacoco/index.csv")
+    }
+
+    def Qdomains = []
+    for (qPattern in "**/QA" .. "**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: [
+                            // 측정 안하고 싶은 패턴
+                            "**/*Application*",
+                            "**/*Controller*",
+                            "**/config/*",
+                            "**/dto/*",
+                            "**/exception/*",
+                            "**/security/*",
+                            "**/support/*"
+                            // Querydsl 관련 제거
+                    ] + Qdomains)
+                })
+        )
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    def Qdomains = []
+    for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
+        Qdomains.add(qPattern + '*')
+    }
+
+    violationRules {
+        rule {
+            failOnViolation = false
+            enabled = true
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+
+            excludes = [
+                    "**.*Application*",
+                    "**.*Controller*",
+                    "**.config.*",
+                    "**.dto.*",
+                    "**.exception.*",
+                    "**.security.*",
+                    "**.support.*"
+            ] + Qdomains
+        }
+    }
 }
