@@ -24,6 +24,26 @@ jacoco {
     toolVersion = '0.8.8'
 }
 
+test {
+    useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
+}
+
+def Qdomains = []
+for (qPattern in "**/QA" .. "**/QZ") {
+    Qdomains.add(qPattern + "*")
+}
+
+def jacocoExcludePatterns = [
+        "**/*Application*",
+        "**/*Controller*",
+        "**/config/*",
+        "**/dto/*",
+        "**/exception/*",
+        "**/security/*",
+        "**/support/*"
+]
+
 sonar {
     properties {
         property 'sonar.host.url', 'https://sonarcloud.io'
@@ -33,10 +53,62 @@ sonar {
         property 'sonar.sources', 'src'
         property 'sonar.language', 'java'
         property 'sonar.sourceEncoding', 'UTF-8'
-        property 'sonar.exclusions', '**/*Application*.java, **/*Controller*.java, **/config/**, **/dto/**, ' +
-                '**/exception/**, **/security/**, **/support/**'
+        property 'sonar.exclusions', jacocoExcludePatterns.join(',')
         property 'sonar.test.inclusions', '**/*Test*.java'
         property 'sonar.java.coveragePlugin', 'jacoco'
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports{
+        html.required.set(true)
+        xml.required.set(true)
+        csv.required.set(true)
+        html.destination file("$buildDir/reports/jacoco/index.html")
+        xml.destination file("$buildDir/reports/jacoco/index.xml")
+        csv.destination file("$buildDir/reports/jacoco/index.csv")
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes: jacocoExcludePatterns + Qdomains)
+                })
+        )
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            failOnViolation = false
+            enabled = true
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+
+            excludes = [
+                    '**.*Application*',
+                    '**.*Controller*',
+                    '**.config.*',
+                    '**.dto.*',
+                    '**.exception.*',
+                    '**.security.*',
+                    '**.support.*'
+            ] + Qdomains
+        }
     }
 }
 
@@ -65,82 +137,4 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured'
     testImplementation 'it.ozimov:embedded-redis:0.7.2'
-}
-
-test {
-    useJUnitPlatform()
-    finalizedBy 'jacocoTestReport'
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports{
-        html.required.set(true)
-        xml.required.set(true)
-        csv.required.set(true)
-        html.destination file("$buildDir/reports/jacoco/index.html")
-        xml.destination file("$buildDir/reports/jacoco/index.xml")
-        csv.destination file("$buildDir/reports/jacoco/index.csv")
-    }
-
-    def Qdomains = []
-    for (qPattern in "**/QA" .. "**/QZ") {
-        Qdomains.add(qPattern + "*")
-    }
-
-    afterEvaluate {
-        classDirectories.setFrom(
-                files(classDirectories.files.collect {
-                    fileTree(dir: it, excludes: [
-                            // 측정 안하고 싶은 패턴
-                            "**/*Application*",
-                            "**/*Controller*",
-                            "**/config/*",
-                            "**/dto/*",
-                            "**/exception/*",
-                            "**/security/*",
-                            "**/support/*"
-                            // Querydsl 관련 제거
-                    ] + Qdomains)
-                })
-        )
-    }
-    finalizedBy 'jacocoTestCoverageVerification'
-}
-
-jacocoTestCoverageVerification {
-    def Qdomains = []
-    for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
-        Qdomains.add(qPattern + '*')
-    }
-
-    violationRules {
-        rule {
-            failOnViolation = false
-            enabled = true
-            element = 'CLASS'
-
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.70
-            }
-
-            limit {
-                counter = 'BRANCH'
-                value = 'COVEREDRATIO'
-                minimum = 0.70
-            }
-
-            excludes = [
-                    "**.*Application*",
-                    "**.*Controller*",
-                    "**.config.*",
-                    "**.dto.*",
-                    "**.exception.*",
-                    "**.security.*",
-                    "**.support.*"
-            ] + Qdomains
-        }
-    }
 }
