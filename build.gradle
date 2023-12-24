@@ -45,7 +45,7 @@ sonar {
         property 'sonar.sourceEncoding', 'UTF-8'
         property 'sonar.exclusions', '**/test/**, **/resources/**, **/*Application*.java, **/*Controller*.java ,**/config/**, **/dto/**, ' +
                 '**/exception/**, **/security/**, **/support/**, **/Q*.java'
-        property 'sonar.test.inclusions', '**/*Test*.java'
+        property 'sonar.test.inclusions', '**/*Test.java'
         property 'sonar.java.coveragePlugin', 'jacoco'
     }
 }
