@@ -10,15 +10,30 @@
 ![Group 301](https://github.com/mocacong/Mocacong-Backend/assets/69844138/008dad54-7ad5-4c5a-a614-927887457c32)
 <br>
 
-## ⚒️ Tech Stack
-- `Language`: Java 11, JUnit 5
-- `Framework`: Spring Boot 2.7.9
-- `Database`: H2, Amazon RDS for MySQL, Amazon Elasticache for Redis
-- `ORM`: JPA (Spring Data JPA)
-- `Deploy`: Github Actions, Docker CI/CD
-- `Logging`: Logback, AWS Cloudwatch, AWS Lambda, Slack API
-- `API Docs`: SpringDoc Swagger 3
-- `Performance Test`: nGrinder
+## 💻 Server Architecture
+### 📦 Dependency
+- Java 11, Junit 5
+- Spring Boot 2.7.9
+- MySQL
+
+<br>
+
+### 🤲 AWS Architechture Diagram
+<p align="center">
+  <img width="90%" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/27e4efcd-1d2e-4aca-a7c2-d655dede951a">
+</p>
+
+<br>
+
+## 🛠️ Tech Stack
+#### Framework - <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-social&logo=Spring Boot&logoColor=white">  <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-social&logo=Gradle&logoColor=white">
+#### Database - <img src ="https://img.shields.io/badge/H2 Database-blue"> <img src="https://img.shields.io/badge/Amazon RDS for MySQL-527FFF?style=for-the-sociak&logo=Amazon RDS&logoColor=white"> <img src="https://img.shields.io/badge/Amazon Elasticache for Redis-DC382D?style=for-the-sociak&logo=redis&logoColor=white">
+#### ORM - <img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?style=for-the-social&logo=Databricks&logoColor=white">
+#### Deploy - <img src="https://img.shields.io/badge/Github Actions-2088FF?style=for-the-sociak&logo=githubactions&logoColor=white"> <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-sociak&logo=docker&logoColor=white">
+#### Logging - Logback, <img src="https://img.shields.io/badge/AWS Cloudwatch-FF4F8B?style=for-the-sociak&logo=amazoncloudwatch&logoColor=white"> <img src="https://img.shields.io/badge/AWS Lambda-FF9900?style=for-the-sociak&logo=awslambda&logoColor=white"> <img src="https://img.shields.io/badge/Slack API-4A154B?style=for-the-social&logo=slack&logoColor=white">
+#### API Docs - <img src="https://img.shields.io/badge/SpringDoc Swagger 3-85EA2D?style=for-the-sociak&logo=swagger&logoColor=white">
+#### Performance Test - <img src="https://img.shields.io/badge/nGrinder-orange">
+#### Test - <img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-sociak&logo=junit5&logoColor=white"> <img src="https://img.shields.io/badge/CodeCov-F01F7A?style=for-the-sociak&logo=codecov&logoColor=white">
 
 <br>
 
@@ -26,13 +41,6 @@
 ### 🐬 MySQL
 <p align="center">
   <img width="90%" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/69844138/969731a8-8852-46ba-9bdd-bbf515215b6d">
-</p>
-
-<br>
-
-## 💻 Server Architecture
-<p align="center">
-  <img width="90%" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/57135043/27e4efcd-1d2e-4aca-a7c2-d655dede951a">
 </p>
 
 <br>
