@@ -26,4 +26,9 @@ public class BatchConfig {
     public void activateInactivateMembers() {
         memberService.setActiveAfter60days();
     }
+
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정에 실행
+    public void deleteLogicallyDeletedMember() {
+        memberService.deleteLogicallyDeletedMemberAfter30Days();
+    }
 }

@@ -16,7 +16,7 @@ import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DataJpaTest
+@RepositoryTest
 class MemberRepositoryTest {
 
     @Autowired
@@ -49,7 +49,7 @@ class MemberRepositoryTest {
         memberRepository.save(member1);
         memberRepository.save(member2);
 
-        LocalDate thresholdDateTime = LocalDate.now();
+        LocalDate thresholdDateTime = LocalDate.now().plusDays(1);
         Instant instant = thresholdDateTime.atStartOfDay(ZoneId.systemDefault()).toInstant();
         Date thresholdDate = Date.from(instant);
         Status oldStatus = Status.INACTIVE;
