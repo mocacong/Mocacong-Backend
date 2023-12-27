@@ -33,12 +33,11 @@
 #### Logging - Logback, <img src="https://img.shields.io/badge/AWS Cloudwatch-FF4F8B?style=for-the-sociak&logo=amazoncloudwatch&logoColor=white"> <img src="https://img.shields.io/badge/AWS Lambda-FF9900?style=for-the-sociak&logo=awslambda&logoColor=white"> <img src="https://img.shields.io/badge/Slack API-4A154B?style=for-the-social&logo=slack&logoColor=white">
 #### API Docs - <img src="https://img.shields.io/badge/SpringDoc Swagger 3-85EA2D?style=for-the-sociak&logo=swagger&logoColor=white">
 #### Performance Test - <img src="https://img.shields.io/badge/nGrinder-orange">
-#### Test - <img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-sociak&logo=junit5&logoColor=white"> <img src="https://img.shields.io/badge/CodeCov-F01F7A?style=for-the-sociak&logo=codecov&logoColor=white">
+#### Test - <img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-sociak&logo=junit5&logoColor=white"> <img src="https://img.shields.io/badge/RestAssured-25A162"> <img src="https://img.shields.io/badge/CodeCov-F01F7A?style=for-the-sociak&logo=codecov&logoColor=white">
 
 <br>
 
 ## 🖇️ DataBase Schema
-### 🐬 MySQL
 <p align="center">
   <img width="90%" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/69844138/969731a8-8852-46ba-9bdd-bbf515215b6d">
 </p>
