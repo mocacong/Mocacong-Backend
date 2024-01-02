@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.9'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'jacoco'
+    id 'org.sonarqube' version '4.2.1.3168'
 }
 
 group = 'mocacong'
@@ -45,6 +47,92 @@ dependencies {
     testImplementation 'it.ozimov:embedded-redis:0.7.2'
 }
 
+jacoco {
+    toolVersion = '0.8.8'
+}
+
 test {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
+}
+
+def Qdomains = []
+for (qPattern in "**/QA" .. "**/QZ") {
+    Qdomains.add(qPattern + "*")
+}
+
+sonar {
+    properties {
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.organization', 'mocacong'
+        property 'sonar.projectKey', 'mocacong_Mocacong-Backend'
+        property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/index.xml'
+        property 'sonar.sources', 'src'
+        property 'sonar.language', 'java'
+        property 'sonar.sourceEncoding', 'UTF-8'
+        property 'sonar.exclusions', '**/test/**, **/resources/**, **/*Application*.java, **/*Controller*.java, **/*Config.java' +
+                '**/*Response.java, **/*Exception.java, **/security/**, **/support/**, **/Q*.java'
+        property 'sonar.test.inclusions', '**/*Test.java'
+        property 'sonar.java.coveragePlugin', 'jacoco'
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports{
+        html.required.set(true)
+        xml.required.set(true)
+        html.destination file("$buildDir/reports/jacoco/index.html")
+        xml.destination file("$buildDir/reports/jacoco/index.xml")
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, excludes:
+                            [
+                                    "**/*Application*",
+                                    "**/*Controller*",
+                                    "**/config/*",
+                                    "**/dto/*",
+                                    "**/exception/*",
+                                    "**/security/*",
+                                    "**/support/*"
+                            ]+ Qdomains)
+                })
+        )
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            failOnViolation = false
+            enabled = true
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+
+            excludes = [
+                    '**.*Application*',
+                    '**.*Controller*',
+                    '**.config.*',
+                    '**.dto.*',
+                    '**.exception.*',
+                    '**.security.*',
+                    '**.support.*'
+            ] + Qdomains
+        }
+    }
 }

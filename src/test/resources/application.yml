@@ -12,6 +12,7 @@ spring:
           enabled: true
         show_sql: true
         format_sql: true
+        default_batch_fetch_size: 100
   redis:
     host: localhost
     port: 16379
@@ -24,7 +25,8 @@ spring:
 
 security.jwt.token:
   secret-key: testtesttesttesttesttesttesttesttesttest
-  expire-length: 864000
+  access-key-expire-length: 864000
+  refresh-key-expire-length: 1728000
 
 cloud:
   aws:
@@ -56,7 +58,3 @@ oauth:
     iss: https://appleid.apple.com
     client-id: test
     nonce: nonce
-  kakao:
-    client-id: test
-    client-secret: test
-    redirect-uri: test

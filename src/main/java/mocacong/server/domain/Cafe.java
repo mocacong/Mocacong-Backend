@@ -29,6 +29,12 @@ public class Cafe extends BaseTime {
     @Column(name = "map_id", unique = true, nullable = false)
     private String mapId;
 
+    @Column(name = "road_address")
+    private String roadAddress;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @OneToMany(mappedBy = "cafe", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score;
 
@@ -54,6 +60,29 @@ public class Cafe extends BaseTime {
         this.comments = new ArrayList<>();
     }
 
+    public Cafe(String mapId, String name, String roadAddress) {
+        this.mapId = mapId;
+        this.name = name;
+        this.roadAddress = roadAddress;
+        this.cafeDetail = new CafeDetail();
+        this.cafeImages = new ArrayList<>();
+        this.score = new ArrayList<>();
+        this.reviews = new ArrayList<>();
+        this.comments = new ArrayList<>();
+    }
+
+    public Cafe(String mapId, String name, String roadAddress, String phoneNumber) {
+        this.mapId = mapId;
+        this.name = name;
+        this.roadAddress = roadAddress;
+        this.phoneNumber = phoneNumber;
+        this.cafeDetail = new CafeDetail();
+        this.cafeImages = new ArrayList<>();
+        this.score = new ArrayList<>();
+        this.reviews = new ArrayList<>();
+        this.comments = new ArrayList<>();
+    }
+
     public void updateCafeDetails() {
         StudyType studyType = getMostFrequentStudyType();
         Wifi wifi = Wifi.averageFrom(reviews.stream().map(Review::getWifi)
@@ -69,6 +98,10 @@ public class Cafe extends BaseTime {
         Sound sound = Sound.averageFrom(reviews.stream().map(Review::getSound)
                 .filter(Objects::nonNull).mapToDouble(Sound::getScore).average().orElse(NONE_REVIEW_SCORE));
         this.cafeDetail = new CafeDetail(studyType, wifi, parking, toilet, desk, power, sound);
+    }
+
+    public void updateCafeRoadAddress(String roadAddress) {
+        this.roadAddress = roadAddress;
     }
 
     private StudyType getMostFrequentStudyType() {
@@ -106,5 +139,22 @@ public class Cafe extends BaseTime {
 
     public void addReview(Review review) {
         this.reviews.add(review);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Cafe)) {
+            return false;
+        }
+        Cafe cafe = (Cafe) o;
+        return Objects.equals(mapId, cafe.mapId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mapId);
     }
 }

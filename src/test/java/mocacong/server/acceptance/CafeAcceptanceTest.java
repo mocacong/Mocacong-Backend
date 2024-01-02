@@ -21,7 +21,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("카페를 정상적으로 등록한다")
     void cafeSave() {
-        CafeRegisterRequest request = new CafeRegisterRequest("1", "메리네 카페");
+        CafeRegisterRequest request = new CafeRegisterRequest("1", "메리네 카페", "서울시 강남구", "010-1234-5678");
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -36,7 +36,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 카페 정보를 조회한다")
     void findCafe() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -55,7 +55,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페에 대한 리뷰를 작성한다")
     void saveCafeReview() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -83,7 +83,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페에 대해 내가 작성한 리뷰를 조회한다")
     void findMyCafeReview() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -103,7 +103,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페에 대한 리뷰를 다시 작성할 수 없다")
     void saveCafeReviewManyTimes() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
@@ -126,7 +126,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("등록한 카페에 대한 리뷰를 수정한다")
     void updateCafeReview() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-5678"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
@@ -157,7 +157,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("등록하지 않은 카페에 대한 리뷰는 수정할 수 없다")
     void updateCafeReviewNotFoundReview() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "서울시 강남구", "010-1234-5678"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
@@ -178,7 +178,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("카페 정보를 미리보기한다")
     void previewCafe() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페", "100", "010-1234-5678"));
 
         MemberSignUpRequest signUpRequest1 = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         MemberSignUpRequest signUpRequest2 = new MemberSignUpRequest("dlawotn3@naver.com", "a1b2c3d4", "메리");
@@ -206,9 +206,9 @@ public class CafeAcceptanceTest extends AcceptanceTest {
         String mapId1 = "12332312";
         String mapId2 = "12355412";
         String mapId3 = "18486512";
-        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페 본점"));
-        카페_등록(new CafeRegisterRequest(mapId2, "메리네 카페 2호점"));
-        카페_등록(new CafeRegisterRequest(mapId3, "메리네 카페 3호점"));
+        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페 본점", "서울시 강남구", "010-1234-5678"));
+        카페_등록(new CafeRegisterRequest(mapId2, "메리네 카페 2호점", "서울시 강남구", "010-1234-5678"));
+        카페_등록(new CafeRegisterRequest(mapId3, "메리네 카페 3호점", "서울시 강남구", "010-1234-5678"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
@@ -242,9 +242,9 @@ public class CafeAcceptanceTest extends AcceptanceTest {
         String mapId1 = "12332312";
         String mapId2 = "12355412";
         String mapId3 = "18486512";
-        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페 본점"));
-        카페_등록(new CafeRegisterRequest(mapId2, "메리네 카페 2호점"));
-        카페_등록(new CafeRegisterRequest(mapId3, "메리네 카페 3호점"));
+        카페_등록(new CafeRegisterRequest(mapId1, "메리네 카페 본점", "서울시 강남구", "010-1234-5678"));
+        카페_등록(new CafeRegisterRequest(mapId2, "메리네 카페 2호점", "서울시 강남구", "010-1234-5678"));
+        카페_등록(new CafeRegisterRequest(mapId3, "메리네 카페 3호점", "서울시 강남구", "010-1234-5678"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());
@@ -270,7 +270,7 @@ public class CafeAcceptanceTest extends AcceptanceTest {
     @DisplayName("특정 카페 이미지들을 조회한다")
     void getCafeImages() {
         String mapId = "12332312";
-        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페 본점"));
+        카페_등록(new CafeRegisterRequest(mapId, "메리네 카페 본점", "서울시 강남구", "010-1234-5678"));
         MemberSignUpRequest signUpRequest = new MemberSignUpRequest("kth990303@naver.com", "a1b2c3d4", "케이");
         회원_가입(signUpRequest);
         String token = 로그인_토큰_발급(signUpRequest.getEmail(), signUpRequest.getPassword());

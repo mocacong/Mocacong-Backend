@@ -20,12 +20,10 @@ public class CafeReviewResponse {
     private String sound;
     private String desk;
     private int reviewsCount;
-    private int userReportCount;
 
     public static CafeReviewResponse of(double score, Cafe cafe, Member member) {
         CafeDetail cafeDetail = cafe.getCafeDetail();
         int reviewsCount = cafe.getReviews().size();
-        int userReportCount = member.getReportCount();
 
         return new CafeReviewResponse(
                 score,
@@ -36,8 +34,7 @@ public class CafeReviewResponse {
                 cafeDetail.getPowerValue(),
                 cafeDetail.getSoundValue(),
                 cafeDetail.getDeskValue(),
-                reviewsCount,
-                userReportCount
+                reviewsCount
         );
     }
 }

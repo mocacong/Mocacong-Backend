@@ -24,7 +24,7 @@ class FavoriteRepositoryTest {
     @Test
     @DisplayName("카페 id, 멤버 id로 즐겨찾기 id를 조회한다")
     void findByCafeIdAndMemberId() {
-        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페"));
+        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페", "서울시 강남구"));
         Member savedMember = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         Favorite favorite = new Favorite(savedMember, savedCafe);
         favoriteRepository.save(favorite);
@@ -41,7 +41,7 @@ class FavoriteRepositoryTest {
     @Test
     @DisplayName("멤버 id가 null인 즐겨찾기들을 모두 삭제한다")
     void deleteAllByMemberIdIsNull() {
-        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페"));
+        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페", "서울시 강남구"));
         Favorite favorite = new Favorite(null, savedCafe);
         favoriteRepository.save(favorite);
 

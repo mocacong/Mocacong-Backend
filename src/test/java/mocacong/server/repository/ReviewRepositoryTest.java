@@ -23,7 +23,7 @@ class ReviewRepositoryTest {
     @Test
     @DisplayName("카페 id, 멤버 id로 해당 멤버가 특정 카페에 작성한 리뷰의 id를 조회한다")
     void findIdByCafeIdAndMemberId() {
-        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페"));
+        Cafe savedCafe = cafeRepository.save(new Cafe("1", "케이카페", "서울시 강남구"));
         Member savedMember = memberRepository.save(new Member("kth@naver.com", "abcd1234", "케이"));
         CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.COMFORTABLE, Power.MANY, Sound.LOUD);
         Review savedReview = reviewRepository.save(new Review(savedMember, savedCafe, cafeDetail));

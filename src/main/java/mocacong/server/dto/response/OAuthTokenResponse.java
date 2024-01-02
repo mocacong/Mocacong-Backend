@@ -8,7 +8,8 @@ import lombok.*;
 @ToString
 public class OAuthTokenResponse {
 
-    private String token;
+    private String accessToken;
+    private String refreshToken;
     private String email;
     private Boolean isRegistered;
     private String platformId;

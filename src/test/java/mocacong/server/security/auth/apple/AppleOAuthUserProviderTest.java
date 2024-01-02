@@ -4,7 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.security.*;
 import java.util.Date;
-import mocacong.server.exception.unauthorized.InvalidTokenException;
+import mocacong.server.exception.unauthorized.InvalidAccessTokenException;
 import mocacong.server.security.auth.OAuthPlatformMemberResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -87,6 +87,6 @@ class AppleOAuthUserProviderTest {
         when(appleClaimsValidator.isValid(any())).thenReturn(false);
 
         assertThatThrownBy(() -> appleOAuthUserProvider.getApplePlatformMember(identityToken))
-                .isInstanceOf(InvalidTokenException.class);
+                .isInstanceOf(InvalidAccessTokenException.class);
     }
 }

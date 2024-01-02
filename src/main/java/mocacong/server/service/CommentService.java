@@ -46,7 +46,7 @@ public class CommentService {
                 .orElseThrow(NotFoundMemberException::new);
         Comment comment = new Comment(cafe, member, content);
 
-        return new CommentSaveResponse(commentRepository.save(comment).getId(), member.getReportCount());
+        return new CommentSaveResponse(commentRepository.save(comment).getId());
     }
 
     @Transactional(readOnly = true)
@@ -81,9 +81,9 @@ public class CommentService {
         return comments.stream()
                 .map(comment -> {
                     if (comment.isWrittenByMember(member)) {
-                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), true);
+                        return new CommentResponse(comment.getId(), member.getImgUrl(), member.getNickname(), comment.getContent(), comment.getLikeCounts(), true);
                     } else {
-                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), false);
+                        return new CommentResponse(comment.getId(), comment.getWriterImgUrl(), comment.getWriterNickname(), comment.getContent(), comment.getLikeCounts(), false);
                     }
                 })
                 .collect(Collectors.toList());

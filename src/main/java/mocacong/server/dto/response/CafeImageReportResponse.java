@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CommentReportResponse {
+public class CafeImageReportResponse {
 
-    private int commentReportCount;
+    private int cafeImageReportCount;
 }

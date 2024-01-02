@@ -12,8 +12,8 @@ spring:
       hibernate:
         create_empty_composites:
           enabled: true
-        show_sql: true
         format_sql: true
+        default_batch_fetch_size: 100
   servlet:
     multipart:
       max-file-size: 10MB
@@ -31,7 +31,8 @@ spring:
 
 security.jwt.token:
   secret-key: ${JWT_SECRET_KEY}
-  expire-length: ${JWT_EXPIRE_LENGTH}
+  access-key-expire-length: ${JWT_ACCESS_EXPIRE_LENGTH}
+  refresh-key-expire-length: ${JWT_REFRESH_EXPIRE_LENGTH}
 
 springdoc:
   default-consumes-media-type: application/json
@@ -69,10 +70,6 @@ oauth:
     iss: https://appleid.apple.com
     client-id: ${OAUTH_APPLE_CLIENT_ID}
     nonce: ${OAUTH_APPLE_NONCE}
-  kakao:
-    client-id: ${OAUTH_KAKAO_CLIENT_ID}
-    client-secret: ${OAUTH_KAKAO_CLIENT_SECRET}
-    redirect-uri: ${OAUTH_KAKAO_REDIRECT_URI}
 
 mocacong:
   nonce: ${MOCACONG_NONCE}

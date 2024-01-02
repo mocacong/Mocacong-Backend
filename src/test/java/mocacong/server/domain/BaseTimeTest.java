@@ -38,7 +38,7 @@ class BaseTimeTest {
     public void updateCafeAtNow() {
         Member member = new Member("kth990303@naver.com", "a1b2c3d4", "케이");
         memberRepository.save(member);
-        Cafe cafe = new Cafe("2143154352323", "케이카페");
+        Cafe cafe = new Cafe("2143154352323", "케이카페", "100");
         cafeRepository.save(cafe);
         CafeDetail cafeDetail = new CafeDetail(StudyType.SOLO, Wifi.FAST, Parking.COMFORTABLE, Toilet.CLEAN, Desk.UNCOMFORTABLE, Power.MANY, Sound.LOUD);
         Review addReview = new Review(member, cafe, cafeDetail);

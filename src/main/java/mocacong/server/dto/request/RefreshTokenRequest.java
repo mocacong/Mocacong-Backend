@@ -8,14 +8,8 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @Getter
 @ToString
-public class CafeRegisterRequest {
-    @NotBlank(message = "1012:공백일 수 없습니다.")
-    private String mapId;
+public class RefreshTokenRequest {
 
     @NotBlank(message = "1012:공백일 수 없습니다.")
-    private String name;
-
-    private String roadAddress;
-
-    private String phoneNumber;
+    private String refreshToken;
 }

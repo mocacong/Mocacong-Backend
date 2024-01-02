@@ -10,8 +10,8 @@ spring:
       hibernate:
         create_empty_composites:
           enabled: true
-        show_sql: true
         format_sql: true
+        default_batch_fetch_size: 100
   task:
     execution:
       pool:
@@ -35,7 +35,8 @@ spring:
 
 security.jwt.token:
   secret-key: testtesttesttesttesttesttesttesttesttest
-  expire-length: 864000
+  access-key-expire-length: 864000
+  refresh-key-expire-length: 1728000
 
 springdoc:
   default-consumes-media-type: application/json
@@ -73,10 +74,6 @@ oauth:
     iss: https://appleid.apple.com
     client-id: ${OAUTH_APPLE_CLIENT_ID}
     nonce: ${OAUTH_APPLE_NONCE}
-  kakao:
-    client-id: ${OAUTH_KAKAO_CLIENT_ID}
-    client-secret: ${OAUTH_KAKAO_CLIENT_SECRET}
-    redirect-uri: ${OAUTH_KAKAO_REDIRECT_URI}
 
 mocacong:
   nonce: ${MOCACONG_NONCE}

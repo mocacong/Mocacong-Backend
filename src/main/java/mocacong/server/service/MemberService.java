@@ -127,8 +127,8 @@ public class MemberService {
         int randomNumber = random.nextInt(EMAIL_VERIFY_CODE_MAXIMUM_NUMBER + 1);
         String code = String.format("%04d", randomNumber);
         awsSESSender.sendToVerifyEmail(requestEmail, code);
-        String token = jwtTokenProvider.createToken(member.getId());
-        return new EmailVerifyCodeResponse(token, code);
+        String accessToken = jwtTokenProvider.createAccessToken(member.getId());
+        return new EmailVerifyCodeResponse(accessToken, code);
     }
 
     @Transactional

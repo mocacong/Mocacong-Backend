@@ -9,14 +9,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenResponse {
+public class ReissueTokenResponse {
     private String accessToken;
-
-    private String refreshToken;
 
     private int userReportCount;
 
-    public static TokenResponse from(final String accessToken, final String refreshToken, int userReportCount) {
-        return new TokenResponse(accessToken, refreshToken, userReportCount);
+    public static ReissueTokenResponse from(final String accessToken, int userReportCount) {
+        return new ReissueTokenResponse(accessToken, userReportCount);
     }
 }
