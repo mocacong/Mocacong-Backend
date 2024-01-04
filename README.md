@@ -4,11 +4,19 @@
 [![Google Play](https://img.shields.io/badge/Google_Play-414141?style=flat-square&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.konkuk.mocacong&hl=en-KR)
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fmocacong%2FMocacong-Backend&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mocacong_Mocacong-Backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mocacong_Mocacong-Backend)
+<br><br><br>
+
+![Artboard](https://github.com/mocacong/Mocacong-Backend/assets/69844138/3c0c2962-a4e0-4136-8120-516c123c51c4)
 <br><br>
 
 ## 🔎 Introduction
-![Group 301](https://github.com/mocacong/Mocacong-Backend/assets/69844138/008dad54-7ad5-4c5a-a614-927887457c32)
-<br>
+
+<p align="center" width="100%">
+    <img src="https://github.com/mocacong/Mocacong-Backend/assets/69844138/3ce38fb5-1a5a-4789-9a5a-bcc30ba78879" width="31%">
+    <img src="https://github.com/mocacong/Mocacong-Backend/assets/69844138/bd6506f6-17a4-45a3-9fd5-20a59764ac44" width="31%">
+    <img src="https://github.com/mocacong/Mocacong-Backend/assets/69844138/b07a2c9f-f00e-416c-9cac-7f3bc5511a2b" width="31%">
+</p>
+<br><br>
 
 ## 💻 Server Architecture
 ### 📦 Dependency
@@ -35,14 +43,14 @@
 #### Performance Test - <img src="https://img.shields.io/badge/nGrinder-orange">
 #### Test - <img src="https://img.shields.io/badge/JUnit5-25A162?style=for-the-sociak&logo=junit5&logoColor=white"> <img src="https://img.shields.io/badge/RestAssured-25A162"> <img src="https://img.shields.io/badge/CodeCov-F01F7A?style=for-the-sociak&logo=codecov&logoColor=white">
 
-<br>
+<br><br>
 
 ## 🖇️ DataBase Schema
 <p align="center">
   <img width="90%" alt="image" src="https://github.com/mocacong/Mocacong-Backend/assets/69844138/969731a8-8852-46ba-9bdd-bbf515215b6d">
 </p>
 
-<br>
+<br><br>
 
 ## 🙋🏻‍♂️ Server Engineers
 |                                                                                                                                                                                                                                                Taehyeon                                                                                                                                                                                                                                                 |                                                                                         Jisoo                                                                                          |                                                                                                                                                                                                                                                                  Jungwoo                                                                                                                                                                                                                                                                  |
