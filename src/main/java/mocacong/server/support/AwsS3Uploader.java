@@ -1,7 +1,13 @@
 package mocacong.server.support;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
+import com.amazonaws.services.s3.model.DeleteObjectsResult;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -23,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class AwsS3Uploader {
 
     private static final String S3_BUCKET_DIRECTORY_NAME = "static";
+    private static final int IMAGE_CHUNK_SIZE = 1000;
+
 
     private final AmazonS3Client amazonS3Client;
 
@@ -36,7 +44,8 @@ public class AwsS3Uploader {
         objectMetadata.setContentType(multipartFile.getContentType());
         objectMetadata.setContentLength(multipartFile.getSize());
 
-        String fileName = S3_BUCKET_DIRECTORY_NAME + "/" + UUID.randomUUID() + "." + multipartFile.getOriginalFilename();
+        String fileName =
+                S3_BUCKET_DIRECTORY_NAME + "/" + UUID.randomUUID() + "." + multipartFile.getOriginalFilename();
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
@@ -58,10 +67,15 @@ public class AwsS3Uploader {
     @EventListener
     public void deleteImages(DeleteNotUsedImagesEvent event) {
         List<String> imgUrls = event.getImgUrls();
+        Lists.partition(imgUrls, IMAGE_CHUNK_SIZE)
+                .forEach(this::deleteImagesByChunk);
+    }
+
+    private void deleteImagesByChunk(List<String> imgUrls) {
         List<DeleteObjectsRequest.KeyVersion> keys = new ArrayList<>();
         for (String imgUrl : imgUrls) {
             String fileName = S3_BUCKET_DIRECTORY_NAME + imgUrl.substring(imgUrl.lastIndexOf("/"));
-            keys.add(new DeleteObjectsRequest.KeyVersion(fileName));
+            keys.add(new KeyVersion(fileName));
         }
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucket).withKeys(keys);
         DeleteObjectsResult result = amazonS3Client.deleteObjects(deleteObjectsRequest);
